@@ -91,7 +91,6 @@ export class CursorContext {
     return definitionContext;
   };
   
-
   currentFileText() {
     return this.editor?.document.getText();
   }
