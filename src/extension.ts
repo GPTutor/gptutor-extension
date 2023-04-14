@@ -20,6 +20,24 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+
+	// TODO: Initialize GPTutor
+	// - Set OpenAI API key
+	// - configure GPTutor
+
+	// TODO: get code from editor
+	// - Get code from editor
+	// - Get cursor position
+	// - determine if cursor is selected Text or Hovering over some code
+
+	// TODO: get context from code
+
+	// TODO: send code to GPTutor API
+	// TODO: handle response from GPTutor API
+
+	// TODO: display response from GPTutor API
+	// - How to display response from GPTutor API??
 }
 
 // This method is called when your extension is deactivated
