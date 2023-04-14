@@ -10,7 +10,7 @@ import {
   Hover,
   MarkdownString,
 } from "vscode";
-import { openAiIsActive } from "./openAi";
+import { openAiIsActive, showAnswer } from "./openAi";
 import { getApiKey } from "./apiKey";
 import { CursorContext } from "./context/cursor.context";
 
@@ -57,6 +57,7 @@ export function activate(context: ExtensionContext) {
 	// TODO: configure GPTutor
 
 	// show Hover provider when hovering over code
+	// determine if cursor is selected Text or Hovering over some code 
 	context.subscriptions.push(
     languages.registerHoverProvider(["solidity", "javascript", "python"], {
       provideHover(document, position, token) {
@@ -86,20 +87,49 @@ export function activate(context: ExtensionContext) {
     })
   );
 
-	// TODO: determine if cursor is selected Text or Hovering over some code 
+	// ask GPTutor
+	context.subscriptions.push(
+    commands.registerCommand("Active GPTutor", async () => {
+      let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+      if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
+        await getApiKey(context);
+      }
+      const editor: any = window.activeTextEditor;
+      if (!editor) {
+        window.showErrorMessage("No active editor");
+        return;
+      }
+      const document = editor.document;
+      const currentTextLines = document.getText().split("\n");
+      const anchorPosition: any = cursorContext.anchorPosition;
+      // const currentLine = currentTextLines[cursorContext.anchorPosition?.c];
+      const question = `Question: why use ${cursorContext.currentText} at ${
+        currentTextLines[anchorPosition.c]
+      } in the ${document.languageId} code above?`;
+      const codeContext = currentTextLines
+        .slice(anchorPosition.c - 50, anchorPosition.c + 50)
+        .join("\n");
 
-	// TODO: get code from editor
-	// - Get code from editor
-	// - Get cursor position
-	// - determine if cursor is selected Text or Hovering over some code
+      const definitionContext = await cursorContext.getDefinitionContext();
+      const definitionContextPrompt = `The following is the source code of the line ${
+        currentTextLines[anchorPosition.c]
+      }:\n${definitionContext}`;
+
+      await showAnswer(OPEN_AI_API_KEY, {
+        question,
+        code_context: codeContext,
+        program_language: document.languageId,
+        definitionContextPrompt,
+      });
+      // TODO: GPT-3 Tokenizer is same as GPT-2, try use GPT2 Tokenizer to estimated the price.
+    })
+  );
 
 	// TODO: get context from code
-
-	// TODO: send code to GPTutor API
-	// TODO: handle response from GPTutor API
-
-	// TODO: display response from GPTutor API
+	// TODO: enhace display result
 	// - How to display response from GPTutor API??
+
+	cursorContext.init();
 }
 
 // This method is called when your extension is deactivated
