@@ -7,7 +7,7 @@ export type reqType = {
 export const getExplainRequestMsg = (
     languageId: string,
     codeContext: string,
-    question: string
+    selectedcode: string
 ): reqType[] => {
     return [
       {
@@ -16,14 +16,14 @@ export const getExplainRequestMsg = (
       },
       {
         role: "user",
-        content: `Here are target ${languageId} code : ${question}, please explain this code as detailed as possible, Here is some other information ${codeContext} if needed, Please focus on explain target ${languageId} code`,
+        content: `Here are target ${languageId} code : ${selectedcode}, please explain this code as detailed as possible, Here is some other information ${codeContext} if needed, Please focus on explain target ${languageId} code`,
       },
     ];
 };
 
 export const FirstAuditRequest = (
     languageId: string,
-    question: string
+    selectedcode: string
 ): reqType[] => {
     return [
       {
@@ -32,7 +32,7 @@ export const FirstAuditRequest = (
       },
       {
         role: "user",
-        content: `Here are ${languageId} code : ${question}, \n if there is a problem with this ${languageId} code or if there is a security concern, modify this ${languageId} code. \n Please only provide code that after modify`,
+        content: `Here are ${languageId} code : ${selectedcode}, \n if there is a problem with this ${languageId} code or if there is a security concern, modify this ${languageId} code. \n Please only provide code that after modify`,
       },
     ];
 };
@@ -40,7 +40,7 @@ export const FirstAuditRequest = (
 export const getAuditRequestMsg = (
     languageId: string,
     previousanswer: string,
-    question: string
+    selectedcode: string
 ): reqType[] => {
     return [
       {
@@ -49,8 +49,26 @@ export const getAuditRequestMsg = (
       },
       {
         role: "user",
-        content: `The original given ${languageId} code is as follows: ${question} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, return original answer.`,
+        content: `The original given ${languageId} code is as follows: ${selectedcode} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, return original answer.`,
       },
     ];
+};
+
+
+export const CustomizePrompt = (
+  userinput : string, 
+  languageId : string,
+  selectedcode: string
+): reqType[] => {
+  return [
+    {
+      role: "system",
+      content: `I want you to act as a Senior ${languageId} Developer. \n Expertise in analyzing ${languageId} code and solving smart contract problems`,
+    },
+    {
+      role: "user",
+      content: `Give question : ${userinput} \n And given code : ${selectedcode} \n Please answer ${userinput} as detail as possible `,
+    },
+  ];
 };
   

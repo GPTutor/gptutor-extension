@@ -108,8 +108,13 @@ export function activate(context: ExtensionContext) {
       const question = `Question: why use ${cursorContext.currentText} at ${
         currentTextLines[anchorPosition.c]
       } in the ${document.languageId} code above?`;
-      const codeContext = currentTextLines
-        .slice(anchorPosition.c - 50, anchorPosition.c + 50)
+      
+      const ExplainContext = currentTextLines
+        .slice(anchorPosition.c - 300, anchorPosition.c + 300)
+        .join("\n");
+      
+      const AuditContext = currentTextLines
+        .slice(0, currentTextLines.length)
         .join("\n");
 
       const definitionContext = await cursorContext.getDefinitionContext();
@@ -119,7 +124,7 @@ export function activate(context: ExtensionContext) {
 
       await showAnswer(OPEN_AI_API_KEY, {
         question,
-        code_context: codeContext,
+        code_context: ExplainContext,
         program_language: document.languageId,
         definitionContextPrompt,
       });
