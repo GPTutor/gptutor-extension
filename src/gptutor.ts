@@ -6,6 +6,7 @@ import {
   getExplainRequestMsg,
   FirstAuditRequest,
   getAuditRequestMsg,
+  FirstReplyForGpt3,
 } from "./prompt";
 
 export class GPTutor implements vscode.WebviewViewProvider {
@@ -103,22 +104,18 @@ export class GPTutor implements vscode.WebviewViewProvider {
           });
           break;
         case "Audit":
-          const auditsearchPrompt = FirstAuditRequest(
-            prompt.languageId,
-            prompt.selectedCode,
-            prompt.auditContext || ""
-          );
-          const completion1 = await this.openAiProvider.ask(
-            model,
-            auditsearchPrompt
-          );
-          this.currentResponse =
-            completion1.data.choices[0].message?.content || "";
+          
 
           if (model === DefaultOpenAiModel) {
+            const p1 = FirstReplyForGpt3(
+              prompt.languageId,
+              prompt.selectedCode,
+              prompt.auditContext || ""
+            );
+            const completion1 = await this.openAiProvider.ask(model, p1);
             const auditsearchPrompt2 = getAuditRequestMsg(
               prompt.languageId,
-              this.currentResponse,
+              completion1.data.choices[0].message?.content || "",
               prompt.selectedCode
             );
             const completion2 = await this.openAiProvider.ask(
@@ -127,6 +124,18 @@ export class GPTutor implements vscode.WebviewViewProvider {
             );
             this.currentResponse =
               completion2.data.choices[0].message?.content || "";
+          } else {
+            const auditsearchPrompt = FirstAuditRequest(
+              prompt.languageId,
+              prompt.selectedCode,
+              prompt.auditContext || ""
+            );
+            const completion1 = await this.openAiProvider.ask(
+              model,
+              auditsearchPrompt
+            );
+            this.currentResponse =
+              completion1.data.choices[0].message?.content || "";
           }
 
           break;

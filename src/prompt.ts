@@ -44,6 +44,23 @@ export const FirstAuditRequest = (
   ];
 };
 
+export const FirstReplyForGpt3 = (
+  languageId: string,
+  selectedCode : string,
+  codeContext : string
+): reqType[] => {
+  return [
+    {
+      role: "system",
+      content: `I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
+    },
+    {
+      role: "user",
+      content : `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed \n Only return the code after modified`
+    },
+  ];
+};
+
 export const getAuditRequestMsg = (
   languageId: string,
   previousanswer: string,
