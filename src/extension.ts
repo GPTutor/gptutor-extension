@@ -42,14 +42,14 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
+  gptutor.registerVscode();
 
   // Initialize GPTutor
   context.subscriptions.push(
     commands.registerCommand("Initialize GPTutor", async () => {
       let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+      gptutor.setOpenAiKey(OPEN_AI_API_KEY);
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
-        gptutor.setOpenAiKey(OPEN_AI_API_KEY);
-        gptutor.registerVscode();
         window.showInformationMessage(`GPTutor Activate Successfully!`);
       } else {
         await getApiKey(context);
@@ -81,15 +81,15 @@ export function activate(context: ExtensionContext) {
         }
         const codeBlockContent = new MarkdownString();
         codeBlockContent.appendCodeblock(
-          `/**
-  * GPTutor 🤖
+          `/** GPTutor 🤖
+  * 
   */`
         );
         codeBlockContent.appendCodeblock(cursorContext.currentText, document.languageId);
         const activeCommandUri = Uri.parse(`command:Active GPTutor`);
-        const chatCommandUri = Uri.parse(`command:Chat GPTutor`);
+        // const chatCommandUri = Uri.parse(`command:Chat GPTutor`);
         const command = new MarkdownString(
-          `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Chat](${chatCommandUri})`
+          `[🤖 GPTutor](${activeCommandUri})` //  &nbsp;&nbsp; [🕵️ Chat](${chatCommandUri})
         );
         command.isTrusted = true;
         return new Hover([codeBlockContent, command]);
@@ -97,7 +97,7 @@ export function activate(context: ExtensionContext) {
     })
   );
   context.subscriptions.push(
-    commands.registerCommand("Chat GPTutor", async () => {
+    commands.registerCommand("Active GPTutor", async () => {
       const editor: any = window.activeTextEditor;
       const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
 
@@ -109,36 +109,36 @@ export function activate(context: ExtensionContext) {
     })
   );
 
-  context.subscriptions.push(
-    commands.registerCommand("Active GPTutor", async () => {
-      let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
-      if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
-        await getApiKey(context);
-      }
-      const editor: any = window.activeTextEditor;
-      if (!editor) {
-        window.showErrorMessage("No active editor");
-        return;
-      }
-      const document = editor.document;
+  // context.subscriptions.push(
+  //   commands.registerCommand("Active GPTutor", async () => {
+  //     let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+  //     if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
+  //       await getApiKey(context);
+  //     }
+  //     const editor: any = window.activeTextEditor;
+  //     if (!editor) {
+  //       window.showErrorMessage("No active editor");
+  //       return;
+  //     }
+  //     const document = editor.document;
 
-      const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
-      await showAnswer(OPEN_AI_API_KEY, {
-        question: cursorContext.currentText,
-        code_context: explainContext,
-        program_language: languageId,
-      });
+  //     const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
+  //     await showAnswer(OPEN_AI_API_KEY, {
+  //       question: cursorContext.currentText,
+  //       code_context: explainContext,
+  //       program_language: languageId,
+  //     });
       
-      // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
+  //     // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
 
-      // await showAnswer(OPEN_AI_API_KEY, {
-      //   question,
-      //   code_context: codeContext,
-      //   program_language: editor.document.languageId,
-      //   definitionContextPrompt,
-      // });
-    })
-  );
+  //     // await showAnswer(OPEN_AI_API_KEY, {
+  //     //   question,
+  //     //   code_context: codeContext,
+  //     //   program_language: editor.document.languageId,
+  //     //   definitionContextPrompt,
+  //     // });
+  //   })
+  // );
 
 	// TODO: get context from code
 	// TODO: enhace display result

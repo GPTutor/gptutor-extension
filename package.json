@@ -37,8 +37,97 @@
         "command": "test-hover.helloWorldSearch",
         "title": "test-hover.helloWorldSearch"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "gptutor.ask",
+          "when": "editorTextFocus",
+          "group": "gptutor-menu-group@1"
+        },
+        {
+          "command": "gptutor.explain",
+          "when": "editorHasSelection",
+          "group": "gptutor-menu-group@2"
+        },
+        {
+          "command": "gptutor.refactor",
+          "when": "editorHasSelection",
+          "group": "gptutor-menu-group@3"
+        },
+        {
+          "command": "gptutor.findProblems",
+          "when": "editorHasSelection",
+          "group": "gptutor-menu-group@4"
+        },
+        {
+          "command": "gptutor.optimize",
+          "when": "editorHasSelection",
+          "group": "gptutor-menu-group@5"
+        },
+        {
+          "command": "gptutor.documentation",
+          "when": "editorHasSelection",
+          "group": "gptutor-menu-group@6"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "gptutor.ask"
+        },
+        {
+          "command": "gptutor.explain",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptutor.refactor",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptutor.findProblems",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptutor.optimize",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptutor.documentation",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "gptutor.resetSession"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gptutor",
+          "title": "GPTutor",
+          "icon": "src/resources/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "gptutor": [
+        {
+          "type": "webview",
+          "id": "gptutor.chatView",
+          "name": "GPTutor"
+        }
+      ]
+    }
   },
+  "activationEvents": [
+    "onView:gptutor.chatView",
+    "onCommand:gptutor.ask",
+    "onCommand:gptutor.explain",
+    "onCommand:gptutor.refactor",
+    "onCommand:gptutor.optimize",
+    "onCommand:gptutor.findProblems",
+    "onCommand:gptutor.documentation"
+  ],
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
