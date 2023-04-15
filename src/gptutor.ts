@@ -220,6 +220,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				}
 				#response {
 					padding-top: 0;
+					font-size: 0.8rem;
+					line-height: 1rem;
 				}
 				</style>
 			</head>
