@@ -1,5 +1,8 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 import {
   window,
   commands,
@@ -10,55 +13,55 @@ import {
   Hover,
   MarkdownString,
 } from "vscode";
-import { openAiIsActive, showAnswer } from "./openAi";
+// const path = require('path');
+import { Configuration, OpenAIApi, CreateChatCompletionRequest } from "openai";
 import { getApiKey } from "./apiKey";
+import { askOpenAi, openAiIsActive, showAnswer } from "./openAi";
+import {
+  getAuditRequestMsg,
+  getTutorRequestMsg,
+} from "./utils";
 import { CursorContext } from "./context/cursor.context";
+import { activate as activateHierarchy } from "./hierarchyProvider/extension";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+// import { TextDocuments } from "vscode-languageserver";
+// import { TextDocument } from "vscode-languageserver-textdocument";
+// const documents = new TextDocuments(TextDocument);
+
 export function activate(context: ExtensionContext) {
   const cursorContext = new CursorContext(context);
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "gptutor-extension" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = commands.registerCommand('gptutor-extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
+  console.log('Congratulations, your extension "gptutor-extension" is now active!');
+  let disposable = commands.registerCommand('gptutor-extension.helloWorld', () => {
 		window.showInformationMessage('Hello World from gptutor-extension!');
 	});
 
 	context.subscriptions.push(disposable);
 
 
-	// Initialize GPTutor
-	context.subscriptions.push(
-		commands.registerCommand("Initialize GPTutor", async () => {
-			let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+  // Initialize GPTutor
+  context.subscriptions.push(
+    commands.registerCommand("Initialize GPTutor", async () => {
+      let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
-				window.showInformationMessage(`GPTutor Activate Successfully!`);
+        window.showInformationMessage(`GPTutor Activate Successfully!`);
       } else {
-				await getApiKey(context);
+        await getApiKey(context);
       }
     })
-	);
-		
-	// Set OpenAI API key
-	context.subscriptions.push(
+  );
+
+  // Set OpenAI API key
+  context.subscriptions.push(
     commands.registerCommand("Set OpenAI API Key", async () => {
       await getApiKey(context);
     })
   );
 
-	// TODO: configure GPTutor
+  // TODO: configure GPTutor
 
-	// show Hover provider when hovering over code
+  // show Hover provider when hovering over code
 	// determine if cursor is selected Text or Hovering over some code 
-	context.subscriptions.push(
+  context.subscriptions.push(
     languages.registerHoverProvider(["solidity", "javascript", "python"], {
       provideHover(document, position, token) {
         // const fileName = document.fileName;
@@ -87,8 +90,7 @@ export function activate(context: ExtensionContext) {
     })
   );
 
-	// ask GPTutor
-	context.subscriptions.push(
+  context.subscriptions.push(
     commands.registerCommand("Active GPTutor", async () => {
       let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
       if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
@@ -129,8 +131,9 @@ export function activate(context: ExtensionContext) {
 	// TODO: enhace display result
 	// - How to display response from GPTutor API??
 
-	cursorContext.init();
+  cursorContext.init();
+  activateHierarchy(context);
+
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

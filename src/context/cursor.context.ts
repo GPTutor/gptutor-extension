@@ -55,7 +55,6 @@ export class CursorContext {
     );
   }
 
-
   getDefinitionContext = async () => {
     let channel = window.createOutputChannel("getDefinitionContext");
     const editor = this.editor;
@@ -91,7 +90,4 @@ export class CursorContext {
     return definitionContext;
   };
   
-  currentFileText() {
-    return this.editor?.document.getText();
-  }
 }
