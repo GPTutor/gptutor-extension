@@ -159,6 +159,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				#prompt-input {
 					width: 100%;
 					word-wrap: break-word;
+					max-height: 30vh;
 				}
 				.hr {
 					margin: 1rem auto;
