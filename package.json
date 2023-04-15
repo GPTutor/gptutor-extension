@@ -3,7 +3,7 @@
   "displayName": "GPTutor (🤖‚🤖)",
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.75.0"
   },
