@@ -1,6 +1,6 @@
 {
-  "name": "tutor",
-  "displayName": "tutor",
+  "name": "gptutor",
+  "displayName": "GPTutor",
   "description": "",
   "version": "0.0.1",
   "engines": {
