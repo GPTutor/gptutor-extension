@@ -1,30 +1,36 @@
 // @ts-ignore 
-
-// This script will be run within the webview itself
-// It cannot access the main VS Code APIs directly.
+// Reference: https://github.com/mpociot/chatgpt-vscode/blob/main/media/main.js
+function auto_grow(element) {
+  element.style.height = "5px";
+  element.style.height = (element.scrollHeight)+"px";
+}
 (function () {
   const vscode = acquireVsCodeApi();
-
   let response = '';
+
+  window.onload=function(){
+    var promptEle = document.getElementById("prompt-input");
+    promptEle.value = '';
+    setResponse();
+  }
+
 
   // Handle messages sent from the extension to the webview
   window.addEventListener("message", (event) => {
     const message = event.data;
-    console.log({
-      message,
-    });
+
     switch (message.type) {
      
-      case "addResponse": {
+      case "gptutor-set-answer": {
         response = message.value;
         setResponse();
         break;
       }
-      case "clearResponse": {
+      case "gptutor-clear-answer": {
         response = '';
         break;
       }
-      case "setPrompt": {
+      case "gptutor-set-prompt": {
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
@@ -110,8 +116,3 @@
     }
   });
 })();
-
-function auto_grow(element) {
-  element.style.height = "5px";
-  element.style.height = (element.scrollHeight)+"px";
-}

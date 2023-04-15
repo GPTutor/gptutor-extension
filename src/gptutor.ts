@@ -18,12 +18,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
   private currentResponse: string = "";
   private currentMessageNum = 0;
   private currentPrompt?: GPTutorPromptType;
+  public isInited = false;
 
   constructor(_context: vscode.ExtensionContext) {
     this.context = _context;
   }
 
-  registerVscode() {
+  async registerVscode() {
     this.context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(GPTutor.viewType, this, {
         webviewOptions: { retainContextWhenHidden: true },
@@ -46,11 +47,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
           )
       )
     );
+    await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 
   setOpenAiKey(key: string) {
     this.openAiProvider = new GPTutorOpenAiProvider();
     this.openAiProvider.setApiKey(key);
+    this.isInited = true;
   }
 
   resolveWebviewView(
@@ -64,28 +67,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
       localResourceRoots: [this.context.extensionUri],
     };
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
-    // webviewView.webview.onDidReceiveMessage(data => {
-    // 	switch (data.type) {
-    // 		case 'codeSelected':
-    // 			{
-    // 				// do nothing if the pasteOnClick option is disabled
-    // 				if (!this._settings.pasteOnClick) {
-    // 					break;
-    // 				}
-    // 				let code = data.value;
-    // 				//code = code.replace(/([^\\])(\$)([^{0-9])/g, "$1\\$$$3");
-    // 				const snippet = new vscode.SnippetString();
-    // 				snippet.appendText(code);
-    // 				// insert the code as a snippet into the active text editor
-    // 				vscode.window.activeTextEditor?.insertSnippet(snippet);
-    // 				break;
-    // 			}
-    // 		case 'prompt':
-    // 			{
-    // 				this.search(data.value);
-    // 			}
-    // 	}
-    // });
   }
 
   public async search(prompt: GPTutorPromptType, type: string) {
@@ -101,14 +82,14 @@ export class GPTutor implements vscode.WebviewViewProvider {
       this.view?.show?.(true);
     }
 
-    this.currentResponse = "...";
+    this.currentResponse = "Loading......";
 
     this.view?.webview.postMessage({
-      type: "setPrompt",
-      value: this.currentPrompt?.selectedCode || "",
+      type: "gptutor-set-prompt",
+      value: this.currentPrompt?.selectedcode || "",
     });
     this.view?.webview.postMessage({
-      type: "addResponse",
+      type: "gptutor-set-answer",
       value: this.currentResponse,
     });
 
@@ -162,7 +143,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       if (this.view) {
         this.view.show?.(true);
         this.view.webview.postMessage({
-          type: "addResponse",
+          type: "gptutor-set-answer",
           value: this.currentResponse,
         });
       }
@@ -170,21 +151,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
       vscode.window.showErrorMessage(error?.message || "ERROR");
     }
   }
-
-  // private getHtmlForWebview(webview: vscode.Webview) {
-
-  // 	return `<!DOCTYPE html>
-  // 		<html lang="en">
-  // 		<head>
-  // 			<meta charset="UTF-8">
-  // 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  // 		</head>
-  // 		<body>
-  // 			<h1>GPTutor</h1>
-  // 		</body>
-  // 		</html>`;
-  // }
 
   private getHtmlForWebview(webview: vscode.Webview) {
     const extensionUri = this.context.extensionUri;
@@ -248,12 +214,21 @@ export class GPTutor implements vscode.WebviewViewProvider {
 					width: 100%;
 					word-wrap: break-word;
 				}
+				.hr {
+					margin: 1rem auto;
+					opacity: .3;
+				}
+				#response {
+					padding-top: 0;
+				}
 				</style>
 			</head>
 			<body>
+				<label>Question: </label>
 				<textarea oninput="auto_grow(this)" class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
-				</textarea
-				
+				</textarea>
+				<hr class="hr" />
+				<label>Answer: </label>
 				<div id="response" class="pt-4 text-sm">
 				</div>
 
