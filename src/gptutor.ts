@@ -100,22 +100,15 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				case 'Audit':
 					const auditsearchPrompt = FirstAuditRequest(
 						prompt.languageId,
-						prompt.auditContext || '',
+						prompt.selectedCode,
+						prompt.auditContext || ''
 						);
 					const completion1 = await this.openAiProvider.ask(model, auditsearchPrompt)
-					const res1 = completion1.data.choices[0].message?.content || '';
+					this.currentResponse = completion1.data.choices[0].message?.content || '';
 
-					const auditfinalPrompt = getAuditRequestMsg(
-							prompt.languageId,
-							res1,
-							prompt.auditContext || '',
-							);
-					const completion2 = await this.openAiProvider.ask(model, auditfinalPrompt);
-					this.currentResponse = completion2.data.choices[0].message?.content || '';
 					break;
 
 				default:
-					console.log('This is not a fruit.');
 			}
 	  
       if (this.currentMessageNum !== currentMessageNumber) {
