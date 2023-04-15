@@ -21,11 +21,12 @@ import {
   getExplainRequestMsg,
   FirstAuditRequest,
   getAuditRequestMsg,
-  CustomizePrompt
+  CustomizePrompt,
 } from "./prompt";
 import { CursorContext } from "./context/cursor.context";
 import { activate as activateHierarchy } from "./hierarchyProvider/extension";
 import { GPTutor } from "./gptutor";
+import { getModel } from "./model";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";
@@ -35,13 +36,17 @@ export function activate(context: ExtensionContext) {
   const gptutor = new GPTutor(context);
 
   const cursorContext = new CursorContext(context);
-  console.log('Congratulations, your extension "gptutor-extension" is now active!');
-  let disposable = commands.registerCommand('gptutor-extension.helloWorld', () => {
-		window.showInformationMessage('Hello World from gptutor-extension!');
-	});
+  console.log(
+    'Congratulations, your extension "gptutor-extension" is now active!'
+  );
+  let disposable = commands.registerCommand(
+    "gptutor-extension.helloWorld",
+    () => {
+      window.showInformationMessage("Hello World from gptutor-extension!");
+    }
+  );
 
-	context.subscriptions.push(disposable);
-
+  context.subscriptions.push(disposable);
 
   // Initialize GPTutor
   context.subscriptions.push(
@@ -64,10 +69,16 @@ export function activate(context: ExtensionContext) {
     })
   );
 
+  context.subscriptions.push(
+    commands.registerCommand("Set Model", async () => {
+      await getModel(context);
+    })
+  );
+
   // TODO: configure GPTutor
 
   // show Hover provider when hovering over code
-	// determine if cursor is selected Text or Hovering over some code 
+  // determine if cursor is selected Text or Hovering over some code
   context.subscriptions.push(
     languages.registerHoverProvider(["solidity", "javascript", "python"], {
       provideHover(document, position, token) {
@@ -82,10 +93,13 @@ export function activate(context: ExtensionContext) {
         const codeBlockContent = new MarkdownString();
         codeBlockContent.appendCodeblock(
           `/**
-  * GPTutor 🤖
+  * GPTutor (🤖,🤖)
   */`
         );
-        codeBlockContent.appendCodeblock(cursorContext.currentText, document.languageId);
+        codeBlockContent.appendCodeblock(
+          cursorContext.currentText,
+          document.languageId
+        );
         const activeCommandUri = Uri.parse(`command:Active GPTutor`);
         const chatCommandUri = Uri.parse(`command:Chat GPTutor`);
         const command = new MarkdownString(
@@ -99,19 +113,22 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("Chat GPTutor", async () => {
       const editor: any = window.activeTextEditor;
-      const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
+      const { explainContext, languageId } = await getCurrentPromptV2(
+        cursorContext
+      );
 
       gptutor.search({
         languageId: languageId,
         codeContext: explainContext,
         question: cursorContext.currentText,
-      })
+      });
     })
   );
 
   context.subscriptions.push(
     commands.registerCommand("Active GPTutor", async () => {
       let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+      let MODEL: any = context.globalState.get("MODEL");
       if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
         await getApiKey(context);
       }
@@ -122,13 +139,15 @@ export function activate(context: ExtensionContext) {
       }
       const document = editor.document;
 
-      const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
-      await showAnswer(OPEN_AI_API_KEY, {
+      const { explainContext, languageId } = await getCurrentPromptV2(
+        cursorContext
+      );
+      await showAnswer(OPEN_AI_API_KEY, MODEL, {
         question: cursorContext.currentText,
         code_context: explainContext,
         program_language: languageId,
       });
-      
+
       // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
 
       // await showAnswer(OPEN_AI_API_KEY, {
@@ -140,12 +159,11 @@ export function activate(context: ExtensionContext) {
     })
   );
 
-	// TODO: get context from code
-	// TODO: enhace display result
-	// - How to display response from GPTutor API??
+  // TODO: get context from code
+  // TODO: enhace display result
+  // - How to display response from GPTutor API??
 
   cursorContext.init();
-
 }
 
 async function getCurrentPromptV2(cursorContext: CursorContext) {
@@ -160,15 +178,14 @@ async function getCurrentPromptV2(cursorContext: CursorContext) {
 
   const currentTextLines = document.getText().split("\n");
   const anchorPosition: any = cursorContext.anchorPosition;
-  
+
   const explainContext = currentTextLines
-  .slice(anchorPosition.c - 300, anchorPosition.c + 300)
-  .join("\n");
+    .slice(anchorPosition.c - 300, anchorPosition.c + 300)
+    .join("\n");
 
   const auditContext = currentTextLines
     .slice(0, currentTextLines.length)
     .join("\n");
-
 
   // const definitionContext = await cursorContext.getDefinitionContext();
   // const definitionContextPrompt = `The following is the source code of the line ${currentTextLines[anchorPosition.c]}:\n${definitionContext}`;
@@ -185,19 +202,21 @@ async function getCurrentPrompt(cursorContext: CursorContext) {
   const document = editor.document;
   const languageId = document.languageId;
 
-
   const currentTextLines = document.getText().split("\n");
   const anchorPosition: any = cursorContext.anchorPosition;
   // const currentLine = currentTextLines[cursorContext.anchorPosition?.c];
-  const question = `Question: why use ${cursorContext.currentText} at ${currentTextLines[anchorPosition.c]} in the ${document.languageId} code above?`;
+  const question = `Question: why use ${cursorContext.currentText} at ${
+    currentTextLines[anchorPosition.c]
+  } in the ${document.languageId} code above?`;
   const codeContext = currentTextLines
     .slice(anchorPosition.c - 50, anchorPosition.c + 50)
     .join("\n");
 
   const definitionContext = await cursorContext.getDefinitionContext();
-  const definitionContextPrompt = `The following is the source code of the line ${currentTextLines[anchorPosition.c]}:\n${definitionContext}`;
+  const definitionContextPrompt = `The following is the source code of the line ${
+    currentTextLines[anchorPosition.c]
+  }:\n${definitionContext}`;
   return { languageId, question, codeContext, definitionContextPrompt };
 }
-
 
 export function deactivate() {}
