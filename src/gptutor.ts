@@ -1,19 +1,24 @@
-import { OpenAIApi } from 'openai';
-import * as vscode from 'vscode';
-import { GPTutorOpenAiProvider } from './openAi';
-import { GPTutorPromptType, getExplainRequestMsg, FirstAuditRequest, getAuditRequestMsg, CustomizePrompt } from './prompt';
+import { OpenAIApi } from "openai";
+import * as vscode from "vscode";
+import { GPTutorOpenAiProvider } from "./openAi";
+import {
+  GPTutorPromptType,
+  getExplainRequestMsg,
+  FirstAuditRequest,
+  getAuditRequestMsg,
+} from "./prompt";
 
 export class GPTutor implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'gptutor.chatView';
+  public static readonly viewType = "gptutor.chatView";
 
   private openAiProvider!: GPTutorOpenAiProvider;
   private view?: vscode.WebviewView;
 
   private context!: vscode.ExtensionContext;
-  private currentResponse: string = '';
+  private currentResponse: string = "";
   private currentMessageNum = 0;
-	private currentPrompt?: GPTutorPromptType;
-	public isInited = false;
+  private currentPrompt?: GPTutorPromptType;
+  public isInited = false;
 
   constructor(_context: vscode.ExtensionContext) {
     this.context = _context;
@@ -21,55 +26,56 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
   async registerVscode() {
     this.context.subscriptions.push(
-      vscode.window.registerWebviewViewProvider(GPTutor.viewType, this,  {
-        webviewOptions: { retainContextWhenHidden: true }
+      vscode.window.registerWebviewViewProvider(GPTutor.viewType, this, {
+        webviewOptions: { retainContextWhenHidden: true },
       })
     );
 
 		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
-	
+
   setOpenAiKey(key: string) {
-		this.openAiProvider = new GPTutorOpenAiProvider();
+    this.openAiProvider = new GPTutorOpenAiProvider();
     this.openAiProvider.setApiKey(key);
-		this.isInited = true;
+    this.isInited = true;
   }
 
-
-
   resolveWebviewView(
-		webviewView: vscode.WebviewView,
-		context: vscode.WebviewViewResolveContext,
-		_token: vscode.CancellationToken,
-	) {
-		this.view = webviewView;
-		webviewView.webview.options = {
-			enableScripts: true,
-			localResourceRoots: [
-				this.context.extensionUri
-			]
-		};
-		webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
-	}
+    webviewView: vscode.WebviewView,
+    context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+  ) {
+    this.view = webviewView;
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this.context.extensionUri],
+    };
+    webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+  }
 
-	public async search(prompt: GPTutorPromptType, type : string) {
-		this.currentPrompt = prompt;
-		if (!prompt) {
-			return;
-		};
+  public async search(prompt: GPTutorPromptType, type: string) {
+    this.currentPrompt = prompt;
+    if (!prompt) {
+      return;
+    }
 
-		// focus gpt activity from activity bar
-		if (!this.view) {
-			await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
-		} else {
-			this.view?.show?.(true);
-		}
-		
-		this.currentResponse = 'Loading......';
-		
+    // focus gpt activity from activity bar
+    if (!this.view) {
+      await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
+    } else {
+      this.view?.show?.(true);
+    }
 
-    this.view?.webview.postMessage({ type: 'gptutor-set-prompt', value: this.currentPrompt?.selectedcode || ''});
-    this.view?.webview.postMessage({ type: 'gptutor-set-answer', value: this.currentResponse });
+    this.currentResponse = "Loading......";
+
+    this.view?.webview.postMessage({
+      type: "gptutor-set-prompt",
+      value: this.currentPrompt?.selectedCode || "",
+    });
+    this.view?.webview.postMessage({
+      type: "gptutor-set-answer",
+      value: this.currentResponse,
+    });
 
     this.currentMessageNum++;
 
@@ -80,7 +86,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 					const explainsearchPrompt = getExplainRequestMsg(
 						prompt.languageId,
 						prompt.codeContext || '',
-						prompt.selectedcode,
+						prompt.selectedCode,
 						);
 					const explaincompletion = await this.openAiProvider.ask(explainsearchPrompt)
 					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
@@ -92,7 +98,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				case 'Audit':
 					const auditsearchPrompt = FirstAuditRequest(
 						prompt.languageId,
-						prompt.selectedcode,
+						prompt.auditContext || '',
 						);
 					const completion1 = await this.openAiProvider.ask(auditsearchPrompt)
 					const res1 = completion1.data.choices[0].message?.content || '';
@@ -100,12 +106,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
 					const auditfinalPrompt = getAuditRequestMsg(
 							prompt.languageId,
 							res1,
-							prompt.selectedcode,
+							prompt.auditContext || '',
 							);
 					const completion2 = await this.openAiProvider.ask(auditfinalPrompt);
 					this.currentResponse = completion2.data.choices[0].message?.content || '';
 					break;
-						
+
 				default:
 					console.log('This is not a fruit.');
 			}
@@ -114,25 +120,53 @@ export class GPTutor implements vscode.WebviewViewProvider {
         return;
       }
 
-			if (this.view) {
-				this.view.show?.(true);
-				this.view.webview.postMessage({ type: 'gptutor-set-answer', value: this.currentResponse });
-			}
-
-    } catch (error:any) {
-      vscode.window.showErrorMessage(error?.message || 'ERROR');
+      if (this.view) {
+        this.view.show?.(true);
+        this.view.webview.postMessage({
+          type: "gptutor-set-answer",
+          value: this.currentResponse,
+        });
+      }
+    } catch (error: any) {
+      vscode.window.showErrorMessage(error?.message || "ERROR");
     }
-	}
+  }
 
-	private getHtmlForWebview(webview: vscode.Webview) {
+  private getHtmlForWebview(webview: vscode.Webview) {
     const extensionUri = this.context.extensionUri;
 
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'src', 'media', 'main.js'));
-		const microlightUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'src', 'media', 'scripts', 'microlight.min.js'));
-		const tailwindUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'src', 'media', 'scripts', 'showdown.min.js'));
-		const showdownUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'src', 'media', 'scripts', 'tailwind.min.js'));
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(extensionUri, "src", "media", "main.js")
+    );
+    const microlightUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        extensionUri,
+        "src",
+        "media",
+        "scripts",
+        "microlight.min.js"
+      )
+    );
+    const tailwindUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        extensionUri,
+        "src",
+        "media",
+        "scripts",
+        "showdown.min.js"
+      )
+    );
+    const showdownUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        extensionUri,
+        "src",
+        "media",
+        "scripts",
+        "tailwind.min.js"
+      )
+    );
 
-		return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
 				<meta charset="UTF-8">
@@ -167,6 +201,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				}
 				#response {
 					padding-top: 0;
+					font-size: 0.8rem;
+					line-height: 1rem;
 				}
 				</style>
 			</head>
@@ -182,8 +218,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				<script src="${scriptUri}"></script>
 			</body>
 			</html>`;
-	}
-
+  }
 }
 
 export function deactivate() {}
