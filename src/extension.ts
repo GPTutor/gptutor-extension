@@ -18,9 +18,11 @@ import { Configuration, OpenAIApi, CreateChatCompletionRequest } from "openai";
 import { getApiKey } from "./apiKey";
 import { askOpenAi, openAiIsActive, showAnswer } from "./openAi";
 import {
+  getExplainRequestMsg,
+  FirstAuditRequest,
   getAuditRequestMsg,
-  getTutorRequestMsg,
-} from "./utils";
+  CustomizePrompt
+} from "./prompt";
 import { CursorContext } from "./context/cursor.context";
 import { activate as activateHierarchy } from "./hierarchyProvider/extension";
 import { GPTutor } from "./gptutor";
