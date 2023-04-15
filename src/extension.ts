@@ -82,8 +82,9 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     languages.registerHoverProvider(["solidity", "javascript", "python"], {
       provideHover(document, position, token) {
-        // const fileName = document.fileName;
-        // const workDir = path.dirname(fileName);
+        if(!gptutor.isInited) {
+          return new Hover([]);
+        }
 
         const editor = window.activeTextEditor;
         if (!editor) {
@@ -101,7 +102,7 @@ export function activate(context: ExtensionContext) {
         const activeCommandUri = Uri.parse(`command:Active GPTutor`);
         const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
         const command = new MarkdownString(
-          `[🤖 GPTutor Explain](${activeCommandUri}) &nbsp;&nbsp; [🕵️ GPTutor Audit](${auditCommandUri})`
+          `[🤖 Explain](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
         );
         command.isTrusted = true;
         return new Hover([codeBlockContent, command]);
@@ -135,44 +136,6 @@ export function activate(context: ExtensionContext) {
       }, 'Audit')
     })
   );
-
-  // context.subscriptions.push(
-  //   commands.registerCommand("Active GPTutor", async () => {
-  //     let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
-  //     let MODEL: any = context.globalState.get("MODEL");
-  //     if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
-  //       await getApiKey(context);
-  //     }
-  //     const editor: any = window.activeTextEditor;
-  //     if (!editor) {
-  //       window.showErrorMessage("No active editor");
-  //       return;
-  //     }
-
-  //     const { explainContext, languageId } = await getCurrentPromptV2(
-  //       cursorContext
-  //     );
-  //     await showAnswer(OPEN_AI_API_KEY, MODEL, {
-  //       question: cursorContext.currentText,
-  //       code_context: explainContext,
-  //       program_language: languageId,
-  //     });
-
-  //     // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
-
-  //     // await showAnswer(OPEN_AI_API_KEY, {
-  //     //   question,
-  //     //   code_context: codeContext,
-  //     //   program_language: editor.document.languageId,
-  //     //   definitionContextPrompt,
-  //     // });
-  //   })
-  // );
-
-  // TODO: get context from code
-  // TODO: enhace display result
-  // - How to display response from GPTutor API??
-
   cursorContext.init();
 }
 

@@ -16,7 +16,6 @@ export const getExplainRequestMsg = (
     codeContext: string,
     selectedcode: string
 ): reqType[] => {
-
     return [
       {
         role: "system",

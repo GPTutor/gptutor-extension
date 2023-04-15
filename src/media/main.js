@@ -1,18 +1,24 @@
 // @ts-ignore 
-
-// This script will be run within the webview itself
-// It cannot access the main VS Code APIs directly.
+function auto_grow(element) {
+  element.style.height = "5px";
+  element.style.height = (element.scrollHeight)+"px";
+}
 (function () {
   const vscode = acquireVsCodeApi();
-
   let response = '';
+
+  window.onload=function(){
+    var promptEle = document.getElementById("prompt-input");
+    promptEle.value = '';
+
+    setResponse();
+  }
+
 
   // Handle messages sent from the extension to the webview
   window.addEventListener("message", (event) => {
     const message = event.data;
-    console.log({
-      message,
-    });
+
     switch (message.type) {
      
       case "addResponse": {
@@ -110,8 +116,3 @@
     }
   });
 })();
-
-function auto_grow(element) {
-  element.style.height = "5px";
-  element.style.height = (element.scrollHeight)+"px";
-}
