@@ -88,6 +88,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
             prompt.selectedCode
           );
           const explaincompletion = await this.openAiProvider.ask(
+            model,
             explainsearchPrompt
           );
           this.currentResponse =
@@ -100,27 +101,19 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "Audit":
           const auditsearchPrompt = FirstAuditRequest(
             prompt.languageId,
-            prompt.codeContext || "",
+            prompt.selectedCode,
             prompt.auditContext || ""
           );
-          // const completion1 = await this.openAiProvider.ask(auditsearchPrompt);
-          // const res1 = completion1.data.choices[0].message?.content || "";
-
-          // const auditfinalPrompt = getAuditRequestMsg(
-          //   prompt.languageId,
-          //   res1,
-          //   prompt.auditContext || ""
-          // );
-          console.log({
-            auditsearchPrompt,
-          });
-          const completion2 = await this.openAiProvider.ask(auditsearchPrompt);
+          const completion1 = await this.openAiProvider.ask(
+            model,
+            auditsearchPrompt
+          );
           this.currentResponse =
-            completion2.data.choices[0].message?.content || "";
+            completion1.data.choices[0].message?.content || "";
+
           break;
 
         default:
-          console.log("This is not a fruit.");
       }
 
       if (this.currentMessageNum !== currentMessageNumber) {
