@@ -122,7 +122,7 @@ export function activate(context: ExtensionContext) {
       gptutor.search(
         {
           languageId: languageId,
-          codeContext: auditContext,
+          auditContext,
           selectedCode: cursorContext.currentText,
         },
         "Audit"

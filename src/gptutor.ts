@@ -31,23 +31,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       })
     );
 
-    this.context.subscriptions.push(
-      vscode.commands.registerCommand("codegpt.ask", () =>
-        vscode.window
-          .showInputBox({ prompt: "What do you want to do?" })
-          .then((value: any) =>
-            this.search(
-              {
-                languageId: "solidity",
-                selectedCode: value,
-                codeContext: "function",
-              },
-              "Explain"
-            )
-          )
-      )
-    );
-    await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
+		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 
   setOpenAiKey(key: string) {
@@ -209,6 +193,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				#prompt-input {
 					width: 100%;
 					word-wrap: break-word;
+					max-height: 30vh;
 				}
 				.hr {
 					margin: 1rem auto;
