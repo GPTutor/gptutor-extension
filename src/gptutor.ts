@@ -19,7 +19,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     this.context = _context;
   }
 
-  registerVscode() {
+  async registerVscode() {
     this.context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(GPTutor.viewType, this,  {
         webviewOptions: { retainContextWhenHidden: true }
@@ -36,7 +36,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				}, "Explain"))
 			)
 		);
-
+		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 	
   setOpenAiKey(key: string) {
@@ -75,7 +75,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 			this.view?.show?.(true);
 		}
 		
-		this.currentResponse = '...';
+		this.currentResponse = 'Loading......';
 		
 
     this.view?.webview.postMessage({ type: 'setPrompt', value: this.currentPrompt?.selectedcode || ''});
