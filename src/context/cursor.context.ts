@@ -39,7 +39,7 @@ export class CursorContext {
       return this.lastText;  
     }
     this.lastText = this.hoverText || this.selectedText;
-    return this.lastText;
+    return this.lastText.trim();
   }
 
   get selectedText() {

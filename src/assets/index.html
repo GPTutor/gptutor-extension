@@ -1,0 +1,42 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="${tailwindUri}"></script>
+        <script src="${showdownUri}"></script>
+        <script src="${microlightUri}"></script>
+        <style>
+            .code {
+                white-space: pre;
+            }
+            p {
+                padding-top: 0.4rem;
+                padding-bottom: 0.4rem;
+            }
+            /* overrides vscodes style reset, displays as if inside web browser */
+            ol,
+            ul {
+                list-style: initial !important;
+                margin-left: 10px !important;
+            }
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                font-weight: bold !important;
+            }
+        </style>
+    </head>
+    <body>
+        <textarea
+            class="h-10 w-full text-white bg-stone-700 p-4 text-sm"
+            placeholder="Ask something"
+            id="prompt-input"/>
+
+        <div id="response" class="pt-4 text-sm"></div>
+
+        <script src="${scriptUri}"></script>
+    </body>
+</html>

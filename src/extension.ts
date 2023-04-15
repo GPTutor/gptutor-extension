@@ -99,9 +99,9 @@ export function activate(context: ExtensionContext) {
           document.languageId
         );
         const activeCommandUri = Uri.parse(`command:Active GPTutor`);
-        // const chatCommandUri = Uri.parse(`command:Chat GPTutor`);
+        const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
         const command = new MarkdownString(
-          `[🤖 GPTutor](${activeCommandUri})` //  &nbsp;&nbsp; [🕵️ Chat](${chatCommandUri})
+          `[🤖 GPTutor Explain](${activeCommandUri}) &nbsp;&nbsp; [🕵️ GPTutor Audit](${auditCommandUri})`
         );
         command.isTrusted = true;
         return new Hover([codeBlockContent, command]);
@@ -110,7 +110,6 @@ export function activate(context: ExtensionContext) {
   );
   context.subscriptions.push(
     commands.registerCommand("Active GPTutor", async () => {
-      const editor: any = window.activeTextEditor;
       const { explainContext, languageId } = await getCurrentPromptV2(
         cursorContext
       );
@@ -119,13 +118,28 @@ export function activate(context: ExtensionContext) {
         languageId: languageId,
         codeContext: explainContext,
         selectedcode: cursorContext.currentText,
-      }, '') // need type
+      }, 'Explain');
+    })
+  );
+
+  context.subscriptions.push(
+    commands.registerCommand("Audit GPTutor", async () => {
+      const { auditContext, languageId } = await getCurrentPromptV2(
+        cursorContext
+      );
+
+      gptutor.search({
+        languageId: languageId,
+        codeContext: auditContext,
+        selectedcode: cursorContext.currentText,
+      }, 'Audit')
     })
   );
 
   // context.subscriptions.push(
   //   commands.registerCommand("Active GPTutor", async () => {
   //     let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+  //     let MODEL: any = context.globalState.get("MODEL");
   //     if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
   //       await getApiKey(context);
   //     }
@@ -134,15 +148,16 @@ export function activate(context: ExtensionContext) {
   //       window.showErrorMessage("No active editor");
   //       return;
   //     }
-  //     const document = editor.document;
 
-  //     const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
-  //     await showAnswer(OPEN_AI_API_KEY, {
+  //     const { explainContext, languageId } = await getCurrentPromptV2(
+  //       cursorContext
+  //     );
+  //     await showAnswer(OPEN_AI_API_KEY, MODEL, {
   //       question: cursorContext.currentText,
   //       code_context: explainContext,
   //       program_language: languageId,
   //     });
-      
+
   //     // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
 
   //     // await showAnswer(OPEN_AI_API_KEY, {
@@ -153,38 +168,6 @@ export function activate(context: ExtensionContext) {
   //     // });
   //   })
   // );
-  context.subscriptions.push(
-    commands.registerCommand("Active GPTutor", async () => {
-      let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
-      let MODEL: any = context.globalState.get("MODEL");
-      if (!(await openAiIsActive(OPEN_AI_API_KEY))) {
-        await getApiKey(context);
-      }
-      const editor: any = window.activeTextEditor;
-      if (!editor) {
-        window.showErrorMessage("No active editor");
-        return;
-      }
-
-      const { explainContext, languageId } = await getCurrentPromptV2(
-        cursorContext
-      );
-      await showAnswer(OPEN_AI_API_KEY, MODEL, {
-        question: cursorContext.currentText,
-        code_context: explainContext,
-        program_language: languageId,
-      });
-
-      // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
-
-      // await showAnswer(OPEN_AI_API_KEY, {
-      //   question,
-      //   code_context: codeContext,
-      //   program_language: editor.document.languageId,
-      //   definitionContextPrompt,
-      // });
-    })
-  );
 
   // TODO: get context from code
   // TODO: enhace display result

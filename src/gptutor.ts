@@ -84,7 +84,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 			this.view?.show?.(true);
 		}
 		
-		let response = '';
 		this.currentResponse = '...';
 		
 
@@ -97,12 +96,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
       let currentMessageNumber = this.currentMessageNum;
 			switch (type) {
 				case 'Explain':
-					const ExplainsearchPrompt = getExplainRequestMsg(
+					const explainsearchPrompt = getExplainRequestMsg(
 						prompt.languageId,
 						prompt.codeContext || '',
 						prompt.selectedcode,
 						);
-					const explaincompletion = await this.openAiProvider.ask(ExplainsearchPrompt)
+					const explaincompletion = await this.openAiProvider.ask(explainsearchPrompt)
 					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
 							console.log({
 								currentMessageNumber,
@@ -198,7 +197,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-				<input class="h-10 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input" />
+				<textarea class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
+				</textarea
 				
 				<div id="response" class="pt-4 text-sm">
 				</div>
