@@ -5,7 +5,6 @@ import {
   GPTutorPromptType,
   getExplainRequestMsg,
   FirstAuditRequest,
-  getAuditRequestMsg,
 } from "./prompt";
 
 export class GPTutor implements vscode.WebviewViewProvider {
@@ -31,7 +30,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       })
     );
 
-		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
+    await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 
   setOpenAiKey(key: string) {
@@ -81,41 +80,49 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     try {
       let currentMessageNumber = this.currentMessageNum;
-			switch (type) {
-				case 'Explain':
-					const explainsearchPrompt = getExplainRequestMsg(
-						prompt.languageId,
-						prompt.codeContext || '',
-						prompt.selectedCode,
-						);
-					const explaincompletion = await this.openAiProvider.ask(explainsearchPrompt)
-					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
-							console.log({
-								currentMessageNumber,
-								explainresponse: this.currentResponse,
-						})
-						break;
-				case 'Audit':
-					const auditsearchPrompt = FirstAuditRequest(
-						prompt.languageId,
-						prompt.auditContext || '',
-						);
-					const completion1 = await this.openAiProvider.ask(auditsearchPrompt)
-					const res1 = completion1.data.choices[0].message?.content || '';
+      switch (type) {
+        case "Explain":
+          const explainsearchPrompt = getExplainRequestMsg(
+            prompt.languageId,
+            prompt.codeContext || "",
+            prompt.selectedCode
+          );
+          const explaincompletion = await this.openAiProvider.ask(
+            explainsearchPrompt
+          );
+          this.currentResponse =
+            explaincompletion.data.choices[0].message?.content || "";
+          console.log({
+            currentMessageNumber,
+            explainresponse: this.currentResponse,
+          });
+          break;
+        case "Audit":
+          const auditsearchPrompt = FirstAuditRequest(
+            prompt.languageId,
+            prompt.codeContext || "",
+            prompt.auditContext || ""
+          );
+          // const completion1 = await this.openAiProvider.ask(auditsearchPrompt);
+          // const res1 = completion1.data.choices[0].message?.content || "";
 
-					const auditfinalPrompt = getAuditRequestMsg(
-							prompt.languageId,
-							res1,
-							prompt.auditContext || '',
-							);
-					const completion2 = await this.openAiProvider.ask(auditfinalPrompt);
-					this.currentResponse = completion2.data.choices[0].message?.content || '';
-					break;
+          // const auditfinalPrompt = getAuditRequestMsg(
+          //   prompt.languageId,
+          //   res1,
+          //   prompt.auditContext || ""
+          // );
+          console.log({
+            auditsearchPrompt,
+          });
+          const completion2 = await this.openAiProvider.ask(auditsearchPrompt);
+          this.currentResponse =
+            completion2.data.choices[0].message?.content || "";
+          break;
 
-				default:
-					console.log('This is not a fruit.');
-			}
-	  
+        default:
+          console.log("This is not a fruit.");
+      }
+
       if (this.currentMessageNum !== currentMessageNumber) {
         return;
       }

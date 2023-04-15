@@ -29,6 +29,7 @@ export const getExplainRequestMsg = (
 
 export const FirstAuditRequest = (
   languageId: string,
+  codeContext: string,
   selectedCode: string
 ): reqType[] => {
   return [
@@ -38,27 +39,27 @@ export const FirstAuditRequest = (
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, modify this ${languageId} code. \n Please only provide code that after modify`,
+      content: `Question: is ${selectedCode} safe at ${codeContext} in the ${languageId} code? Please explain like a professional solidity smart contract auditor and pay special attention to whether there are security issues. Do not repeat your role in your reply, it is unnecessary.`,
     },
   ];
 };
 
-export const getAuditRequestMsg = (
-  languageId: string,
-  previousanswer: string,
-  selectedCode: string
-): reqType[] => {
-  return [
-    {
-      role: "system",
-      content: `I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract,\n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
-    },
-    {
-      role: "user",
-      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, return ${previousanswer} and explain why modify to provided code.`,
-    },
-  ];
-};
+// export const getAuditRequestMsg = (
+//   languageId: string,
+//   previousanswer: string,
+//   selectedCode: string
+// ): reqType[] => {
+//   return [
+//     {
+//       role: "system",
+//       content: `You are a helpful coding tutor master in ${languageId}.`,
+//     },
+//     {
+//       role: "user",
+//       content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return provided code and explain original given problem and why modify to provided code.`,
+//     },
+//   ];
+// };
 
 export const CustomizePrompt = (
   userinput: string,
