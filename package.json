@@ -2,6 +2,7 @@
   "name": "gptutor",
   "displayName": "GPTutor",
   "description": "",
+  "publisher": "gptutor",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.75.0"

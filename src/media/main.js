@@ -2,7 +2,8 @@
 // Reference: https://github.com/mpociot/chatgpt-vscode/blob/main/media/main.js
 function auto_grow(element) {
   element.style.height = "5px";
-  element.style.height = (element.scrollHeight)+"px";
+  const height = Math.max(element.scrollHeight, 400);
+  element.style.height = (height)+"px";
 }
 (function () {
   const vscode = acquireVsCodeApi();

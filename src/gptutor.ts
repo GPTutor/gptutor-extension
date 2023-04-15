@@ -182,7 +182,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 					padding-top: 0.4rem;
 					padding-bottom: 0.4rem;
 				}
-				/* overrides vscodes style reset, displays as if inside web browser */
 				ul, ol {
 					list-style: initial !important;
 					margin-left: 10px !important;
@@ -193,7 +192,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				#prompt-input {
 					width: 100%;
 					word-wrap: break-word;
-					max-height: 30vh;
 				}
 				.hr {
 					margin: 1rem auto;
