@@ -3,6 +3,8 @@ import { Configuration, OpenAIApi } from "openai";
 import { getAuditRequestMsg, reqType } from "./utils";
 import axios from "axios";
 
+export const DefaultOpenAiModel = "gpt-3.5-turbo";
+
 export class GPTutorOpenAiProvider {
   openai!: OpenAIApi;
 

@@ -29,16 +29,17 @@ export const getExplainRequestMsg = (
 
 export const FirstAuditRequest = (
   languageId: string,
-  selectedCode: string
+  selectedCode : string,
+  codeContext : string
 ): reqType[] => {
   return [
     {
       role: "system",
-      content: `I want you to act as a Senior ${languageId} Developer. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
+      content: `I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, modify this ${languageId} code. \n Please only provide code that after modify`,
+      content : `Here are solidity code : ${selectedCode}, \n if there is a problem with this solidity code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed`
     },
   ];
 };
@@ -55,7 +56,7 @@ export const getAuditRequestMsg = (
     },
     {
       role: "user",
-      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, return ${previousanswer} and explain why modify to provided code.`,
+      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return ${previousanswer} and explain original given problem and why modify to provided code.`,
     },
   ];
 };

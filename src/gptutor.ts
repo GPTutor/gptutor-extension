@@ -1,6 +1,6 @@
 import { OpenAIApi } from "openai";
 import * as vscode from "vscode";
-import { GPTutorOpenAiProvider } from "./openAi";
+import { DefaultOpenAiModel, GPTutorOpenAiProvider } from "./openAi";
 import {
   GPTutorPromptType,
   getExplainRequestMsg,
@@ -31,7 +31,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       })
     );
 
-		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
+    await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 
   setOpenAiKey(key: string) {
@@ -55,7 +55,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
   public async search(prompt: GPTutorPromptType, type: string) {
     this.currentPrompt = prompt;
-		const model = this.context.globalState.get("MODEL") as string || 'gpt-3.5-turbo';
+    const model =
+      (this.context.globalState.get("MODEL") as string) || DefaultOpenAiModel;
 
     if (!prompt) {
       return;
@@ -83,41 +84,57 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     try {
       let currentMessageNumber = this.currentMessageNum;
-			switch (type) {
-				case 'Explain':
-					const explainsearchPrompt = getExplainRequestMsg(
-						prompt.languageId,
-						prompt.codeContext || '',
-						prompt.selectedCode,
-						);
-					const explaincompletion = await this.openAiProvider.ask(model, explainsearchPrompt)
-					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
-							console.log({
-								currentMessageNumber,
-								explainresponse: this.currentResponse,
-						})
-						break;
-				case 'Audit':
-					const auditsearchPrompt = FirstAuditRequest(
-						prompt.languageId,
-						prompt.auditContext || '',
-						);
-					const completion1 = await this.openAiProvider.ask(model, auditsearchPrompt)
-					const res1 = completion1.data.choices[0].message?.content || '';
+      switch (type) {
+        case "Explain":
+          const explainsearchPrompt = getExplainRequestMsg(
+            prompt.languageId,
+            prompt.codeContext || "",
+            prompt.selectedCode
+          );
+          const explaincompletion = await this.openAiProvider.ask(
+            model,
+            explainsearchPrompt
+          );
+          this.currentResponse =
+            explaincompletion.data.choices[0].message?.content || "";
+          console.log({
+            currentMessageNumber,
+            explainresponse: this.currentResponse,
+          });
+          break;
+        case "Audit":
+          const auditsearchPrompt = FirstAuditRequest(
+            prompt.languageId,
+            prompt.selectedCode,
+            prompt.auditContext || ""
+          );
+          const completion1 = await this.openAiProvider.ask(
+            model,
+            auditsearchPrompt
+          );
+          this.currentResponse =
+            completion1.data.choices[0].message?.content || "";
 
-					const auditfinalPrompt = getAuditRequestMsg(
-							prompt.languageId,
-							res1,
-							prompt.auditContext || '',
-							);
-					const completion2 = await this.openAiProvider.ask(model, auditfinalPrompt);
-					this.currentResponse = completion2.data.choices[0].message?.content || '';
-					break;
+          if (model === DefaultOpenAiModel) {
+            const auditsearchPrompt2 = getAuditRequestMsg(
+              prompt.languageId,
+              this.currentResponse,
+              prompt.selectedCode
+            );
+            const completion2 = await this.openAiProvider.ask(
+              model,
+              auditsearchPrompt2
+            );
+            this.currentResponse =
+              completion2.data.choices[0].message?.content || "";
+          }
 
-				default:
-					console.log('This is not a fruit.');
-			}
-	  
+          break;
+
+        default:
+          break;
+      }
+
       if (this.currentMessageNum !== currentMessageNumber) {
         return;
       }
