@@ -3,6 +3,32 @@ import { Configuration, OpenAIApi } from "openai";
 import { getAuditRequestMsg, reqType } from "./utils";
 import axios from "axios";
 
+export class GPTutorOpenAiProvider {
+  openai!: OpenAIApi;
+
+  constructor() {
+  }
+
+  setApiKey(apiKey: string) {
+    this.openai = getOpenAI(apiKey);
+  }
+  
+  async ask(requestMsg: reqType[]) {
+    if(!this.openai) {
+      // window.showErrorMessage('You need to set API key first.');
+      throw new Error('You need to set API key first.');
+    }
+    const request: any = {
+      model: "gpt-3.5-turbo",
+      messages: requestMsg,
+    };
+    // // TODO: handle ERROR
+    return await this.openai.createChatCompletion(request);    
+    // const res = await this.openai.createChatCompletion(request);
+    // return res.data.choices[0].message?.content || '';
+  };
+}
+
 export async function openAiIsActive(apiKey: string | undefined) {
   if (apiKey === undefined) {
     return false;
@@ -21,7 +47,7 @@ export async function openAiIsActive(apiKey: string | undefined) {
   }
 }
 
-const getOpenAI = (apiKey: string) => {
+function getOpenAI(apiKey: string) {
   const configuration = new Configuration({
     apiKey: apiKey,
   });
