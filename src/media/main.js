@@ -1,13 +1,15 @@
 // @ts-ignore 
 // Reference: https://github.com/mpociot/chatgpt-vscode/blob/main/media/main.js
 function auto_grow(element) {
-  element.style.height = "5px";
-  const max = window.innerHeight * 0.3;
-  if(element.scrollHeight <= max) {
-    element.style.height = (element.scrollHeight)+"px";
-  } else {
-    element.style.height = '30vh';
-  }
+  setTimeout(() => {
+    element.style.height = "5px";
+    const max = window.innerHeight * 0.3;
+    if(element.scrollHeight <= max) {
+      element.style.height = (element.scrollHeight)+"px";
+    } else {
+      element.style.height = '30vh';
+    }
+  }, 300);
 }
 (function () {
   const vscode = acquireVsCodeApi();
@@ -17,6 +19,8 @@ function auto_grow(element) {
     var promptEle = document.getElementById("prompt-input");
     promptEle.value = '';
     setResponse();
+
+    auto_grow(promptEle);
   }
 
 

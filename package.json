@@ -1,15 +1,16 @@
 {
   "name": "gptutor",
-  "displayName": "GPTutor",
-  "description": "",
+  "displayName": "GPTutor (🤖‚🤖)",
+  "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.75.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "out/resources/extensionIcon.png",
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -27,20 +28,12 @@
         "title": "GPTutor: setModel"
       },
       {
-        "command": "Test",
-        "title": "GPTutor: test"
-      },
-      {
         "command": "Active GPTutor",
         "title": "GPTutor: active"
       },
       {
         "command": "Audit GPTutor",
         "title": "GPTutor: audit"
-      },
-      {
-        "command": "test-hover.helloWorldSearch",
-        "title": "test-hover.helloWorldSearch"
       }
     ],
     "menus": {
