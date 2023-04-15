@@ -1,7 +1,7 @@
 import { OpenAIApi } from 'openai';
 import * as vscode from 'vscode';
 import { GPTutorOpenAiProvider } from './openAi';
-import { GPTutorPromptType, getExplainRequestMsg } from './prompt';
+import { GPTutorPromptType, getExplainRequestMsg, FirstAuditRequest, getAuditRequestMsg, CustomizePrompt } from './prompt';
 
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = 'gptutor.chatView';
@@ -71,8 +71,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 		
 	}
 
-
-	public async search(prompt?: GPTutorPromptType) {
+	public async search(prompt: GPTutorPromptType, type : string) {
 		this.currentPrompt = prompt;
 		if (!prompt) {
 			return;
@@ -86,28 +85,51 @@ export class GPTutor implements vscode.WebviewViewProvider {
 		}
 		
 		let response = '';
-		this.currentResponse = '';
-		const searchPrompt = getExplainRequestMsg(
-			prompt.languageId,
-			prompt.codeContext,
-			prompt.question,
-		);
+		this.currentResponse = '...';
+		
 
-    this.view?.webview.postMessage({ type: 'setPrompt', value: this.currentPrompt?.question || '' });
-    this.view?.webview.postMessage({ type: 'addResponse', value: '...' });
+    this.view?.webview.postMessage({ type: 'setPrompt', value: this.currentPrompt?.selectedcode || ''});
+    this.view?.webview.postMessage({ type: 'addResponse', value: this.currentResponse });
 
     this.currentMessageNum++;
 
     try {
       let currentMessageNumber = this.currentMessageNum;
+			switch (type) {
+				case 'Explain':
+					const ExplainsearchPrompt = getExplainRequestMsg(
+						prompt.languageId,
+						prompt.codeContext || '',
+						prompt.selectedcode,
+						);
+					const explaincompletion = await this.openAiProvider.ask(ExplainsearchPrompt)
+					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
+							console.log({
+								currentMessageNumber,
+								explainresponse: this.currentResponse,
+						})
+						break;
+				case 'Audit':
+					const auditsearchPrompt = FirstAuditRequest(
+						prompt.languageId,
+						prompt.selectedcode,
+						);
+					const completion1 = await this.openAiProvider.ask(auditsearchPrompt)
+					const res1 = completion1.data.choices[0].message?.content || '';
 
-      const completion = await this.openAiProvider.ask(searchPrompt)
-      this.currentResponse = completion.data.choices[0].message?.content || '';
-			console.log({
-				completion,
-				currentMessageNumber,
-				response: this.currentResponse,
-			})
+					const auditfinalPrompt = getAuditRequestMsg(
+							prompt.languageId,
+							res1,
+							prompt.selectedcode,
+							);
+					const completion2 = await this.openAiProvider.ask(auditfinalPrompt);
+					this.currentResponse = completion2.data.choices[0].message?.content || '';
+					break;
+						
+				default:
+					console.log('This is not a fruit.');
+			}
+	  
       if (this.currentMessageNum !== currentMessageNumber) {
         return;
       }
