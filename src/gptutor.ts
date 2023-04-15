@@ -86,7 +86,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     this.view?.webview.postMessage({
       type: "gptutor-set-prompt",
-      value: this.currentPrompt?.selectedcode || "",
+      value: this.currentPrompt?.selectedCode || "",
     });
     this.view?.webview.postMessage({
       type: "gptutor-set-answer",
