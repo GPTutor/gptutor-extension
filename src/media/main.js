@@ -2,7 +2,7 @@
 // Reference: https://github.com/mpociot/chatgpt-vscode/blob/main/media/main.js
 function auto_grow(element) {
   element.style.height = "5px";
-  const max = window.height * 0.3;
+  const max = window.innerHeight * 0.3;
   if(element.scrollHeight <= max) {
     element.style.height = (element.scrollHeight)+"px";
   } else {
