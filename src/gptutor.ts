@@ -55,6 +55,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
   public async search(prompt: GPTutorPromptType, type: string) {
     this.currentPrompt = prompt;
+		const model = this.context.globalState.get("MODEL") as string || 'gpt-3.5-turbo';
+
     if (!prompt) {
       return;
     }
@@ -88,7 +90,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 						prompt.codeContext || '',
 						prompt.selectedCode,
 						);
-					const explaincompletion = await this.openAiProvider.ask(explainsearchPrompt)
+					const explaincompletion = await this.openAiProvider.ask(model, explainsearchPrompt)
 					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
 							console.log({
 								currentMessageNumber,
@@ -100,7 +102,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 						prompt.languageId,
 						prompt.auditContext || '',
 						);
-					const completion1 = await this.openAiProvider.ask(auditsearchPrompt)
+					const completion1 = await this.openAiProvider.ask(model, auditsearchPrompt)
 					const res1 = completion1.data.choices[0].message?.content || '';
 
 					const auditfinalPrompt = getAuditRequestMsg(
@@ -108,7 +110,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 							res1,
 							prompt.auditContext || '',
 							);
-					const completion2 = await this.openAiProvider.ask(auditfinalPrompt);
+					const completion2 = await this.openAiProvider.ask(model, auditfinalPrompt);
 					this.currentResponse = completion2.data.choices[0].message?.content || '';
 					break;
 

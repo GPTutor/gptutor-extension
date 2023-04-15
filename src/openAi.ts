@@ -12,13 +12,13 @@ export class GPTutorOpenAiProvider {
     this.openai = getOpenAI(apiKey);
   }
 
-  async ask(requestMsg: reqType[]) {
+  async ask(model: string, requestMsg: reqType[]) {
     if (!this.openai) {
       // window.showErrorMessage('You need to set API key first.');
       throw new Error("You need to set API key first.");
     }
     const request: any = {
-      model: "gpt-3.5-turbo",
+      model: model,
       messages: requestMsg,
     };
     // // TODO: handle ERROR
@@ -52,83 +52,4 @@ function getOpenAI(apiKey: string) {
   });
   const openai = new OpenAIApi(configuration);
   return openai;
-}
-
-interface GpTutorApiStep1Request {
-  question: string;
-  code_context: string;
-  program_language: string;
-  definitionContextPrompt?: string;
-}
-interface GpTutorApiStep2Request extends GpTutorApiStep1Request {
-  previous_answer: string;
-}
-// export async function askGptutor(apiKey: string, req: GptutorApiStep1Request) {
-//   const result = await axios.post(
-//     "https://api.collectsight.com/single_respond/",
-//     req
-//   );
-//   const { data } = result.data;
-//   if (!data) {
-//     throw new Error("No data returned from GPTutor API");
-//   }
-
-//   const answer = await askOpenAi(apiKey, data);
-
-//   const step2Req: GpTutorApiStep2Request = {
-//     ...req,
-//     previous_answer: answer,
-//   };
-//   const finalResult = await axios.post(
-//     "https://api.collectsight.com/second_respond/",
-//     step2Req
-//   );
-//   return finalResult.data;
-// }
-
-export async function askOpenAi(
-  apiKey: string,
-  model: string,
-  requestMsg: reqType[]
-) {
-  let openai: OpenAIApi = getOpenAI(apiKey);
-  let request: any = {
-    model: model ?? "gpt-3.5-turbo",
-    messages: requestMsg,
-  };
-  let res = await openai.createChatCompletion(request);
-  // console.log(res.data.usage?.total_tokens);
-
-  // TODO: handle ERROR
-  return res.data.choices[0].message?.content || "";
-}
-
-export async function askOpenAiAudit(apiKey: string, requestMsg: reqType[]) {
-  let openai: OpenAIApi = getOpenAI(apiKey);
-  let request: any = {
-    model: "gpt-3.5-turbo",
-    messages: requestMsg,
-  };
-  let res = await openai.createChatCompletion(request);
-
-  return res.data.choices[0].message?.content || "";
-}
-
-export async function showAnswer(
-  apiKey: string,
-  model: string,
-  req: GpTutorApiStep1Request
-) {
-  // const answer = await askGpTutor(apiKey, req)
-  const reqTypes = getAuditRequestMsg(
-    req.program_language,
-    req.definitionContextPrompt || "",
-    req.code_context,
-    req.question
-  );
-  const answer = await askOpenAi(apiKey, model, reqTypes);
-
-  let channel = window.createOutputChannel("AI Tutor");
-  channel.append(`${answer}`);
-  window.showInformationMessage(`${answer}`);
 }
