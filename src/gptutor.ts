@@ -24,6 +24,17 @@ export class GPTutor implements vscode.WebviewViewProvider {
         webviewOptions: { retainContextWhenHidden: true }
       })
     );
+
+		this.context.subscriptions.push(
+			vscode.commands.registerCommand('codegpt.ask', () => 
+				vscode.window.showInputBox({ prompt: 'What do you want to do?' })
+				.then((value: any) => this.search({
+					languageId: "solidity",
+  				selectedcode: value,
+					codeContext: "function",
+				}, "Explain"))
+			)
+		);
   }
 
   setOpenAiKey(key: string) {
@@ -197,7 +208,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-				<textarea class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
+				<textarea oninput="auto_grow(this)" class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
 				</textarea
 				
 				<div id="response" class="pt-4 text-sm">

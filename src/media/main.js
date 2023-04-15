@@ -25,7 +25,9 @@
         break;
       }
       case "setPrompt": {
-        document.getElementById("prompt-input").value = message.value;
+        var promptEle = document.getElementById("prompt-input");
+        promptEle.value = message.value;
+        auto_grow(promptEle);
         break;
       }
     }
@@ -108,3 +110,8 @@
     }
   });
 })();
+
+function auto_grow(element) {
+  element.style.height = "5px";
+  element.style.height = (element.scrollHeight)+"px";
+}
