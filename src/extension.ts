@@ -7,24 +7,15 @@ import {
   window,
   commands,
   ExtensionContext,
-  env,
   Uri,
   languages,
   Hover,
   MarkdownString,
 } from "vscode";
 // const path = require('path');
-import { Configuration, OpenAIApi, CreateChatCompletionRequest } from "openai";
 import { getApiKey } from "./apiKey";
-import { askOpenAi, openAiIsActive, showAnswer } from "./openAi";
-import {
-  getExplainRequestMsg,
-  FirstAuditRequest,
-  getAuditRequestMsg,
-  CustomizePrompt,
-} from "./prompt";
+import { openAiIsActive } from "./openAi";
 import { CursorContext } from "./context/cursor.context";
-import { activate as activateHierarchy } from "./hierarchyProvider/extension";
 import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
 
@@ -75,14 +66,12 @@ export function activate(context: ExtensionContext) {
     })
   );
 
-  // TODO: configure GPTutor
-
   // show Hover provider when hovering over code
   // determine if cursor is selected Text or Hovering over some code
   context.subscriptions.push(
     languages.registerHoverProvider(["solidity", "javascript", "python"], {
       provideHover(document, position, token) {
-        if(!gptutor.isInited) {
+        if (!gptutor.isInited) {
           return new Hover([]);
         }
 
@@ -92,9 +81,7 @@ export function activate(context: ExtensionContext) {
           return;
         }
         const codeBlockContent = new MarkdownString();
-        codeBlockContent.appendCodeblock(
-          `/** GPTutor (🤖,🤖) */`
-        );
+        codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
         codeBlockContent.appendCodeblock(
           cursorContext.currentText,
           document.languageId
@@ -102,7 +89,7 @@ export function activate(context: ExtensionContext) {
         const activeCommandUri = Uri.parse(`command:Active GPTutor`);
         const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
         const command = new MarkdownString(
-          `[🤖 Explain](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
+          `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
         );
         command.isTrusted = true;
         return new Hover([codeBlockContent, command]);
@@ -115,11 +102,14 @@ export function activate(context: ExtensionContext) {
         cursorContext
       );
 
-      gptutor.search({
-        languageId: languageId,
-        codeContext: explainContext,
-        selectedcode: cursorContext.currentText,
-      }, 'Explain');
+      gptutor.search(
+        {
+          languageId: languageId,
+          codeContext: explainContext,
+          selectedCode: cursorContext.currentText,
+        },
+        "Explain"
+      );
     })
   );
 
@@ -129,11 +119,14 @@ export function activate(context: ExtensionContext) {
         cursorContext
       );
 
-      gptutor.search({
-        languageId: languageId,
-        codeContext: auditContext,
-        selectedcode: cursorContext.currentText,
-      }, 'Audit')
+      gptutor.search(
+        {
+          languageId: languageId,
+          codeContext: auditContext,
+          selectedCode: cursorContext.currentText,
+        },
+        "Audit"
+      );
     })
   );
   cursorContext.init();
@@ -165,7 +158,7 @@ async function getCurrentPromptV2(cursorContext: CursorContext) {
   return { languageId, auditContext, explainContext };
 }
 
-// orgin
+// origin
 async function getCurrentPrompt(cursorContext: CursorContext) {
   const editor: any = window.activeTextEditor;
   if (!editor) {

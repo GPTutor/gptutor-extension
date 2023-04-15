@@ -1,4 +1,5 @@
 // @ts-ignore 
+// Reference: https://github.com/mpociot/chatgpt-vscode/blob/main/media/main.js
 function auto_grow(element) {
   element.style.height = "5px";
   element.style.height = (element.scrollHeight)+"px";
@@ -10,7 +11,6 @@ function auto_grow(element) {
   window.onload=function(){
     var promptEle = document.getElementById("prompt-input");
     promptEle.value = '';
-
     setResponse();
   }
 
@@ -21,16 +21,16 @@ function auto_grow(element) {
 
     switch (message.type) {
      
-      case "addResponse": {
+      case "gptutor-set-answer": {
         response = message.value;
         setResponse();
         break;
       }
-      case "clearResponse": {
+      case "gptutor-clear-answer": {
         response = '';
         break;
       }
-      case "setPrompt": {
+      case "gptutor-set-prompt": {
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
