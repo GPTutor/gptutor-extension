@@ -26,16 +26,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
       })
     );
 
-		this.context.subscriptions.push(
-			vscode.commands.registerCommand('codegpt.ask', () => 
-				vscode.window.showInputBox({ prompt: 'What do you want to do?' })
-				.then((value: any) => this.search({
-					languageId: "solidity",
-  				selectedcode: value,
-					codeContext: "function",
-				}, "Explain"))
-			)
-		);
 		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 	
