@@ -51,7 +51,7 @@ export const getAuditRequestMsg = (
   return [
     {
       role: "system",
-      content: `I want you to act as a Senior ${languageId} Developer. \n I will provide some code about ${languageId} smart contract,\n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
+      content: `I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract,\n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
     },
     {
       role: "user",
