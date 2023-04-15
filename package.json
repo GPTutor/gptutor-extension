@@ -22,6 +22,10 @@
         "title": "GPTutor: setKey"
       },
       {
+        "command": "Set Model",
+        "title": "GPTutor: setModel"
+      },
+      {
         "command": "Test",
         "title": "GPTutor: test"
       },
