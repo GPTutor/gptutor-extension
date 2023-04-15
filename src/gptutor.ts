@@ -5,6 +5,7 @@ import {
   GPTutorPromptType,
   getExplainRequestMsg,
   FirstAuditRequest,
+  getAuditRequestMsg,
 } from "./prompt";
 
 export class GPTutor implements vscode.WebviewViewProvider {
@@ -30,7 +31,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       })
     );
 
-    await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
+		await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
   }
 
   setOpenAiKey(key: string) {
@@ -54,6 +55,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
   public async search(prompt: GPTutorPromptType, type: string) {
     this.currentPrompt = prompt;
+		const model = this.context.globalState.get("MODEL") as string || 'gpt-3.5-turbo';
+
     if (!prompt) {
       return;
     }
@@ -80,42 +83,34 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     try {
       let currentMessageNumber = this.currentMessageNum;
-      switch (type) {
-        case "Explain":
-          const explainsearchPrompt = getExplainRequestMsg(
-            prompt.languageId,
-            prompt.codeContext || "",
-            prompt.selectedCode
-          );
-          const explaincompletion = await this.openAiProvider.ask(
-            model,
-            explainsearchPrompt
-          );
-          this.currentResponse =
-            explaincompletion.data.choices[0].message?.content || "";
-          console.log({
-            currentMessageNumber,
-            explainresponse: this.currentResponse,
-          });
-          break;
-        case "Audit":
-          const auditsearchPrompt = FirstAuditRequest(
-            prompt.languageId,
-            prompt.selectedCode,
-            prompt.auditContext || ""
-          );
-          const completion1 = await this.openAiProvider.ask(
-            model,
-            auditsearchPrompt
-          );
-          this.currentResponse =
-            completion1.data.choices[0].message?.content || "";
+			switch (type) {
+				case 'Explain':
+					const explainsearchPrompt = getExplainRequestMsg(
+						prompt.languageId,
+						prompt.codeContext || '',
+						prompt.selectedCode,
+						);
+					const explaincompletion = await this.openAiProvider.ask(model, explainsearchPrompt)
+					this.currentResponse = explaincompletion.data.choices[0].message?.content || '';
+							console.log({
+								currentMessageNumber,
+								explainresponse: this.currentResponse,
+						})
+						break;
+				case 'Audit':
+					const auditsearchPrompt = FirstAuditRequest(
+						prompt.languageId,
+						prompt.selectedCode,
+						prompt.auditContext || ''
+						);
+					const completion1 = await this.openAiProvider.ask(model, auditsearchPrompt)
+					this.currentResponse = completion1.data.choices[0].message?.content || '';
 
-          break;
+					break;
 
-        default:
-      }
-
+				default:
+			}
+	  
       if (this.currentMessageNum !== currentMessageNumber) {
         return;
       }
@@ -182,7 +177,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 					padding-top: 0.4rem;
 					padding-bottom: 0.4rem;
 				}
-				/* overrides vscodes style reset, displays as if inside web browser */
 				ul, ol {
 					list-style: initial !important;
 					margin-left: 10px !important;
@@ -193,7 +187,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				#prompt-input {
 					width: 100%;
 					word-wrap: break-word;
-					max-height: 30vh;
 				}
 				.hr {
 					margin: 1rem auto;

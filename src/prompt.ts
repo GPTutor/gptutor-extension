@@ -29,8 +29,8 @@ export const getExplainRequestMsg = (
 
 export const FirstAuditRequest = (
   languageId: string,
-  selectedCode: string,
-  codeContext: string
+  selectedCode : string,
+  codeContext : string
 ): reqType[] => {
   return [
     {
@@ -39,7 +39,7 @@ export const FirstAuditRequest = (
     },
     {
       role: "user",
-      content: `Here are solidity code : ${selectedCode}, \n if there is a problem with this solidity code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed`,
+      content : `Here are solidity code : ${selectedCode}, \n if there is a problem with this solidity code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed`
     },
   ];
 };
