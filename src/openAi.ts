@@ -95,6 +95,19 @@ export async function askOpenAi(apiKey: string, requestMsg: reqType[]) {
   return res.data.choices[0].message?.content || '';
 };
 
+export async function askOpenAiAudit(apiKey: string, requestMsg: reqType[]) {
+  let openai: OpenAIApi = getOpenAI(apiKey);
+  let request: any = {
+    model: "gpt-3.5-turbo",
+    messages: requestMsg,
+  };
+  let res = await openai.createChatCompletion(request);
+
+
+  
+  return res.data.choices[0].message?.content || '';
+};
+
 export async function showAnswer(apiKey:string, req: GptutorApiStep1Request) {
   // const answer = await askGptutor(apiKey, req)
   const reqtypes = getAuditRequestMsg(

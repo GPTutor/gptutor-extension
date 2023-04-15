@@ -104,8 +104,8 @@ export function activate(context: ExtensionContext) {
       gptutor.search({
         languageId: languageId,
         codeContext: explainContext,
-        question: cursorContext.currentText,
-      })
+        selectedcode: cursorContext.currentText,
+      }, '') // need type
     })
   );
 
@@ -175,6 +175,7 @@ async function getCurrentPromptV2(cursorContext: CursorContext) {
   return { languageId, auditContext, explainContext };
 }
 
+// orgin
 async function getCurrentPrompt(cursorContext: CursorContext) {
   const editor: any = window.activeTextEditor;
   if (!editor) {
@@ -191,7 +192,7 @@ async function getCurrentPrompt(cursorContext: CursorContext) {
   // const currentLine = currentTextLines[cursorContext.anchorPosition?.c];
   const question = `Question: why use ${cursorContext.currentText} at ${currentTextLines[anchorPosition.c]} in the ${document.languageId} code above?`;
   const codeContext = currentTextLines
-    .slice(anchorPosition.c - 50, anchorPosition.c + 50)
+    .slice(anchorPosition.c - 15, anchorPosition.c + 15)
     .join("\n");
 
   const definitionContext = await cursorContext.getDefinitionContext();

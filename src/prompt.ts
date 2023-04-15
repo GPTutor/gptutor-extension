@@ -1,4 +1,3 @@
-
 export type reqType = {
     role: string;
     content: string;
@@ -6,8 +5,10 @@ export type reqType = {
 
 export interface GPTutorPromptType  {
   languageId: string,
-  codeContext: string,
-  question: string
+  selectedcode: string
+  codeContext?: string,
+  auditContext?: string,
+  
 };
 
 export const getExplainRequestMsg = (

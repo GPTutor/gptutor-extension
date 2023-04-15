@@ -1,7 +1,7 @@
 import { OpenAIApi } from 'openai';
 import * as vscode from 'vscode';
 import { GPTutorOpenAiProvider } from './openAi';
-import { GPTutorPromptType, getExplainRequestMsg } from './prompt';
+import { GPTutorPromptType, getExplainRequestMsg, FirstAuditRequest, getAuditRequestMsg, CustomizePrompt } from './prompt';
 
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = 'gptutor.chatView';
@@ -49,8 +49,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
 	}
 
-
-	public async search(prompt?: GPTutorPromptType) {
+	public async search(prompt: GPTutorPromptType, type : string) {
 		this.currentPrompt = prompt;
 		if (!prompt) {
 			return;
@@ -65,26 +64,52 @@ export class GPTutor implements vscode.WebviewViewProvider {
 		
 		let response = '';
 		this.currentResponse = '';
-		const searchPrompt = getExplainRequestMsg(
-			prompt.languageId,
-			prompt.codeContext,
-			prompt.question,
-		);
+		
 
-    this.view?.webview.postMessage({ type: 'setPrompt', value: this.currentPrompt?.question });
+    this.view?.webview.postMessage({ type: 'setPrompt', value: this.currentPrompt?.selectedcode });
     this.view?.webview.postMessage({ type: 'addResponse', value: '...' });
 
     this.currentMessageNum++;
 
     try {
       let currentMessageNumber = this.currentMessageNum;
+	  switch (type) {
+		case 'Explain':
+			const ExplainsearchPrompt = getExplainRequestMsg(
+				prompt.languageId,
+				prompt.codeContext || '',
+				prompt.selectedcode,
+				);
+			const explaincompletion = await this.openAiProvider.ask(ExplainsearchPrompt)
+			let explainresponse = explaincompletion.data.choices[0].message?.content || '';
+					console.log({
+						currentMessageNumber,
+						explainresponse,
+				})
+		  	break;
+		case 'Audit':
+			const AuditsearchPrompt = FirstAuditRequest(
+				prompt.languageId,
+				prompt.selectedcode,
+				);
+			const completion = await this.openAiProvider.ask(AuditsearchPrompt)
+			let response = completion.data.choices[0].message?.content || '';
+					console.log({
+						currentMessageNumber,
+						response,
+				})
 
-      const completion = await this.openAiProvider.ask(searchPrompt)
-      let response = completion.data.choices[0].message?.content || '';
-			console.log({
-				currentMessageNumber,
-				response,
-			})
+			const AuditfinalPrompt = getAuditRequestMsg(
+					prompt.languageId,
+					response,
+					prompt.selectedcode,
+					);
+		  	break;
+		  	
+		default:
+		  console.log('This is not a fruit.');
+	  }
+	  
       if (this.currentMessageNum !== currentMessageNumber) {
         return;
       }
