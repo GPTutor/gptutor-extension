@@ -54,13 +54,13 @@ function getOpenAI(apiKey: string) {
   return openai;
 }
 
-interface GptutorApiStep1Request {
+interface GpTutorApiStep1Request {
   question: string;
   code_context: string;
   program_language: string;
   definitionContextPrompt?: string;
 }
-interface GptutorApiStep2Request extends GptutorApiStep1Request {
+interface GpTutorApiStep2Request extends GpTutorApiStep1Request {
   previous_answer: string;
 }
 // export async function askGptutor(apiKey: string, req: GptutorApiStep1Request) {
@@ -75,7 +75,7 @@ interface GptutorApiStep2Request extends GptutorApiStep1Request {
 
 //   const answer = await askOpenAi(apiKey, data);
 
-//   const step2Req: GptutorApiStep2Request = {
+//   const step2Req: GpTutorApiStep2Request = {
 //     ...req,
 //     previous_answer: answer,
 //   };
@@ -111,24 +111,22 @@ export async function askOpenAiAudit(apiKey: string, requestMsg: reqType[]) {
   };
   let res = await openai.createChatCompletion(request);
 
-
-  
-  return res.data.choices[0].message?.content || '';
-};
+  return res.data.choices[0].message?.content || "";
+}
 
 export async function showAnswer(
   apiKey: string,
   model: string,
-  req: GptutorApiStep1Request
+  req: GpTutorApiStep1Request
 ) {
-  // const answer = await askGptutor(apiKey, req)
-  const reqtypes = getAuditRequestMsg(
+  // const answer = await askGpTutor(apiKey, req)
+  const reqTypes = getAuditRequestMsg(
     req.program_language,
     req.definitionContextPrompt || "",
     req.code_context,
     req.question
   );
-  const answer = await askOpenAi(apiKey, model, reqtypes);
+  const answer = await askOpenAi(apiKey, model, reqTypes);
 
   let channel = window.createOutputChannel("AI Tutor");
   channel.append(`${answer}`);
