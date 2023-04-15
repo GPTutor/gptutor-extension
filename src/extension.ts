@@ -23,12 +23,15 @@ import {
 } from "./utils";
 import { CursorContext } from "./context/cursor.context";
 import { activate as activateHierarchy } from "./hierarchyProvider/extension";
+import { GPTutor } from "./gptutor";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";
 // const documents = new TextDocuments(TextDocument);
 
 export function activate(context: ExtensionContext) {
+  const gptutor = new GPTutor(context);
+
   const cursorContext = new CursorContext(context);
   console.log('Congratulations, your extension "gptutor-extension" is now active!');
   let disposable = commands.registerCommand('gptutor-extension.helloWorld', () => {
@@ -43,6 +46,8 @@ export function activate(context: ExtensionContext) {
     commands.registerCommand("Initialize GPTutor", async () => {
       let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
+        gptutor.setOpenAiKey(OPEN_AI_API_KEY);
+        gptutor.registerVscode();
         window.showInformationMessage(`GPTutor Activate Successfully!`);
       } else {
         await getApiKey(context);
@@ -80,13 +85,25 @@ export function activate(context: ExtensionContext) {
         );
         codeBlockContent.appendCodeblock(cursorContext.currentText, document.languageId);
         const activeCommandUri = Uri.parse(`command:Active GPTutor`);
-        const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
+        const chatCommandUri = Uri.parse(`command:Chat GPTutor`);
         const command = new MarkdownString(
-          `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
+          `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Chat](${chatCommandUri})`
         );
         command.isTrusted = true;
         return new Hover([codeBlockContent, command]);
       },
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("Chat GPTutor", async () => {
+      const editor: any = window.activeTextEditor;
+      const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
+
+      gptutor.search({
+        languageId: languageId,
+        codeContext: explainContext,
+        question: cursorContext.currentText,
+      })
     })
   );
 
@@ -102,33 +119,22 @@ export function activate(context: ExtensionContext) {
         return;
       }
       const document = editor.document;
-      const currentTextLines = document.getText().split("\n");
-      const anchorPosition: any = cursorContext.anchorPosition;
-      // const currentLine = currentTextLines[cursorContext.anchorPosition?.c];
-      const question = `Question: why use ${cursorContext.currentText} at ${
-        currentTextLines[anchorPosition.c]
-      } in the ${document.languageId} code above?`;
-      
-      const ExplainContext = currentTextLines
-        .slice(anchorPosition.c - 300, anchorPosition.c + 300)
-        .join("\n");
-      
-      const AuditContext = currentTextLines
-        .slice(0, currentTextLines.length)
-        .join("\n");
 
-      const definitionContext = await cursorContext.getDefinitionContext();
-      const definitionContextPrompt = `The following is the source code of the line ${
-        currentTextLines[anchorPosition.c]
-      }:\n${definitionContext}`;
-
+      const { explainContext, languageId } = await getCurrentPromptV2(cursorContext);
       await showAnswer(OPEN_AI_API_KEY, {
-        question,
-        code_context: ExplainContext,
-        program_language: document.languageId,
-        definitionContextPrompt,
+        question: cursorContext.currentText,
+        code_context: explainContext,
+        program_language: languageId,
       });
-      // TODO: GPT-3 Tokenizer is same as GPT-2, try use GPT2 Tokenizer to estimated the price.
+      
+      // const { question, codeContext, definitionContextPrompt } = await getCurrentPrompt(cursorContext);
+
+      // await showAnswer(OPEN_AI_API_KEY, {
+      //   question,
+      //   code_context: codeContext,
+      //   program_language: editor.document.languageId,
+      //   definitionContextPrompt,
+      // });
     })
   );
 
@@ -137,8 +143,59 @@ export function activate(context: ExtensionContext) {
 	// - How to display response from GPTutor API??
 
   cursorContext.init();
-  activateHierarchy(context);
 
 }
+
+async function getCurrentPromptV2(cursorContext: CursorContext) {
+  const editor = window.activeTextEditor;
+  if (!editor) {
+    window.showErrorMessage("No active editor");
+    throw new Error("No active editor");
+  }
+
+  const document = editor.document;
+  const languageId = document.languageId;
+
+  const currentTextLines = document.getText().split("\n");
+  const anchorPosition: any = cursorContext.anchorPosition;
+  
+  const explainContext = currentTextLines
+  .slice(anchorPosition.c - 300, anchorPosition.c + 300)
+  .join("\n");
+
+  const auditContext = currentTextLines
+    .slice(0, currentTextLines.length)
+    .join("\n");
+
+
+  // const definitionContext = await cursorContext.getDefinitionContext();
+  // const definitionContextPrompt = `The following is the source code of the line ${currentTextLines[anchorPosition.c]}:\n${definitionContext}`;
+  return { languageId, auditContext, explainContext };
+}
+
+async function getCurrentPrompt(cursorContext: CursorContext) {
+  const editor: any = window.activeTextEditor;
+  if (!editor) {
+    window.showErrorMessage("No active editor");
+    throw new Error("No active editor");
+  }
+
+  const document = editor.document;
+  const languageId = document.languageId;
+
+
+  const currentTextLines = document.getText().split("\n");
+  const anchorPosition: any = cursorContext.anchorPosition;
+  // const currentLine = currentTextLines[cursorContext.anchorPosition?.c];
+  const question = `Question: why use ${cursorContext.currentText} at ${currentTextLines[anchorPosition.c]} in the ${document.languageId} code above?`;
+  const codeContext = currentTextLines
+    .slice(anchorPosition.c - 50, anchorPosition.c + 50)
+    .join("\n");
+
+  const definitionContext = await cursorContext.getDefinitionContext();
+  const definitionContextPrompt = `The following is the source code of the line ${currentTextLines[anchorPosition.c]}:\n${definitionContext}`;
+  return { languageId, question, codeContext, definitionContextPrompt };
+}
+
 
 export function deactivate() {}
