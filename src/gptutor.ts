@@ -87,25 +87,23 @@ export class GPTutor implements vscode.WebviewViewProvider {
       let currentMessageNumber = this.currentMessageNum;
       switch (type) {
         case "Explain":
-          const explainsearchPrompt = getExplainRequestMsg(
+          const explainSearchPrompt = getExplainRequestMsg(
             prompt.languageId,
             prompt.codeContext || "",
             prompt.selectedCode
           );
-          const explaincompletion = await this.openAiProvider.ask(
+          const explainCompletion = await this.openAiProvider.ask(
             model,
-            explainsearchPrompt
+            explainSearchPrompt
           );
           this.currentResponse =
-            explaincompletion.data.choices[0].message?.content || "";
+            explainCompletion.data.choices[0].message?.content || "";
           console.log({
             currentMessageNumber,
-            explainresponse: this.currentResponse,
+            explainResponse: this.currentResponse,
           });
           break;
         case "Audit":
-          
-
           if (model === DefaultOpenAiModel) {
             const p1 = FirstReplyForGpt3(
               prompt.languageId,
@@ -113,26 +111,26 @@ export class GPTutor implements vscode.WebviewViewProvider {
               prompt.auditContext || ""
             );
             const completion1 = await this.openAiProvider.ask(model, p1);
-            const auditsearchPrompt2 = getAuditRequestMsg(
+            const auditSearchPrompt2 = getAuditRequestMsg(
               prompt.languageId,
               completion1.data.choices[0].message?.content || "",
               prompt.selectedCode
             );
             const completion2 = await this.openAiProvider.ask(
               model,
-              auditsearchPrompt2
+              auditSearchPrompt2
             );
             this.currentResponse =
               completion2.data.choices[0].message?.content || "";
           } else {
-            const auditsearchPrompt = FirstAuditRequest(
+            const auditSearchPrompt = FirstAuditRequest(
               prompt.languageId,
               prompt.selectedCode,
               prompt.auditContext || ""
             );
             const completion1 = await this.openAiProvider.ask(
               model,
-              auditsearchPrompt
+              auditSearchPrompt
             );
             this.currentResponse =
               completion1.data.choices[0].message?.content || "";

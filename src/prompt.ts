@@ -29,8 +29,8 @@ export const getExplainRequestMsg = (
 
 export const FirstAuditRequest = (
   languageId: string,
-  selectedCode : string,
-  codeContext : string
+  selectedCode: string,
+  codeContext: string
 ): reqType[] => {
   return [
     {
@@ -39,15 +39,15 @@ export const FirstAuditRequest = (
     },
     {
       role: "user",
-      content : `Here are solidity code : ${selectedCode}, \n if there is a problem with this solidity code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed`
+      content: `Here are solidity code : ${selectedCode}, \n if there is a problem with this solidity code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed`,
     },
   ];
 };
 
 export const FirstReplyForGpt3 = (
   languageId: string,
-  selectedCode : string,
-  codeContext : string
+  selectedCode: string,
+  codeContext: string
 ): reqType[] => {
   return [
     {
@@ -56,14 +56,14 @@ export const FirstReplyForGpt3 = (
     },
     {
       role: "user",
-      content : `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed \n Only return the code after modified`
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed \n Only return the code after modified`,
     },
   ];
 };
 
 export const getAuditRequestMsg = (
   languageId: string,
-  previousanswer: string,
+  previousAnswer: string,
   selectedCode: string
 ): reqType[] => {
   return [
@@ -73,13 +73,13 @@ export const getAuditRequestMsg = (
     },
     {
       role: "user",
-      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousanswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return ${previousanswer} and explain original given problem and why modify to provided code.`,
+      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousAnswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return original answer`,
     },
   ];
 };
 
 export const CustomizePrompt = (
-  userinput: string,
+  userInput: string,
   languageId: string,
   selectedCode: string
 ): reqType[] => {
@@ -90,7 +90,7 @@ export const CustomizePrompt = (
     },
     {
       role: "user",
-      content: `Give question : ${userinput} \n And given code : ${selectedCode} \n Please answer ${userinput} as detail as possible `,
+      content: `Give question : ${userInput} \n And given code : ${selectedCode} \n Please answer ${userInput} as detail as possible `,
     },
   ];
 };
