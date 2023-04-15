@@ -5,7 +5,7 @@ export async function getApiKey(context: ExtensionContext) {
   const options: {
     [key: string]: (context: ExtensionContext) => Promise<void>;
   } = {
-    "Enter My OpenAI API key": inputApiKey,
+    "I have OpenAI API key": inputApiKey,
     "How to get API key?": getLink,
   };
   const quickPick = window.createQuickPick();
