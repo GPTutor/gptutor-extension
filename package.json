@@ -3,7 +3,7 @@
   "displayName": "GPTutor (🤖‚🤖)",
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -11,8 +11,10 @@
     "Other"
   ],
   "icon": "out/resources/extensionIcon.png",
-  "activationEvents": [],
-  "main": "./out/extension.js",
+  "activationEvents": [
+    "onView:gptutor.chatView"
+  ],
+  "main": "out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -37,11 +39,8 @@
       }
     ],
     "menus": {
-      "editor/context": [
-
-      ],
-      "commandPalette": [
-      ]
+      "editor/context": [],
+      "commandPalette": []
     },
     "viewsContainers": {
       "activitybar": [
@@ -62,12 +61,9 @@
       ]
     }
   },
-  "activationEvents": [
-    "onView:gptutor.chatView"
-  ],
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
@@ -88,6 +84,7 @@
   },
   "dependencies": {
     "axios": "^1.3.5",
+    "copyfiles": "^2.4.1",
     "openai": "^3.2.1"
   }
 }
