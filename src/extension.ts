@@ -52,6 +52,7 @@ export function activate(context: ExtensionContext) {
       }
     })
   );
+  commands.executeCommand("Initialize GPTutor");
 
   // Set OpenAI API key
   context.subscriptions.push(
