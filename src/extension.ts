@@ -69,32 +69,35 @@ export function activate(context: ExtensionContext) {
   // show Hover provider when hovering over code
   // determine if cursor is selected Text or Hovering over some code
   context.subscriptions.push(
-    languages.registerHoverProvider(["solidity", "javascript", "python"], {
-      provideHover(document, position, token) {
-        if (!gptutor.isInited) {
-          return new Hover([]);
-        }
+    languages.registerHoverProvider(
+      ["solidity", "javascript", "python", "move", "rust", "typescript"],
+      {
+        provideHover(document, position, token) {
+          if (!gptutor.isInited) {
+            return new Hover([]);
+          }
 
-        const editor = window.activeTextEditor;
-        if (!editor) {
-          window.showErrorMessage("No active editor");
-          return;
-        }
-        const codeBlockContent = new MarkdownString();
-        codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
-        codeBlockContent.appendCodeblock(
-          cursorContext.currentText,
-          document.languageId
-        );
-        const activeCommandUri = Uri.parse(`command:Active GPTutor`);
-        const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
-        const command = new MarkdownString(
-          `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
-        );
-        command.isTrusted = true;
-        return new Hover([codeBlockContent, command]);
-      },
-    })
+          const editor = window.activeTextEditor;
+          if (!editor) {
+            window.showErrorMessage("No active editor");
+            return;
+          }
+          const codeBlockContent = new MarkdownString();
+          codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
+          codeBlockContent.appendCodeblock(
+            cursorContext.currentText,
+            document.languageId
+          );
+          const activeCommandUri = Uri.parse(`command:Active GPTutor`);
+          const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
+          const command = new MarkdownString(
+            `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
+          );
+          command.isTrusted = true;
+          return new Hover([codeBlockContent, command]);
+        },
+      }
+    )
   );
   context.subscriptions.push(
     commands.registerCommand("Active GPTutor", async () => {
