@@ -27,6 +27,7 @@ export function activate(context: ExtensionContext) {
   const gptutor = new GPTutor(context);
 
   const cursorContext = new CursorContext(context);
+
   console.log(
     'Congratulations, your extension "gptutor-extension" is now active!'
   );
@@ -52,7 +53,6 @@ export function activate(context: ExtensionContext) {
       }
     })
   );
-  commands.executeCommand("Initialize GPTutor");
 
   // Set OpenAI API key
   context.subscriptions.push(
@@ -102,10 +102,10 @@ export function activate(context: ExtensionContext) {
   );
   context.subscriptions.push(
     commands.registerCommand("Active GPTutor", async () => {
+      //問題在下面這段
       const { explainContext, languageId } = await getCurrentPromptV2(
         cursorContext
       );
-
       gptutor.search(
         {
           languageId: languageId,
@@ -133,7 +133,8 @@ export function activate(context: ExtensionContext) {
       );
     })
   );
-  cursorContext.init();
+  commands.executeCommand("Initialize GPTutor");
+  // cursorContext.init();
 }
 
 async function getCurrentPromptV2(cursorContext: CursorContext) {
