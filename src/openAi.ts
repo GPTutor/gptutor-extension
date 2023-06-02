@@ -2,6 +2,7 @@ import { window } from "vscode";
 import { Configuration, OpenAIApi } from "openai";
 import { getAuditRequestMsg, reqType } from "./utils";
 import axios from "axios";
+import { streaming_response } from "./streaming_answer";
 
 export const DefaultOpenAiModel = "gpt-3.5-turbo";
 
@@ -14,11 +15,30 @@ export class GPTutorOpenAiProvider {
     this.openai = getOpenAI(apiKey);
   }
 
-  async ask(model: string, requestMsg: reqType[]) {
+  async ask(
+    model: string,
+    requestMsg: reqType[],
+    onUpdate: any = (
+      new_text: string,
+      total_text_so_far: string,
+      options: object = {}
+    ) => {
+      console.log("onUpdate from openAI.ts");
+    },
+    options: object = {}
+  ) {
     if (!this.openai) {
       // window.showErrorMessage('You need to set API key first.');
       throw new Error("You need to set API key first.");
     }
+    return await streaming_response(
+      this.openai,
+      requestMsg,
+      model,
+      onUpdate,
+      options
+    );
+
     const request: any = {
       model: model,
       messages: requestMsg,

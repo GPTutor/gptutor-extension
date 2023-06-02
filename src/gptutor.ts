@@ -31,7 +31,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
   appendOutput(text: string) {
     let channel: any = this.context.workspaceState.get("channel");
     channel.appendLine(text);
-    channel.show();
+    channel.show(true);
     return true;
   }
 
@@ -62,6 +62,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
       localResourceRoots: [this.context.extensionUri],
     };
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+  }
+  updateViewContent(new_text: string, total_text_so_far: string, options: any) {
+    options.view.webview.postMessage({
+      type: "gptutor-set-answer",
+      value: total_text_so_far,
+    });
   }
 
   public async search(prompt: GPTutorPromptType, type: string) {
@@ -102,12 +108,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
             prompt.codeContext || "",
             prompt.selectedCode
           );
-          const explainCompletion = await this.openAiProvider.ask(
+          let completion: any = await this.openAiProvider.ask(
             model,
-            explainSearchPrompt
+            explainSearchPrompt,
+            this.updateViewContent,
+            { view: this.view }
           );
-          this.currentResponse =
-            explainCompletion.data.choices[0].message?.content || "";
+          this.currentResponse = completion || "";
           console.log({
             currentMessageNumber,
             explainResponse: this.currentResponse,
@@ -120,30 +127,37 @@ export class GPTutor implements vscode.WebviewViewProvider {
               prompt.selectedCode,
               prompt.auditContext || ""
             );
-            const completion1 = await this.openAiProvider.ask(model, p1);
+            const completion1: any = await this.openAiProvider.ask(
+              model,
+              p1,
+              this.updateViewContent,
+              { view: this.view }
+            );
             const auditSearchPrompt2 = getAuditRequestMsg(
               prompt.languageId,
-              completion1.data.choices[0].message?.content || "",
+              completion1 || "",
               prompt.selectedCode
             );
-            const completion2 = await this.openAiProvider.ask(
+            const completion2: any = await this.openAiProvider.ask(
               model,
-              auditSearchPrompt2
+              auditSearchPrompt2,
+              this.updateViewContent,
+              { view: this.view }
             );
-            this.currentResponse =
-              completion2.data.choices[0].message?.content || "";
+            this.currentResponse = completion2;
           } else {
             const auditSearchPrompt = FirstAuditRequest(
               prompt.languageId,
               prompt.selectedCode,
               prompt.auditContext || ""
             );
-            const completion1 = await this.openAiProvider.ask(
+            const completion1: any = await this.openAiProvider.ask(
               model,
-              auditSearchPrompt
+              auditSearchPrompt,
+              this.updateViewContent,
+              { view: this.view }
             );
-            this.currentResponse =
-              completion1.data.choices[0].message?.content || "";
+            this.currentResponse = completion1 || "";
           }
 
           break;

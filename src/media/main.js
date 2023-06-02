@@ -1,42 +1,41 @@
-// @ts-ignore 
+// @ts-ignore
 // Reference: https://github.com/mpociot/chatgpt-vscode/blob/main/media/main.js
 function auto_grow(element) {
   setTimeout(() => {
     element.style.height = "5px";
     const max = window.innerHeight * 0.3;
-    if(element.scrollHeight <= max) {
-      element.style.height = (element.scrollHeight)+"px";
+    if (element.scrollHeight <= max) {
+      element.style.height = element.scrollHeight + "px";
     } else {
-      element.style.height = '30vh';
+      element.style.height = "30vh";
     }
   }, 300);
 }
+
 (function () {
   const vscode = acquireVsCodeApi();
-  let response = '';
+  let response = "";
 
-  window.onload=function(){
+  window.onload = function () {
     var promptEle = document.getElementById("prompt-input");
-    promptEle.value = '';
+    promptEle.value = "";
     setResponse();
 
     auto_grow(promptEle);
-  }
-
+  };
 
   // Handle messages sent from the extension to the webview
   window.addEventListener("message", (event) => {
     const message = event.data;
 
     switch (message.type) {
-     
       case "gptutor-set-answer": {
         response = message.value;
         setResponse();
         break;
       }
       case "gptutor-clear-answer": {
-        response = '';
+        response = "";
         break;
       }
       case "gptutor-set-prompt": {
@@ -50,7 +49,7 @@ function auto_grow(element) {
 
   function fixCodeBlocks(response) {
     // Use a regular expression to find all occurrences of the substring in the string
-    const REGEX_CODEBLOCK = new RegExp('\`\`\`', 'g');
+    const REGEX_CODEBLOCK = new RegExp("```", "g");
     const matches = response.match(REGEX_CODEBLOCK);
 
     // Return the number of occurrences of the substring in the response, check if even
@@ -59,69 +58,80 @@ function auto_grow(element) {
       return response;
     } else {
       // else append ``` to the end to make the last code block complete
-      return response.concat('\n\`\`\`');
+      return response.concat("\n```");
     }
   }
 
   function setResponse() {
-        var converter = new showdown.Converter({
-          omitExtraWLInCodeBlocks: true, 
-          simplifiedAutoLink: true,
-          excludeTrailingPunctuationFromURLs: true,
-          literalMidWordUnderscores: true,
-          simpleLineBreaks: true
+    var converter = new showdown.Converter({
+      omitExtraWLInCodeBlocks: true,
+      simplifiedAutoLink: true,
+      excludeTrailingPunctuationFromURLs: true,
+      literalMidWordUnderscores: true,
+      simpleLineBreaks: true,
+    });
+    response = fixCodeBlocks(response);
+    html = converter.makeHtml(response);
+    document.getElementById("response").innerHTML = html;
+
+    var preCodeBlocks = document.querySelectorAll("pre code");
+    for (var i = 0; i < preCodeBlocks.length; i++) {
+      preCodeBlocks[i].classList.add(
+        "p-2",
+        "my-2",
+        "block",
+        "overflow-x-scroll"
+      );
+    }
+
+    var codeBlocks = document.querySelectorAll("code");
+    for (var i = 0; i < codeBlocks.length; i++) {
+      // Check if innertext starts with "Copy code"
+      if (codeBlocks[i].innerText.startsWith("Copy code")) {
+        codeBlocks[i].innerText = codeBlocks[i].innerText.replace(
+          "Copy code",
+          ""
+        );
+      }
+
+      codeBlocks[i].classList.add(
+        "inline-flex",
+        "max-w-full",
+        "overflow-hidden",
+        "rounded-sm",
+        "cursor-pointer"
+      );
+
+      codeBlocks[i].addEventListener("click", function (e) {
+        e.preventDefault();
+        vscode.postMessage({
+          type: "codeSelected",
+          value: this.innerText,
         });
-        response = fixCodeBlocks(response);
-        html = converter.makeHtml(response);
-        document.getElementById("response").innerHTML = html;
+      });
 
-        var preCodeBlocks = document.querySelectorAll("pre code");
-        for (var i = 0; i < preCodeBlocks.length; i++) {
-            preCodeBlocks[i].classList.add(
-              "p-2",
-              "my-2",
-              "block",
-              "overflow-x-scroll"
-            );
-        }
-        
-        var codeBlocks = document.querySelectorAll('code');
-        for (var i = 0; i < codeBlocks.length; i++) {
-            // Check if innertext starts with "Copy code"
-            if (codeBlocks[i].innerText.startsWith("Copy code")) {
-                codeBlocks[i].innerText = codeBlocks[i].innerText.replace("Copy code", "");
-            }
+      const d = document.createElement("div");
+      d.innerHTML = codeBlocks[i].innerHTML;
+      codeBlocks[i].innerHTML = null;
+      codeBlocks[i].appendChild(d);
+      d.classList.add("code");
+    }
 
-            codeBlocks[i].classList.add("inline-flex", "max-w-full", "overflow-hidden", "rounded-sm", "cursor-pointer");
+    microlight.reset("code");
 
-            codeBlocks[i].addEventListener('click', function (e) {
-                e.preventDefault();
-                vscode.postMessage({
-                    type: 'codeSelected',
-                    value: this.innerText
-                });
-            });
-
-            const d = document.createElement('div');
-            d.innerHTML = codeBlocks[i].innerHTML;
-            codeBlocks[i].innerHTML = null;
-            codeBlocks[i].appendChild(d);
-            d.classList.add("code");
-        }
-
-        microlight.reset('code');
-
-        //document.getElementById("response").innerHTML = document.getElementById("response").innerHTML.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    //document.getElementById("response").innerHTML = document.getElementById("response").innerHTML.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   }
 
   // Listen for keyup events on the prompt input element
-  document.getElementById('prompt-input').addEventListener('keyup', function (e) {
-    // If the key that was pressed was the Enter key
-    if (e.keyCode === 13) {
-      vscode.postMessage({
-        type: 'prompt',
-        value: this.value
-      });
-    }
-  });
+  document
+    .getElementById("prompt-input")
+    .addEventListener("keyup", function (e) {
+      // If the key that was pressed was the Enter key
+      if (e.keyCode === 13) {
+        vscode.postMessage({
+          type: "prompt",
+          value: this.value,
+        });
+      }
+    });
 })();
