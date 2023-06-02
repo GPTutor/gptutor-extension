@@ -1,9 +1,13 @@
 {
   "name": "gptutor",
   "displayName": "GPTutor (🤖‚🤖)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RayHuang880301/gptutor-extension"
+  },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -67,7 +71,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "publish": "npm run compile && vsce package && vsce publish"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
