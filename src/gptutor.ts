@@ -171,13 +171,17 @@ export class GPTutor implements vscode.WebviewViewProvider {
   private getHtmlForWebview(webview: vscode.Webview) {
     const extensionUri = this.context.extensionUri;
 
+    let src =
+      vscode.ExtensionMode[this.context.extensionMode] == "Development"
+        ? "src"
+        : "out";
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(extensionUri, "out", "media", "main.js")
+      vscode.Uri.joinPath(extensionUri, src, "media", "main.js")
     );
     const microlightUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         extensionUri,
-        "out",
+        src,
         "media",
         "scripts",
         "microlight.min.js"
@@ -186,7 +190,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     const tailwindUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         extensionUri,
-        "out",
+        src,
         "media",
         "scripts",
         "tailwind.min.js"
@@ -195,7 +199,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     const showdownUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         extensionUri,
-        "out",
+        src,
         "media",
         "scripts",
         "showdown.min.js"
@@ -251,15 +255,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				</div>
 
 				<script src="${scriptUri}"></script>
-        <div>${showdownUri}</div>
-        <div>vscode.Uri.joinPath: ${vscode.Uri.joinPath(
-          extensionUri,
-          "out",
-          "media",
-          "scripts",
-          "showdown.min.js"
-        )}</div>
-        <div>extensionUri: ${extensionUri}</div>
 			</body>
 			</html>`;
   }
