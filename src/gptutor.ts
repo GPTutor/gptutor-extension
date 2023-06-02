@@ -62,6 +62,16 @@ export class GPTutor implements vscode.WebviewViewProvider {
       localResourceRoots: [this.context.extensionUri],
     };
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+    this.view.webview.onDidReceiveMessage((message) => {
+      switch (message.command) {
+        case "alert":
+          vscode.window.showErrorMessage(message.text);
+          return;
+        case "log":
+          vscode.window.showInformationMessage(message.text);
+          return;
+      }
+    }, undefined);
   }
   updateViewContent(new_text: string, total_text_so_far: string, options: any) {
     options.view.webview.postMessage({

@@ -63,6 +63,11 @@ function auto_grow(element) {
   }
 
   function setResponse() {
+    let codes = document.getElementsByTagName("Code");
+    for (let i = 0; i < codes.length; i++) {
+      code = codes[i];
+      code.onclick = null;
+    }
     var converter = new showdown.Converter({
       omitExtraWLInCodeBlocks: true,
       simplifiedAutoLink: true,
@@ -118,6 +123,17 @@ function auto_grow(element) {
     }
 
     microlight.reset("code");
+    codes = document.getElementsByTagName("Code");
+    for (let i = 0; i < codes.length; i++) {
+      code = codes[i];
+      code.onclick = async (event) => {
+        await navigator.clipboard.writeText(event.srcElement.innerText);
+        vscode.postMessage({
+          command: "log",
+          text: "[GPTutor] Text Copied to Clipboard.",
+        });
+      };
+    }
 
     //document.getElementById("response").innerHTML = document.getElementById("response").innerHTML.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   }
