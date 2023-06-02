@@ -92,10 +92,10 @@ export function activate(context: ExtensionContext) {
           const activeCommandUri = Uri.parse(`command:Active GPTutor`);
           const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
           const command = new MarkdownString(
-            `[🤖 GPTutor](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri})`
+            `[🧑‍🏫 Explain](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri}) (by GPTutor)`
           );
           command.isTrusted = true;
-          return new Hover([codeBlockContent, command]);
+          return new Hover([command]);
         },
       }
     )
