@@ -23,6 +23,16 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
   constructor(_context: vscode.ExtensionContext) {
     this.context = _context;
+    let channel = vscode.window.createOutputChannel("GPTutor");
+    this.context.workspaceState.update("channel", channel);
+    this.appendOutput("GPTutor is constructed.");
+  }
+
+  appendOutput(text: string) {
+    let channel: any = this.context.workspaceState.get("channel");
+    channel.appendLine(text);
+    channel.show();
+    return true;
   }
 
   async registerVscode() {
@@ -162,12 +172,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
     const extensionUri = this.context.extensionUri;
 
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(extensionUri, "src", "media", "main.js")
+      vscode.Uri.joinPath(extensionUri, "out", "media", "main.js")
     );
     const microlightUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         extensionUri,
-        "src",
+        "out",
         "media",
         "scripts",
         "microlight.min.js"
@@ -176,19 +186,19 @@ export class GPTutor implements vscode.WebviewViewProvider {
     const tailwindUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         extensionUri,
-        "src",
+        "out",
         "media",
         "scripts",
-        "showdown.min.js"
+        "tailwind.min.js"
       )
     );
     const showdownUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         extensionUri,
-        "src",
+        "out",
         "media",
         "scripts",
-        "tailwind.min.js"
+        "showdown.min.js"
       )
     );
 
@@ -241,6 +251,15 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				</div>
 
 				<script src="${scriptUri}"></script>
+        <div>${showdownUri}</div>
+        <div>vscode.Uri.joinPath: ${vscode.Uri.joinPath(
+          extensionUri,
+          "out",
+          "media",
+          "scripts",
+          "showdown.min.js"
+        )}</div>
+        <div>extensionUri: ${extensionUri}</div>
 			</body>
 			</html>`;
   }
