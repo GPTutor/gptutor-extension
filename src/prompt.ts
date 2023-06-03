@@ -49,17 +49,22 @@ export const getPrompt = (
   return prompt;
 };
 
+let TaiwaneseWordsNote =
+  "請盡量使用繁體中文與臺灣地區用語，避免簡體字與中國大陸地區的用詞。比方請用「程式碼」而不是「代码」。";
 export const getExplainRequestMsg = (
   languageId: string,
   codeContext: string,
   selectedCode: string,
   outputLanguage: string = "English"
 ): reqType[] => {
-  let languageText = "";
+  let noteForLanguage = "";
   if (outputLanguage && outputLanguage != "English") {
     {
-      languageText = ` Output in ${outputLanguage}.`;
+      noteForLanguage = ` Output in ${outputLanguage}.`;
     }
+  }
+  if (outputLanguage == "Chinese (Traditional)") {
+    noteForLanguage += TaiwaneseWordsNote;
   }
   return [
     {
@@ -68,7 +73,7 @@ export const getExplainRequestMsg = (
     },
     {
       role: "user",
-      content: `Other context about the selected code is in the following triple quotes """${codeContext}""". The ${languageId} code I selected is in the following triple quotes """${selectedCode}""". Please focus on explain target ${languageId} code.${languageText}`,
+      content: `Other context about the selected code is in the following triple quotes """${codeContext}""". The ${languageId} code I selected is in the following triple quotes """${selectedCode}""". Please focus on explain target ${languageId} code.${noteForLanguage}`,
     },
   ];
 };
@@ -79,11 +84,14 @@ export const FirstAuditRequest = (
   codeContext: string,
   outputLanguage: string = "English"
 ): reqType[] => {
-  let languageText = "";
+  let noteForLanguage = "";
   if (outputLanguage && outputLanguage != "English") {
     {
-      languageText = `Output in ${outputLanguage}.`;
+      noteForLanguage = `Output in ${outputLanguage}.`;
     }
+  }
+  if (outputLanguage == "Chinese (Traditional)") {
+    noteForLanguage += TaiwaneseWordsNote;
   }
   let moveSpecialization = "";
   if (languageId.toLowerCase() === "move") {
@@ -98,7 +106,7 @@ export const FirstAuditRequest = (
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed.${languageText}`,
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed.${noteForLanguage}`,
     },
   ];
 };
@@ -109,12 +117,14 @@ export const FirstReplyForGpt3 = (
   codeContext: string,
   outputLanguage: string = "English"
 ): reqType[] => {
-  let languageText = "";
-  console.log(`outputLanguage: ${outputLanguage}`);
+  let noteForLanguage = "";
   if (outputLanguage && outputLanguage != "English") {
     {
-      languageText = `Output the explain in ${outputLanguage} and add or rewrite the comment in the code in ${outputLanguage}.`;
+      noteForLanguage = `Output the explain in ${outputLanguage} and add or rewrite the comment in the code in ${outputLanguage}.`;
     }
+  }
+  if (outputLanguage == "Chinese (Traditional)") {
+    noteForLanguage += TaiwaneseWordsNote;
   }
   return [
     {
@@ -123,7 +133,7 @@ export const FirstReplyForGpt3 = (
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed \n Only return the code after modified. return the code with the start of \`\`\` and end it with \`\`\`.${languageText}`,
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed \n Only return the code after modified. return the code with the start of \`\`\` and end it with \`\`\`.${noteForLanguage}`,
     },
   ];
 };
@@ -134,11 +144,14 @@ export const getAuditRequestMsg = (
   selectedCode: string,
   outputLanguage: string = "English"
 ): reqType[] => {
-  let languageText = "";
+  let noteForLanguage = "";
   if (outputLanguage && outputLanguage != "English") {
     {
-      languageText = `Output in ${outputLanguage}.`;
+      noteForLanguage = `Output in ${outputLanguage}.`;
     }
+  }
+  if (outputLanguage == "Chinese (Traditional)") {
+    noteForLanguage += TaiwaneseWordsNote;
   }
   return [
     {
@@ -147,7 +160,7 @@ export const getAuditRequestMsg = (
     },
     {
       role: "user",
-      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousAnswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return original answer.${languageText}`,
+      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousAnswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return original answer.${noteForLanguage}`,
     },
   ];
 };
@@ -158,11 +171,14 @@ export const CustomizePrompt = (
   selectedCode: string,
   outputLanguage: string = "English"
 ): reqType[] => {
-  let languageText = "";
+  let noteForLanguage = "";
   if (outputLanguage && outputLanguage != "English") {
     {
-      languageText = `Output in ${outputLanguage}.`;
+      noteForLanguage = `Output in ${outputLanguage}.`;
     }
+  }
+  if (outputLanguage == "Chinese (Traditional)") {
+    noteForLanguage += TaiwaneseWordsNote;
   }
   return [
     {
@@ -171,7 +187,7 @@ export const CustomizePrompt = (
     },
     {
       role: "user",
-      content: `Give question : ${userInput} \n And given code : ${selectedCode} \n Please answer ${userInput} as detail as possible.${languageText}`,
+      content: `Give question : ${userInput} \n And given code : ${selectedCode} \n Please answer ${userInput} as detail as possible.${noteForLanguage}`,
     },
   ];
 };
