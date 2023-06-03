@@ -21,6 +21,7 @@ import { CursorContext } from "./context/cursor.context";
 import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
 import * as fs from "fs";
+import supportedLanguages from "./supportedLanguages";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";
@@ -105,99 +106,34 @@ export function activate(context: ExtensionContext) {
   // show Hover provider when hovering over code
   // determine if cursor is selected Text or Hovering over some code
   context.subscriptions.push(
-    languages.registerHoverProvider(
-      [
-        "dockercompose",
-        "jsonc",
-        "javascriptreact",
-        "solidity",
-        "json",
-        "tex",
-        "git-commit and git-rebase",
-        "abap",
-        "lua",
-        "vb",
-        "vue",
-        "groovy",
-        "yaml",
-        "java",
-        "css",
-        "haml",
-        "go",
-        "stylus",
-        "typescript",
-        "typescriptreact",
-        "less",
-        "fsharp",
-        "cpp",
-        "python",
-        "clojure",
-        "xsl",
-        "powershell",
-        "rust",
-        "ini",
-        "perl and perl6",
-        "r",
-        "javascript",
-        "handlebars",
-        "ruby",
-        "slim",
-        "coffeescript",
-        "shellscript",
-        "swift",
-        "csharp",
-        "makefile",
-        "markdown",
-        "bibtex",
-        "jade, pug",
-        "scss (syntax using curly brackets), sass (indented syntax)",
-        "move",
-        "razor",
-        "dockerfile",
-        "html",
-        "c",
-        "bat",
-        "cuda-cpp",
-        "objective-c",
-        "plaintext",
-        "xml",
-        "php",
-        "vue-html",
-        "diff",
-        "sql",
-        "latex",
-        "objective-cpp",
-        "shaderlab",
-      ],
-      {
-        provideHover(document, position, token) {
-          if (!gptutor.isInited) {
-            return new Hover([]);
-          }
+    languages.registerHoverProvider(supportedLanguages, {
+      provideHover(document, position, token) {
+        if (!gptutor.isInited) {
+          return new Hover([]);
+        }
 
-          const editor = window.activeTextEditor;
-          if (!editor) {
-            window.showErrorMessage("No active editor");
-            return;
-          }
-          const codeBlockContent = new MarkdownString();
-          codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
-          codeBlockContent.appendCodeblock(
-            cursorContext.currentText,
-            document.languageId
-          );
-          const activeCommandUri = Uri.parse(`command:GPTutor Explain`);
-          const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
-          const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
+        const editor = window.activeTextEditor;
+        if (!editor) {
+          window.showErrorMessage("No active editor");
+          return;
+        }
+        const codeBlockContent = new MarkdownString();
+        codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
+        codeBlockContent.appendCodeblock(
+          cursorContext.currentText,
+          document.languageId
+        );
+        const activeCommandUri = Uri.parse(`command:GPTutor Explain`);
+        const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
+        const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
 
-          const command = new MarkdownString(
-            `[🧑‍🏫 Explain](${activeCommandUri})&nbsp; [📝 Comment](${commentCommandUri})&nbsp; [🕵️ Audit](${auditCommandUri})&nbsp; By GPTutor`
-          );
-          command.isTrusted = true;
-          return new Hover([command]);
-        },
-      }
-    )
+        const command = new MarkdownString(
+          `[🧑‍🏫 Explain](${activeCommandUri})&nbsp; [📝 Comment](${commentCommandUri})&nbsp; [🕵️ Audit](${auditCommandUri})&nbsp; By GPTutor`
+        );
+        command.isTrusted = true;
+        return new Hover([command]);
+      },
+    })
   );
 
   context.subscriptions.push(
