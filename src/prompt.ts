@@ -57,11 +57,11 @@ export const getExplainRequestMsg = (
   return [
     {
       role: "system",
-      content: `You are a Senior ${languageId} Developer \n I will provide a target ${languageId} code, and it will be your job to explain this target ${languageId} code.`,
+      content: `You are a Senior ${languageId} Developer \n I will provide some ${languageId} code, and it will be your job to explain the  ${languageId} code I selected.`,
     },
     {
       role: "user",
-      content: `Here are target ${languageId} code : ${selectedCode}, please explain this code as detailed as possible, Here is some other information ${codeContext} if needed, Please focus on explain target ${languageId} code`,
+      content: `Other context about the selected code is in the following triple quotes """${codeContext}""". The ${languageId} code I selected is in the following triple quotes """${selectedCode}""". Please focus on explain target ${languageId} code`,
     },
   ];
 };
