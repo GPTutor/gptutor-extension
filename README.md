@@ -1,11 +1,11 @@
 # GPTutor - VS Code Extension
 
-GPTutor is a Visual Studio Code extension that uses OpenAI's GPT (Generative Pre-trained Transformer) models to provide users with code explanations and audits for a better understanding of their code. It supports Solidity language, enabling users to get insights into code blocks and improve their coding skills.
+GPTutor is a Visual Studio Code extension that uses OpenAI's GPT (Generative Pre-trained Transformer) models to provide users with code explanations and audits for a better understanding of their code. It supports Move programming languages, enabling users to get insights into code blocks and improve their coding skills.
 
 ## Features
 
 - Get code tutor and audits using OpenAI's GPT models.
-- Supports Solidity language for now.
+- Supports Move language for now.
 - Hover over code blocks to display GPTutor suggestions.
 - Set OpenAI API key for GPTutor (100% Free and we don't own your key).
 - Set the GPT model to be used (supported GPT-3.5, GPT-4).
@@ -21,19 +21,24 @@ GPTutor is a Visual Studio Code extension that uses OpenAI's GPT (Generative Pre
 
 ## Usage
 
-GPTutor provides two main functionalities: code tutor and code audit.
+GPTutor provides three main features: Explain, Comment, and Audit on the code you selected.
 
-### Code Tutor
 
-1. Hover over a code block in a supported language (Solidity).
-2. A hover tooltip will appear showing the code block and two options: GPTutor and Audit.
-3. Click on the "GPTutor" option to get detailed explanation of the selected code.
+### Code Explain
 
+1. Hover over a code block in a supported language (Move).
+2. Click on the "Explain" option to get a thoughtful explanation of the selected code.
+
+### Code Comment
+
+1. Hover over a code block in a supported language (Move).
+2. Click on the "Comment" option to get a commented and refactored version of the selected code.
 ### Code Audit
 
-1. Hover over a code block in a supported language (Solidity).
-2. A hover tooltip will appear showing the code block and two options: GPTutor and Audit.
-3. Click on the "Audit" option to get an audit of the selected code.
+1. Hover over a code block in a supported language (Move).
+1. Click on the "Audit" option to get an audit of the selected code.
+
+
 
 ## Extension Settings
 
