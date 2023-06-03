@@ -125,7 +125,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
           const explainSearchPrompt = getExplainRequestMsg(
             prompt.languageId,
             prompt.codeContext || "",
-            prompt.selectedCode
+            prompt.selectedCode,
+            this.context.globalState.get("language") || "English"
           );
           let completion: any = await this.openAiProvider.ask(
             model,
@@ -144,7 +145,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
             const p1 = FirstReplyForGpt3(
               prompt.languageId,
               prompt.selectedCode,
-              prompt.auditContext || ""
+              prompt.auditContext || "",
+              this.context.globalState.get("language") || "English"
             );
             const completion1: any = await this.openAiProvider.ask(
               model,
@@ -155,7 +157,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
             const auditSearchPrompt2 = getAuditRequestMsg(
               prompt.languageId,
               completion1 || "",
-              prompt.selectedCode
+              prompt.selectedCode,
+              this.context.globalState.get("language") || "English"
             );
             const completion2: any = await this.openAiProvider.ask(
               model,
@@ -168,7 +171,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
             const auditSearchPrompt = FirstAuditRequest(
               prompt.languageId,
               prompt.selectedCode,
-              prompt.auditContext || ""
+              prompt.auditContext || "",
+              this.context.globalState.get("language") || "English"
             );
             const completion1: any = await this.openAiProvider.ask(
               model,
@@ -185,7 +189,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
             const p1 = FirstReplyForGpt3(
               prompt.languageId,
               prompt.selectedCode,
-              prompt.auditContext || ""
+              prompt.auditContext || "",
+              this.context.globalState.get("language") || "English"
             );
             const completion1: any = await this.openAiProvider.ask(
               model,
@@ -198,7 +203,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
             const auditSearchPrompt = FirstAuditRequest(
               prompt.languageId,
               prompt.selectedCode,
-              prompt.auditContext || ""
+              prompt.auditContext || "",
+              this.context.globalState.get("language") || "English"
             );
             const completion1: any = await this.openAiProvider.ask(
               model,

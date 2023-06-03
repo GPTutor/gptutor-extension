@@ -52,8 +52,15 @@ export const getPrompt = (
 export const getExplainRequestMsg = (
   languageId: string,
   codeContext: string,
-  selectedCode: string
+  selectedCode: string,
+  outputLanguage: string = "English"
 ): reqType[] => {
+  let languageText = "";
+  if (outputLanguage && outputLanguage != "English") {
+    {
+      languageText = ` Output in ${outputLanguage}.`;
+    }
+  }
   return [
     {
       role: "system",
@@ -61,7 +68,7 @@ export const getExplainRequestMsg = (
     },
     {
       role: "user",
-      content: `Other context about the selected code is in the following triple quotes """${codeContext}""". The ${languageId} code I selected is in the following triple quotes """${selectedCode}""". Please focus on explain target ${languageId} code`,
+      content: `Other context about the selected code is in the following triple quotes """${codeContext}""". The ${languageId} code I selected is in the following triple quotes """${selectedCode}""". Please focus on explain target ${languageId} code.${languageText}`,
     },
   ];
 };
@@ -69,8 +76,15 @@ export const getExplainRequestMsg = (
 export const FirstAuditRequest = (
   languageId: string,
   selectedCode: string,
-  codeContext: string
+  codeContext: string,
+  outputLanguage: string = "English"
 ): reqType[] => {
+  let languageText = "";
+  if (outputLanguage && outputLanguage != "English") {
+    {
+      languageText = `Output in ${outputLanguage}.`;
+    }
+  }
   let moveSpecialization = "";
   if (languageId.toLowerCase() === "move") {
     console.log("Audit Move!");
@@ -84,7 +98,7 @@ export const FirstAuditRequest = (
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed`,
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed.${languageText}`,
     },
   ];
 };
@@ -92,8 +106,16 @@ export const FirstAuditRequest = (
 export const FirstReplyForGpt3 = (
   languageId: string,
   selectedCode: string,
-  codeContext: string
+  codeContext: string,
+  outputLanguage: string = "English"
 ): reqType[] => {
+  let languageText = "";
+  console.log(`outputLanguage: ${outputLanguage}`);
+  if (outputLanguage && outputLanguage != "English") {
+    {
+      languageText = `Output the explain in ${outputLanguage} and add or rewrite the comment in the code in ${outputLanguage}.`;
+    }
+  }
   return [
     {
       role: "system",
@@ -101,7 +123,7 @@ export const FirstReplyForGpt3 = (
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed \n Only return the code after modified. return the code with the start of \`\`\`${languageId}`,
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed \n Only return the code after modified. return the code with the start of \`\`\` and end it with \`\`\`.${languageText}`,
     },
   ];
 };
@@ -109,8 +131,15 @@ export const FirstReplyForGpt3 = (
 export const getAuditRequestMsg = (
   languageId: string,
   previousAnswer: string,
-  selectedCode: string
+  selectedCode: string,
+  outputLanguage: string = "English"
 ): reqType[] => {
+  let languageText = "";
+  if (outputLanguage && outputLanguage != "English") {
+    {
+      languageText = `Output in ${outputLanguage}.`;
+    }
+  }
   return [
     {
       role: "system",
@@ -118,7 +147,7 @@ export const getAuditRequestMsg = (
     },
     {
       role: "user",
-      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousAnswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return original answer`,
+      content: `The original given ${languageId} code is as follows: ${selectedCode} \n We have provided code that after refine and audit : ${previousAnswer}\n We have the opportunity to refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, \n return original answer.${languageText}`,
     },
   ];
 };
@@ -126,8 +155,15 @@ export const getAuditRequestMsg = (
 export const CustomizePrompt = (
   userInput: string,
   languageId: string,
-  selectedCode: string
+  selectedCode: string,
+  outputLanguage: string = "English"
 ): reqType[] => {
+  let languageText = "";
+  if (outputLanguage && outputLanguage != "English") {
+    {
+      languageText = `Output in ${outputLanguage}.`;
+    }
+  }
   return [
     {
       role: "system",
@@ -135,7 +171,7 @@ export const CustomizePrompt = (
     },
     {
       role: "user",
-      content: `Give question : ${userInput} \n And given code : ${selectedCode} \n Please answer ${userInput} as detail as possible `,
+      content: `Give question : ${userInput} \n And given code : ${selectedCode} \n Please answer ${userInput} as detail as possible.${languageText}`,
     },
   ];
 };
