@@ -21,7 +21,7 @@ import { CursorContext } from "./context/cursor.context";
 import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
 import * as fs from "fs";
-import { supportedLanguages } from "./media/supportedLanguages";
+import { supportedLanguages } from "./media/supportedProgrammingLanguages";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";

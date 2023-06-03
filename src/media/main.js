@@ -16,7 +16,7 @@ function auto_grow(element) {
   const vscode = acquireVsCodeApi();
   let response = "";
 
-  window.onload = function () {
+  window.onload = async function () {
     var promptEle = document.getElementById("prompt-input");
     promptEle.value = "";
     setResponse();
@@ -29,6 +29,43 @@ function auto_grow(element) {
         command: "edit-prompt",
       });
     };
+
+    const dropdownButton = document.getElementById("language-dropdown-button");
+    const dropdownMenu = document.getElementById("language-dropdown-menu");
+    const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
+
+    dropdownButton.addEventListener("click", () => {
+      dropdownMenu.classList.toggle("hidden");
+    });
+
+    let supportedLanguages = this.fetch(
+      "https://raw.githubusercontent.com/RayHuang880301/gptutor-extension/main/src/resources/supportedLanguages.json"
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        let languageBottonClickHandler = function (event) {
+          vscode.postMessage({
+            command: "changeLanguage",
+            language: event.srcElement.innerText,
+          });
+          dropdownButton.innerHTML = `${event.srcElement.innerText} ▼`;
+          dropdownMenu.classList.toggle("hidden");
+        };
+        data.forEach((language) => {
+          const li = document.createElement("li");
+          li.textContent = language;
+          li.classList.add(
+            "hover:bg-gray-100",
+            "px-2",
+            "py-1",
+            "cursor-pointer",
+            "languageListElements"
+          );
+          li.onclick = languageBottonClickHandler;
+          dropdownMenuUl.appendChild(li);
+        });
+      });
+    console.log(supportedLanguages);
   };
 
   // Handle messages sent from the extension to the webview

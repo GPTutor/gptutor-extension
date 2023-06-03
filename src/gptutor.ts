@@ -75,6 +75,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "edit-prompt":
           vscode.commands.executeCommand("GPTutor Edit Prompts");
           return;
+        case "changeLanguage":
+          this.context.globalState.update("language", message.language);
+          return;
       }
     }, undefined);
   }
@@ -280,6 +283,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
         "showdown.min.js"
       )
     );
+    const outputLanguage =
+      this.context.globalState.get("language") || "English";
 
     return `<!DOCTYPE html>
 			<html lang="en">
@@ -321,22 +326,28 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-        <div class="flex items-center">
-          <label class="mr-2">Question:</label>
-          <div class="ml-auto">
-            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" id="edit-prompt">Edit Prompt</button>
+      <div class="flex items-center">
+        <label class="mr-2">Question:</label>
+        <div class="ml-auto relative text-right">
+          <button class="text-white-500 hover:font-bold py-2 px-1 rounded" id="language-dropdown-button">${outputLanguage} ▼</button>
+          <div class="absolute right-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden" id="language-dropdown-menu">
+            <ul class="py-1" style="list-style-type: none!important;">
+            </ul>
           </div>
+          <button class="text-white-500 hover:font-bold py-2 px-2 rounded" id="edit-prompt">Edit Prompt</button>
         </div>
-				<textarea oninput="auto_grow(this)" class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
-				</textarea>
-				<hr class="hr" />
-				<label>Answer: </label>
-				<div id="response" class="pt-4 text-sm">
-				</div>
+      </div>
+    
+      <textarea oninput="auto_grow(this)" class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
+      </textarea>
+      <hr class="hr" />
+      <label>Answer: </label>
+      <div id="response" class="pt-4 text-sm">
+      </div>
 
-				<script src="${scriptUri}"></script>
-			</body>
-			</html>`;
+      <script src="${scriptUri}"></script>
+    </body>
+  </html>`;
   }
 }
 
