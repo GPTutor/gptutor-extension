@@ -22,6 +22,13 @@ function auto_grow(element) {
     setResponse();
 
     auto_grow(promptEle);
+
+    var editPromptEle = document.getElementById("edit-prompt");
+    editPromptEle.onclick = function () {
+      vscode.postMessage({
+        command: "edit-prompt",
+      });
+    };
   };
 
   // Handle messages sent from the extension to the webview

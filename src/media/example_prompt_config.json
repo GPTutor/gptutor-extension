@@ -1,0 +1,115 @@
+{
+  "currentProfile": "default",
+  "default": {
+    "prompts": [
+      {
+        "key": "Explain",
+        "displayName": "🧑\u200d🏫 Explain",
+        "type": "config",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a Senior ${languageId} Developer \n I will provide a target ${languageId} code, and it will be your job to explain this target ${languageId} code."
+          },
+          {
+            "role": "user",
+            "content": "Here are target ${languageId} code : ${selectedCode}, please explain this code as detailed as possible, Here is some other information ${codeContext} if needed, Please focus on explain target ${languageId} code"
+          }
+        ]
+      },
+      {
+        "key": "Comment",
+        "displayName": "📝 Comment",
+        "type": "config",
+        "messages": [
+          {
+            "role": "system",
+            "content": "I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code"
+          },
+          {
+            "role": "user",
+            "content": "Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed"
+          }
+        ]
+      },
+      {
+        "key": "Audit",
+        "displayName": "🕵️ Audit",
+        "type": "config",
+        "messages": [
+          {
+            "role": "system",
+            "content": "I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code"
+          },
+          {
+            "role": "user",
+            "content": "Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed"
+          }
+        ]
+      }
+    ],
+    "specificLanguages": {
+      "solidity": [],
+      "javascript": [],
+      "python": [],
+      "move": [],
+      "rust": [],
+      "typescript": [],
+      "dockercompose": [],
+      "jsonc": [],
+      "javascriptreact": [],
+      "json": [],
+      "tex": [],
+      "abap": [],
+      "lua": [],
+      "vb": [],
+      "vue": [],
+      "groovy": [],
+      "yaml": [],
+      "java": [],
+      "css": [],
+      "haml": [],
+      "go": [],
+      "stylus": [],
+      "typescriptreact": [],
+      "less": [],
+      "fsharp": [],
+      "cpp": [],
+      "clojure": [],
+      "xsl": [],
+      "powershell": [],
+      "ini": [],
+      "perl and perl6": [],
+      "r": [],
+      "handlebars": [],
+      "ruby": [],
+      "slim": [],
+      "coffeescript": [],
+      "shellscript": [],
+      "swift": [],
+      "csharp": [],
+      "makefile": [],
+      "markdown": [],
+      "bibtex": [],
+      "jade, pug": [],
+      "scss": [],
+      "sass": [],
+      "razor": [],
+      "dockerfile": [],
+      "html": [],
+      "c": [],
+      "bat": [],
+      "cuda-cpp": [],
+      "objective-c": [],
+      "plaintext": [],
+      "xml": [],
+      "php": [],
+      "vue-html": [],
+      "diff": [],
+      "sql": [],
+      "latex": [],
+      "objective-cpp": [],
+      "shaderlab": []
+    }
+  }
+}

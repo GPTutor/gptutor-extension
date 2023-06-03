@@ -1,3 +1,5 @@
+import * as fs from "fs";
+
 export type reqType = {
   role: string;
   content: string;
@@ -9,6 +11,43 @@ export interface GPTutorPromptType {
   codeContext?: string;
   auditContext?: string;
 }
+
+export const getPrompt = (
+  context: any,
+  current_mode: string,
+  current_config_provider: any,
+  languageId: string,
+  selectedCode: string,
+  codeContext: string,
+  sourceCodeContext: string
+): reqType[] => {
+  let src = context.workspaceState.get("src");
+  let promptProfile = JSON.parse(
+    fs.readFileSync(
+      context.extensionPath + "/" + src + "/media/prompt_config.json",
+      "utf8"
+    )
+  );
+  if (
+    promptProfile[promptProfile.currentProfile].specificLanguages.languageId
+      .length
+  ) {
+  }
+  let prompt;
+  try {
+    let provider = promptProfile.currentProvider;
+    prompt = promptProfile[languageId][provider][current_mode];
+  } catch (e) {
+    prompt = prompt.default[current_mode];
+  }
+  prompt = JSON.stringify(prompt);
+  prompt = prompt.replace("${languageId}", languageId);
+  prompt = prompt.replace("${selectedCode}", selectedCode);
+  prompt = prompt.replace("${codeContext}", codeContext);
+  prompt = prompt.replace("${sourceCodeContext}", sourceCodeContext);
+  prompt = Array(JSON.parse(prompt));
+  return prompt;
+};
 
 export const getExplainRequestMsg = (
   languageId: string,
@@ -32,14 +71,20 @@ export const FirstAuditRequest = (
   selectedCode: string,
   codeContext: string
 ): reqType[] => {
+  let moveSpecialization = "";
+  if (languageId.toLowerCase() === "move") {
+    console.log("Audit Move!");
+    moveSpecialization =
+      "Move is an open source language for writing safe smart contracts. It's format is similar to Rust.";
+  }
   return [
     {
       role: "system",
-      content: `I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
+      content: `${moveSpecialization} I want you to act as a professional ${languageId} Auditor. \n I will provide some code about ${languageId} smart contract, \n and it will be your job to audit provided ${languageId} smart contract code, refine provided smart contract code`,
     },
     {
       role: "user",
-      content: `Here are solidity code : ${selectedCode}, \n if there is a problem with this solidity code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed`,
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed`,
     },
   ];
 };
@@ -56,7 +101,7 @@ export const FirstReplyForGpt3 = (
     },
     {
       role: "user",
-      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this solidity code. Here is the full code ${codeContext} if needed \n Only return the code after modified`,
+      content: `Here are ${languageId} code : ${selectedCode}, \n if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Here is the full code ${codeContext} if needed \n Only return the code after modified`,
     },
   ];
 };

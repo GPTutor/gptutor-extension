@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { DefaultOpenAiModel, GPTutorOpenAiProvider } from "./openAi";
 import {
   GPTutorPromptType,
+  getPrompt,
   getExplainRequestMsg,
   FirstAuditRequest,
   getAuditRequestMsg,
@@ -69,6 +70,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
           return;
         case "log":
           vscode.window.showInformationMessage(message.text);
+          return;
+        case "edit-prompt":
+          vscode.commands.executeCommand("GPTutor Edit Prompts");
           return;
       }
     }, undefined);
@@ -195,10 +199,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
   private getHtmlForWebview(webview: vscode.Webview) {
     const extensionUri = this.context.extensionUri;
 
-    let src =
-      vscode.ExtensionMode[this.context.extensionMode] == "Development"
-        ? "src"
-        : "out";
+    let src = this.context.workspaceState.get("src", "out");
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(extensionUri, src, "media", "main.js")
     );
@@ -270,7 +271,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
 				</style>
 			</head>
 			<body>
-				<label>Question: </label>
+        <div class="flex items-center">
+          <label class="mr-2">Question:</label>
+          <div class="ml-auto">
+            <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" id="edit-prompt">Edit Prompt</button>
+          </div>
+        </div>
 				<textarea oninput="auto_grow(this)" class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
 				</textarea>
 				<hr class="hr" />

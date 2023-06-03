@@ -34,12 +34,20 @@
         "title": "GPTutor: setModel"
       },
       {
-        "command": "Active GPTutor",
+        "command": "GPTutor Explain",
         "title": "GPTutor: active"
       },
       {
         "command": "Audit GPTutor",
         "title": "GPTutor: audit"
+      },
+      {
+        "command": "GPTutor Edit Prompts",
+        "title": "GPTutor: edit prompts"
+      },
+      {
+        "command": "GPTutor Reset Prompts Config",
+        "title": "GPTutor: reset prompts"
       }
     ],
     "menus": {
@@ -67,7 +75,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out",
+    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out && rm out/media/prompt_config.json",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",

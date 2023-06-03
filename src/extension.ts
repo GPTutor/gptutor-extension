@@ -11,20 +11,55 @@ import {
   languages,
   Hover,
   MarkdownString,
+  workspace,
 } from "vscode";
+import * as vscode from "vscode";
 // const path = require('path');
 import { getApiKey } from "./apiKey";
 import { openAiIsActive } from "./openAi";
 import { CursorContext } from "./context/cursor.context";
 import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
+import * as fs from "fs";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";
 // const documents = new TextDocuments(TextDocument);
 
+function initConfig(context: ExtensionContext) {
+  let src = context.workspaceState.get("src");
+  let configPath =
+    context.extensionPath + "/" + src + "/media/prompt_config.json";
+  if (!fs.existsSync(configPath)) {
+    fs.copyFileSync(
+      configPath.replace("prompt_config.json", "example_prompt_config.json"),
+      configPath
+    );
+  }
+  context.subscriptions.push(
+    commands.registerCommand("GPTutor Edit Prompts", async () => {
+      vscode.workspace
+        .openTextDocument(configPath)
+        .then((doc) => window.showTextDocument(doc));
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("GPTutor Reset Prompts Config", async () => {
+      vscode.workspace
+        .openTextDocument(configPath)
+        .then((doc) => window.showTextDocument(doc));
+    })
+  );
+}
+
 export function activate(context: ExtensionContext) {
+  let src =
+    vscode.ExtensionMode[context.extensionMode] === "Development"
+      ? "src"
+      : "out";
+  context.workspaceState.update("src", src);
   const gptutor = new GPTutor(context);
+  initConfig(context);
 
   const cursorContext = new CursorContext(context);
 
@@ -71,7 +106,69 @@ export function activate(context: ExtensionContext) {
   // determine if cursor is selected Text or Hovering over some code
   context.subscriptions.push(
     languages.registerHoverProvider(
-      ["solidity", "javascript", "python", "move", "rust", "typescript"],
+      [
+        "dockercompose",
+        "jsonc",
+        "javascriptreact",
+        "solidity",
+        "json",
+        "tex",
+        "git-commit and git-rebase",
+        "abap",
+        "lua",
+        "vb",
+        "vue",
+        "groovy",
+        "yaml",
+        "java",
+        "css",
+        "haml",
+        "go",
+        "stylus",
+        "typescript",
+        "typescriptreact",
+        "less",
+        "fsharp",
+        "cpp",
+        "python",
+        "clojure",
+        "xsl",
+        "powershell",
+        "rust",
+        "ini",
+        "perl and perl6",
+        "r",
+        "javascript",
+        "handlebars",
+        "ruby",
+        "slim",
+        "coffeescript",
+        "shellscript",
+        "swift",
+        "csharp",
+        "makefile",
+        "markdown",
+        "bibtex",
+        "jade, pug",
+        "scss (syntax using curly brackets), sass (indented syntax)",
+        "move",
+        "razor",
+        "dockerfile",
+        "html",
+        "c",
+        "bat",
+        "cuda-cpp",
+        "objective-c",
+        "plaintext",
+        "xml",
+        "php",
+        "vue-html",
+        "diff",
+        "sql",
+        "latex",
+        "objective-cpp",
+        "shaderlab",
+      ],
       {
         provideHover(document, position, token) {
           if (!gptutor.isInited) {
@@ -89,10 +186,10 @@ export function activate(context: ExtensionContext) {
             cursorContext.currentText,
             document.languageId
           );
-          const activeCommandUri = Uri.parse(`command:Active GPTutor`);
+          const activeCommandUri = Uri.parse(`command:GPTutor Explain`);
           const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
           const command = new MarkdownString(
-            `[🧑‍🏫 Explain](${activeCommandUri}) &nbsp;&nbsp; [🕵️ Audit](${auditCommandUri}) (by GPTutor)`
+            `[🧑‍🏫 Explain](${activeCommandUri})&nbsp;[📝 Comment](${auditCommandUri})&nbsp;[🕵️ Audit](${auditCommandUri}) By GPTutor`
           );
           command.isTrusted = true;
           return new Hover([command]);
@@ -101,8 +198,7 @@ export function activate(context: ExtensionContext) {
     )
   );
   context.subscriptions.push(
-    commands.registerCommand("Active GPTutor", async () => {
-      //問題在下面這段
+    commands.registerCommand("GPTutor Explain", async () => {
       const { explainContext, languageId } = await getCurrentPromptV2(
         cursorContext
       );
