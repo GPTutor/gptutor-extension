@@ -187,15 +187,33 @@ export function activate(context: ExtensionContext) {
             document.languageId
           );
           const activeCommandUri = Uri.parse(`command:GPTutor Explain`);
+          const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
           const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
+
           const command = new MarkdownString(
-            `[🧑‍🏫 Explain](${activeCommandUri})&nbsp;[📝 Comment](${auditCommandUri})&nbsp;[🕵️ Audit](${auditCommandUri}) By GPTutor`
+            `[🧑‍🏫 Explain](${activeCommandUri})&nbsp; [📝 Comment](${commentCommandUri})&nbsp; [🕵️ Audit](${auditCommandUri})&nbsp; By GPTutor`
           );
           command.isTrusted = true;
           return new Hover([command]);
         },
       }
     )
+  );
+
+  context.subscriptions.push(
+    commands.registerCommand("GPTutor Comment", async () => {
+      const { auditContext, languageId } = await getCurrentPromptV2(
+        cursorContext
+      );
+      gptutor.search(
+        {
+          languageId: languageId,
+          auditContext,
+          selectedCode: cursorContext.currentText,
+        },
+        "Comment"
+      );
+    })
   );
   context.subscriptions.push(
     commands.registerCommand("GPTutor Explain", async () => {

@@ -175,7 +175,35 @@ export class GPTutor implements vscode.WebviewViewProvider {
           }
 
           break;
-
+        case "Comment":
+          if (model === DefaultOpenAiModel) {
+            const p1 = FirstReplyForGpt3(
+              prompt.languageId,
+              prompt.selectedCode,
+              prompt.auditContext || ""
+            );
+            const completion1: any = await this.openAiProvider.ask(
+              model,
+              p1,
+              this.updateViewContent,
+              { view: this.view }
+            );
+            this.currentResponse = completion1 || "";
+          } else {
+            const auditSearchPrompt = FirstAuditRequest(
+              prompt.languageId,
+              prompt.selectedCode,
+              prompt.auditContext || ""
+            );
+            const completion1: any = await this.openAiProvider.ask(
+              model,
+              auditSearchPrompt,
+              this.updateViewContent,
+              { view: this.view }
+            );
+            this.currentResponse = completion1 || "";
+          }
+          break;
         default:
           break;
       }

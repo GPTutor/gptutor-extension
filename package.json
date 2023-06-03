@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.94",
+  "version": "0.0.95",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -40,6 +40,10 @@
       {
         "command": "Audit GPTutor",
         "title": "GPTutor: audit"
+      },
+      {
+        "command": "GPTutor Comment",
+        "title": "GPTutor: comment"
       },
       {
         "command": "GPTutor Edit Prompts",
