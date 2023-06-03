@@ -13,6 +13,7 @@ export async function getModel(context: ExtensionContext) {
     if (selection[0]) {
       options[selection[0].label](context).catch(console.error);
     }
+    quickPick.hide();
   });
   quickPick.onDidHide(() => quickPick.dispose());
   quickPick.show();
