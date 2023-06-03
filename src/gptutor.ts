@@ -9,6 +9,7 @@ import {
   getAuditRequestMsg,
   FirstReplyForGpt3,
 } from "./prompt";
+import { getLink, getApiKey } from "./apiKey";
 
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = "gptutor.chatView";
@@ -112,6 +113,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     });
 
     this.currentMessageNum++;
+    let gptutor = this;
 
     try {
       let currentMessageNumber = this.currentMessageNum;
@@ -220,7 +222,27 @@ export class GPTutor implements vscode.WebviewViewProvider {
         });
       }
     } catch (error: any) {
-      vscode.window.showErrorMessage(error?.message || "ERROR");
+      if (error?.message == "Request failed with status code 401") {
+        vscode.window
+          .showErrorMessage(
+            error?.message || "ERROR",
+            "Set the key now",
+            "How to get the key?"
+          )
+          .then((item) => {
+            if (item === "How to get the key?") {
+              getLink();
+            } else if (item == "Set the key now") {
+              getApiKey(this.context, gptutor);
+              vscode.window.showInformationMessage(
+                "Paste your key on the input box above."
+              );
+            }
+          });
+        getLink;
+      } else {
+        vscode.window.showErrorMessage(error?.message || "ERROR");
+      }
     }
   }
 

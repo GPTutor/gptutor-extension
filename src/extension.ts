@@ -21,7 +21,7 @@ import { CursorContext } from "./context/cursor.context";
 import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
 import * as fs from "fs";
-import supportedLanguages from "./supportedLanguages";
+import { supportedLanguages } from "./media/supportedLanguages";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";
@@ -85,7 +85,7 @@ export function activate(context: ExtensionContext) {
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
         window.showInformationMessage(`GPTutor Activate Successfully!`);
       } else {
-        await getApiKey(context);
+        await getApiKey(context, gptutor);
       }
     })
   );
@@ -93,7 +93,15 @@ export function activate(context: ExtensionContext) {
   // Set OpenAI API key
   context.subscriptions.push(
     commands.registerCommand("Set OpenAI API Key", async () => {
-      await getApiKey(context);
+      await getApiKey(context, gptutor);
+    })
+  );
+  // Delete OpenAI API key
+  context.subscriptions.push(
+    commands.registerCommand("Delete OpenAI API Key", async () => {
+      context.globalState.update("OpenAI_API_KEY", undefined);
+      gptutor.setOpenAiKey("undefined");
+      window.showInformationMessage(`OpenAI_API_KEY Deleted`);
     })
   );
 

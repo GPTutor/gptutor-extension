@@ -1,4 +1,4 @@
-export default supportedLanguages = [
+export const supportedLanguages = [
   "dockercompose",
   "jsonc",
   "javascriptreact",
