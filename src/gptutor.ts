@@ -33,7 +33,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
   appendOutput(text: string) {
     let channel: any = this.context.workspaceState.get("channel");
     channel.appendLine(text);
-    channel.show(true);
+    // channel.show(true);
     return true;
   }
 
