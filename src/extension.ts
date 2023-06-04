@@ -80,9 +80,10 @@ export function activate(context: ExtensionContext) {
   // Initialize GPTutor
   context.subscriptions.push(
     commands.registerCommand("Initialize GPTutor", async () => {
+      console.log("Initialize GPTutor");
       let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
-      gptutor.setOpenAiKey(OPEN_AI_API_KEY);
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
+        gptutor.setOpenAiKey(OPEN_AI_API_KEY);
         window.showInformationMessage(`GPTutor Activate Successfully!`);
       } else {
         await getApiKey(context, gptutor);
