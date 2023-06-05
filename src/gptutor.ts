@@ -253,7 +253,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
         });
       }
     } catch (error: any) {
-      if (error?.message == "Request failed with status code 401") {
+      if (error?.message === "Request failed with status code 401") {
         this.switchToSetKeyPanel();
         vscode.window
           .showErrorMessage(
@@ -266,6 +266,20 @@ export class GPTutor implements vscode.WebviewViewProvider {
               getLink();
             } else if (item == "Set the key now") {
               this.switchToSetKeyPanel();
+            }
+          });
+        getLink;
+      } else if (error?.message.includes("429")) {
+        vscode.window
+          .showErrorMessage(
+            error?.message + "\nYou may hit the API usage limit." || "ERROR",
+            "Go to OpenAI Dashboard"
+          )
+          .then((item) => {
+            if (item === "Go to OpenAI Dashboard") {
+              vscode.env.openExternal(
+                vscode.Uri.parse("https://platform.openai.com/account/api-keys")
+              );
             }
           });
         getLink;
