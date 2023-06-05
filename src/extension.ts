@@ -86,7 +86,9 @@ export function activate(context: ExtensionContext) {
         gptutor.setOpenAiKey(OPEN_AI_API_KEY);
         window.showInformationMessage(`GPTutor Activate Successfully!`);
       } else {
-        await getApiKey(context, gptutor);
+        window.showErrorMessage(
+          "GPTutor Activate Failed because of Invalid OpenAI API Key!"
+        );
       }
     })
   );

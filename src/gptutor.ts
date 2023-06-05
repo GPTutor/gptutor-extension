@@ -10,6 +10,7 @@ import {
   FirstReplyForGpt3,
 } from "./prompt";
 import { getLink, getApiKey } from "./apiKey";
+import { openAiIsActive } from "./openAi";
 
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = "gptutor.chatView";
@@ -64,7 +65,14 @@ export class GPTutor implements vscode.WebviewViewProvider {
       localResourceRoots: [this.context.extensionUri],
     };
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
-    this.view.webview.onDidReceiveMessage((message) => {
+    let OPEN_AI_API_KEY: any = this.context.globalState.get("OpenAI_API_KEY");
+    openAiIsActive(OPEN_AI_API_KEY).then((isActive) => {
+      if (!isActive) {
+        this.switchToSetKeyPanel();
+      }
+    });
+
+    this.view.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
         case "alert":
           vscode.window.showErrorMessage(message.text);
@@ -78,6 +86,20 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "changeLanguage":
           this.context.globalState.update("language", message.language);
           return;
+        case "submit-openai-api-key":
+          let newKey = message.key;
+          console.log(newKey);
+          if (await openAiIsActive(newKey)) {
+            this.context.globalState.update("OpenAI_API_KEY", newKey);
+            this.setOpenAiKey(newKey);
+            this.switchToMainPanel();
+
+            vscode.window.showInformationMessage("OpenAI API Key add success!");
+          } else {
+            this.view?.webview.postMessage({
+              type: "gptutor-invalid-openai-key",
+            });
+          }
       }
     }, undefined);
   }
@@ -232,6 +254,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       }
     } catch (error: any) {
       if (error?.message == "Request failed with status code 401") {
+        this.switchToSetKeyPanel();
         vscode.window
           .showErrorMessage(
             error?.message || "ERROR",
@@ -242,10 +265,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
             if (item === "How to get the key?") {
               getLink();
             } else if (item == "Set the key now") {
-              getApiKey(this.context, gptutor);
-              vscode.window.showInformationMessage(
-                "Paste your key on the input box above."
-              );
+              this.switchToSetKeyPanel();
             }
           });
         getLink;
@@ -253,6 +273,18 @@ export class GPTutor implements vscode.WebviewViewProvider {
         vscode.window.showErrorMessage(error?.message || "ERROR");
       }
     }
+  }
+  switchToSetKeyPanel() {
+    this.view?.webview.postMessage({
+      type: "gptutor-switch-to-set-key-panel",
+      value: this.currentResponse,
+    });
+  }
+  switchToMainPanel() {
+    this.view?.webview.postMessage({
+      type: "gptutor-switch-to-main-panel",
+      value: this.currentResponse,
+    });
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {
@@ -292,68 +324,151 @@ export class GPTutor implements vscode.WebviewViewProvider {
     const outputLanguage =
       this.context.globalState.get("language") || "English";
 
-    return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<script src="${tailwindUri}"></script>
-				<script src="${showdownUri}"></script>
-				<script src="${microlightUri}"></script>
-				<style>
-				.code {
-					white-space: pre;
-				}
-				p {
-					padding-top: 0.4rem;
-					padding-bottom: 0.4rem;
-				}
-				ul, ol {
-					list-style: initial !important;
-					margin-left: 10px !important;
-				}
-				h1, h2, h3, h4, h5, h6 {
-					font-weight: bold !important;
-				}
-				#prompt-input {
-					width: 100%;
-					word-wrap: break-word;
-          height: 30vh;
-				}
-				.hr {
-					margin: 1rem auto;
-					opacity: .3;
-				}
-				#response {
-					padding-top: 0;
-					font-size: 0.8rem;
-					line-height: 1rem;
-				}
-				</style>
-			</head>
-			<body>
-      <div class="flex items-center">
-        <label class="mr-2">Question:</label>
-        <div class="ml-auto relative text-right">
-          <button class="text-white-500 hover:font-bold py-2 px-1 rounded" id="language-dropdown-button">${outputLanguage} ▼</button>
-          <div class="absolute right-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden" id="language-dropdown-menu">
-            <ul class="py-1" style="list-style-type: none!important;">
-            </ul>
-          </div>
-          <button class="text-white-500 hover:font-bold py-2 px-2 rounded" id="edit-prompt">Edit Prompt</button>
-        </div>
-      </div>
-    
-      <textarea oninput="auto_grow(this)" class="h-30 w-full text-white bg-stone-700 p-2 text-sm" placeholder="Ask something" id="prompt-input">
-      </textarea>
-      <hr class="hr" />
-      <label>Answer: </label>
-      <div id="response" class="pt-4 text-sm">
-      </div>
+    return String(`<!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
+          <script src="${tailwindUri}"></script>
+          <script src="${showdownUri}"></script>
+          <script src="${microlightUri}"></script>
+          <style>
+            .code {
+              white-space: pre;
+            }
+            p {
+              padding-top: 0.4rem;
+              padding-bottom: 0.4rem;
+            }
+            ul,
+            ol {
+              list-style: initial !important;
+              margin-left: 10px !important;
+            }
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+              font-weight: bold !important;
+            }
+            #prompt-input {
+              width: 100%;
+              word-wrap: break-word;
+              height: 30vh;
+            }
+            .hr {
+              margin: 1rem auto;
+              opacity: 0.3;
+            }
+            #response {
+              padding-top: 0;
+              font-size: 0.8rem;
+              line-height: 1rem;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="setOpenAI-API-Key-panel" class="hidden">
+            <h2 class="text-2xl mb-4">You Need to set key to continue.</h2>
 
-      <script src="${scriptUri}"></script>
-    </body>
-  </html>`;
+            <div class="mb-4">
+              <label
+                class="block text-white-700 text-sm font-bold mb-2"
+                for="input-openai-api-key"
+                >OpenAI API KEY</label
+              >
+
+              <input
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="input-openai-api-key"
+                type="password"
+                placeholder="Enter your OpenAI API Key"
+              />
+
+              <label
+                class="block text-red-500 font-bold text-sm my-0 hidden"
+                id="invalid-openai-api-key"
+                >Invalid API Key.</label
+              >
+            </div>
+            <div class="flex justify-center">
+              <button
+                id="submit-openai-api-key"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold mt-1 py-1 px-2 mx-2 rounded focus:outline-none focus:shadow-outline"
+              >
+                Submit OpenAI API Key
+              </button>
+            </div>
+            <h3>How To Get API Key?</h3>
+            <p>
+              First, go to
+              <a
+                href="https://platform.openai.com/"
+                class="text-blue-500 underline"
+                >OpenAI Platform</a
+              >
+              and login or sign up. Then click on
+              <u><strong>Personal</strong></u
+              >, and select
+              <a
+                href="https://platform.openai.com/account/api-keys"
+                class="text-blue-500 underline"
+                ><u><strong>View API keys</strong></u></a
+              >
+              in the drop-down menu. Finally, you can click
+              <u><strong>Create API Key</strong></u
+              >, and then copy the key and paste it here at GPTutor.
+            </p>
+            <p>GPTutor doesn't own your key, the key will be stored locally.</p>
+          </div>
+          <div id="GPTutor-main">
+            <div class="flex items-center">
+              <label class="mr-2">Question:</label>
+              <div class="ml-auto relative text-right">
+                <button
+                  class="text-white-500 hover:font-bold py-2 px-1 rounded"
+                  id="language-dropdown-button"
+                >
+                  ${outputLanguage} ▼
+                </button>
+                <div
+                  class="absolute right-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden"
+                  id="language-dropdown-menu"
+                >
+                  <ul
+                    class="py-1"
+                    style="list-style-type: none!important;"
+                  ></ul>
+                </div>
+                <button
+                  class="text-white-500 hover:font-bold py-2 px-2 rounded"
+                  id="edit-prompt"
+                >
+                  Edit Prompt
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              oninput="auto_grow(this)"
+              class="h-30 w-full text-white bg-stone-700 p-2 text-sm"
+              placeholder="Ask something"
+              id="prompt-input"
+            >
+            </textarea>
+            <hr class="hr" />
+            <label>Answer: </label>
+            <div id="response" class="pt-4 text-sm"></div>
+
+            <script src="${scriptUri}"></script>
+          </div>
+        </body>
+      </html>`);
   }
 }
 

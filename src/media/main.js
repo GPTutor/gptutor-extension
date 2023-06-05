@@ -29,6 +29,15 @@ function auto_grow(element) {
         command: "edit-prompt",
       });
     };
+    let subOpenAIKeyBtn = document.getElementById("submit-openai-api-key");
+    subOpenAIKeyBtn.onclick = function () {
+      let keyInput = document.getElementById("input-openai-api-key");
+      vscode.postMessage({
+        command: "submit-openai-api-key",
+        key: keyInput.value,
+      });
+      keyInput.value = "";
+    };
 
     const dropdownButton = document.getElementById("language-dropdown-button");
     const dropdownMenu = document.getElementById("language-dropdown-menu");
@@ -83,6 +92,31 @@ function auto_grow(element) {
         break;
       }
       case "gptutor-set-prompt": {
+        var promptEle = document.getElementById("prompt-input");
+        promptEle.value = message.value;
+        auto_grow(promptEle);
+        break;
+      }
+      case "gptutor-switch-to-set-key-panel": {
+        console.log("Please set your API key in the extension settings.");
+        var setKeyPanel = document.getElementById("setOpenAI-API-Key-panel");
+        setKeyPanel.classList.remove("hidden");
+        var gptutorMain = document.getElementById("GPTutor-main");
+        gptutorMain.classList.add("hidden");
+        break;
+      }
+      case "gptutor-invalid-openai-key": {
+        var setKeyPanel = document.getElementById("invalid-openai-api-key");
+        setKeyPanel.classList.remove("hidden");
+        break;
+      }
+      case "gptutor-switch-to-main-panel": {
+        var setKeyPanel = document.getElementById("setOpenAI-API-Key-panel");
+        setKeyPanel.classList.add("hidden");
+        var setKeyPanel = document.getElementById("invalid-openai-api-key");
+        setKeyPanel.classList.add("hidden");
+        var gptutorMain = document.getElementById("GPTutor-main");
+        gptutorMain.classList.remove("hidden");
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
