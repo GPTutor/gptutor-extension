@@ -134,16 +134,38 @@ export function activate(context: ExtensionContext) {
           cursorContext.currentText,
           document.languageId
         );
-        const activeCommandUri = Uri.parse(`command:GPTutor Explain`);
-        const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
-        const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
+        // const explainCommandUri = Uri.parse(`command:GPTutor Explain`);
+        // const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
+        // const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
+
+        const explainCommandUri = Uri.parse(
+          `command:GPTutor Active?${encodeURIComponent(
+            JSON.stringify({ mode: "Explain" })
+          )}`
+        );
+        const commentCommandUri = Uri.parse(
+          `command:GPTutor Active?${encodeURIComponent(
+            JSON.stringify({ mode: "Comment" })
+          )}`
+        );
+        const auditCommandUri = Uri.parse(
+          `command:GPTutor Active?${encodeURIComponent(
+            JSON.stringify({ mode: "Audit" })
+          )}`
+        );
 
         const command = new MarkdownString(
-          `[🧑‍🏫 Explain](${activeCommandUri})&nbsp; [📝 Comment](${commentCommandUri})&nbsp; [🕵️ Audit](${auditCommandUri})&nbsp; By GPTutor`
+          `[🧑‍🏫 Explain](${explainCommandUri})&nbsp; [📝 Comment](${commentCommandUri})&nbsp; [🕵️ Audit](${auditCommandUri})&nbsp; By GPTutor`
         );
         command.isTrusted = true;
         return new Hover([command]);
       },
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("GPTutor Active", async (args) => {
+      console.log(`Active ${args}`);
+      commands.executeCommand(`GPTutor ${args.mode}`);
     })
   );
 

@@ -38,8 +38,12 @@
         "title": "GPTutor: setModel"
       },
       {
-        "command": "GPTutor Explain",
+        "command": "GPTutor Active",
         "title": "GPTutor: active"
+      },
+      {
+        "command": "GPTutor Explain",
+        "title": "GPTutor: explain"
       },
       {
         "command": "Audit GPTutor",
