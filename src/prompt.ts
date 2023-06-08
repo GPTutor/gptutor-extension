@@ -111,6 +111,33 @@ export const FirstAuditRequest = (
   ];
 };
 
+export const CommentRequestMsg = (
+  languageId: string,
+  selectedCode: string,
+  codeContext: string,
+  outputLanguage: string = "English"
+): reqType[] => {
+  let noteForLanguage = "";
+  if (outputLanguage && outputLanguage != "English") {
+    {
+      noteForLanguage = `Add or rewrite the comment in the given code in ${outputLanguage}.`;
+    }
+  }
+  if (outputLanguage == "Chinese (Traditional)") {
+    noteForLanguage += TaiwaneseWordsNote;
+  }
+  return [
+    {
+      role: "system",
+      content: `I want you to act as a professional ${languageId} Commenter. \n I will provide some code about ${languageId}, \n and it will be your job to add or rewrite comment on the provided ${languageId} code. You should only edit command, but keep the code the same.`,
+    },
+    {
+      role: "user",
+      content: `Here are some context of the code, don't output them: ${codeContext}\n Here are the ${languageId} code I want you to add comment: ${selectedCode}. Only return the code after modified. return the code with the start of \`\`\` and end it with \`\`\`.${noteForLanguage}`,
+    },
+  ];
+};
+
 export const FirstReplyForGpt3 = (
   languageId: string,
   selectedCode: string,

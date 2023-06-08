@@ -8,6 +8,7 @@ import {
   FirstAuditRequest,
   getAuditRequestMsg,
   FirstReplyForGpt3,
+  CommentRequestMsg,
 } from "./prompt";
 import { getLink, getApiKey } from "./apiKey";
 import { openAiIsActive } from "./openAi";
@@ -216,7 +217,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
           break;
         case "Comment":
-          const p1 = FirstReplyForGpt3(
+          const p1 = CommentRequestMsg(
             prompt.languageId,
             prompt.selectedCode,
             prompt.auditContext || "",
@@ -246,7 +247,11 @@ export class GPTutor implements vscode.WebviewViewProvider {
         });
       }
     } catch (error: any) {
-      if (
+      if (error?.message === "Request failed with status code 400") {
+        vscode.window.showErrorMessage(
+          "Request failed with status code 400. This may because the length is too long. You may select less code or use GPT-4 to avoid this problem."
+        );
+      } else if (
         error?.message === "Request failed with status code 404" &&
         (this.context.globalState.get("MODEL") as string) == "gpt-4"
       ) {
