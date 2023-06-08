@@ -39,41 +39,103 @@ function auto_grow(element) {
       keyInput.value = "";
     };
 
-    const dropdownButton = document.getElementById("language-dropdown-button");
-    const dropdownMenu = document.getElementById("language-dropdown-menu");
-    const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
+    {
+      const dropdownButton = document.getElementById("dropdown-button");
+      const dropdownMenu = document.getElementById("dropdown-menu");
+      const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
 
-    dropdownButton.addEventListener("click", () => {
-      dropdownMenu.classList.toggle("hidden");
-    });
+      dropdownButton.addEventListener("click", () => {
+        const dropdownMenus = document.getElementsByClassName("dropdown-menu");
+        Array.from(dropdownMenus).forEach((menu) => {
+          if (dropdownMenu != menu) menu.classList.add("hidden");
+        });
+        dropdownMenu.classList.toggle("hidden");
+      });
 
-    let supportedLanguages = this.fetch(
-      "https://raw.githubusercontent.com/RayHuang880301/gptutor-extension/main/src/resources/supportedLanguages.json"
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        let languageBottonClickHandler = function (event) {
-          vscode.postMessage({
-            command: "changeLanguage",
-            language: event.srcElement.innerText,
+      // Get all dropdown items with nested dropdowns
+      const dropdownItems = dropdownMenu.getElementsByClassName("relative");
+
+      // Attach event listeners to each dropdown item
+      Array.from(dropdownItems).forEach((item) => {
+        const dropdownSubmenu = item.querySelector("div");
+        const dropdownText = item.querySelector("span");
+        let isMouseInButton = false;
+        item.addEventListener("mouseover", () => {
+          Array.from(dropdownItems).forEach((item) => {
+            item.querySelector("div").classList.add("hidden");
           });
-          dropdownButton.innerHTML = `${event.srcElement.innerText} ▼`;
-          dropdownMenu.classList.toggle("hidden");
-        };
-        data.forEach((language) => {
-          const li = document.createElement("li");
-          li.textContent = language;
+          dropdownSubmenu.classList.remove("hidden");
+          isMouseInButton = true;
+        });
+
+        Array.from(item.getElementsByTagName("li")).forEach((li) => {
           li.classList.add(
             "hover:bg-gray-100",
             "px-2",
             "py-1",
-            "cursor-pointer",
-            "languageListElements"
+            "hover:text-black",
+            "cursor-pointer"
           );
-          li.onclick = languageBottonClickHandler;
-          dropdownMenuUl.appendChild(li);
         });
       });
+    }
+    {
+      const dropdownButton = document.getElementById(
+        "language-dropdown-button"
+      );
+      const dropdownMenu = document.getElementById("language-dropdown-menu");
+      const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
+
+      dropdownButton.addEventListener("click", () => {
+        const dropdownMenus = document.getElementsByClassName("dropdown-menu");
+        Array.from(dropdownMenus).forEach((menu) => {
+          if (dropdownMenu != menu) menu.classList.add("hidden");
+        });
+        dropdownMenu.classList.toggle("hidden");
+      });
+
+      let supportedLanguages = this.fetch(
+        "https://raw.githubusercontent.com/RayHuang880301/gptutor-extension/main/src/resources/supportedLanguages.json"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          let languageBottonClickHandler = function (event) {
+            vscode.postMessage({
+              command: "changeLanguage",
+              language: event.srcElement.innerText,
+            });
+            dropdownButton.innerHTML = `${event.srcElement.innerText} ▼`;
+            dropdownMenu.classList.toggle("hidden");
+          };
+          data.forEach((language) => {
+            const li = document.createElement("li");
+            li.textContent = language;
+            li.classList.add(
+              "hover:bg-gray-100",
+              "hover:text-black",
+              "px-2",
+              "py-1",
+              "cursor-pointer",
+              "languageListElements"
+            );
+            li.onclick = languageBottonClickHandler;
+            dropdownMenuUl.appendChild(li);
+          });
+        });
+    }
+    document.addEventListener("click", (event) => {
+      const targetElement = event.target;
+      if (
+        !targetElement.closest(".dropdown-menu") &&
+        !targetElement.closest(".dropdown-button")
+      ) {
+        const dropdownMenus = document.getElementsByClassName("dropdown-menu");
+        Array.from(dropdownMenus).forEach((menu) => {
+          menu.classList.add("hidden");
+        });
+      }
+    });
+
     console.log(supportedLanguages);
   };
 

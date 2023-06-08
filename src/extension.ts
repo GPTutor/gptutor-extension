@@ -201,7 +201,7 @@ export function activate(context: ExtensionContext) {
   );
 
   context.subscriptions.push(
-    commands.registerCommand("Audit GPTutor", async () => {
+    commands.registerCommand("GPTutor Audit", async () => {
       const { auditContext, languageId } = await getCurrentPromptV2(
         cursorContext
       );

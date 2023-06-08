@@ -11,7 +11,15 @@ import {
 } from "./prompt";
 import { getLink, getApiKey } from "./apiKey";
 import { openAiIsActive } from "./openAi";
+import { defaultCachePath } from "@vscode/test-electron/out/download";
 
+function html(strings: TemplateStringsArray, ...values: any[]) {
+  const parsedString = strings.reduce((acc, curr, index) => {
+    // Concatenate the current string literal with its interpolated value
+    return acc + curr + (index < values.length ? values[index] : "");
+  }, "");
+  return parsedString;
+}
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = "gptutor.chatView";
 
@@ -196,6 +204,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
               prompt.auditContext || "",
               this.context.globalState.get("language") || "English"
             );
+            console.log(`auditSearchPrompt: ${auditSearchPrompt}`);
             const completion1: any = await this.openAiProvider.ask(
               model,
               auditSearchPrompt,
@@ -207,6 +216,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
           break;
         case "Comment":
+          console.log("Comment");
           if (model === DefaultOpenAiModel) {
             const p1 = FirstReplyForGpt3(
               prompt.languageId,
@@ -222,6 +232,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
             );
             this.currentResponse = completion1 || "";
           } else {
+            console.log("Comment Else!");
             const auditSearchPrompt = FirstAuditRequest(
               prompt.languageId,
               prompt.selectedCode,
@@ -253,7 +264,14 @@ export class GPTutor implements vscode.WebviewViewProvider {
         });
       }
     } catch (error: any) {
-      if (error?.message === "Request failed with status code 401") {
+      if (
+        error?.message === "Request failed with status code 404" &&
+        (this.context.globalState.get("MODEL") as string) == "gpt-4"
+      ) {
+        vscode.window.showErrorMessage(
+          "Your API Key is not supporting GPT-4, use GPT-3 or try another one"
+        );
+      } else if (error?.message === "Request failed with status code 401") {
         this.switchToSetKeyPanel();
         vscode.window
           .showErrorMessage(
@@ -338,7 +356,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     const outputLanguage =
       this.context.globalState.get("language") || "English";
 
-    return String(`<!DOCTYPE html>
+    return String(html`<!DOCTYPE html>
       <html lang="en">
         <head>
           <meta charset="UTF-8" />
@@ -442,21 +460,78 @@ export class GPTutor implements vscode.WebviewViewProvider {
           </div>
           <div id="GPTutor-main">
             <div class="flex items-center">
-              <label class="mr-2">Question:</label>
+              <!-- <label class="mr-2">Question:</label> -->
+              <!-- <div class="mr-auto relative text-left">
+                <button
+                  class="text-white-500 hover:font-bold py-2 px-1 rounded dropdown-button"
+                  id="dropdown-button"
+                >
+                  AAAA
+                </button>
+                <div
+                  class="absolute left-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu"
+                  id="dropdown-menu"
+                >
+                  <ul
+                    class="py-1"
+                    style="list-style-type: none!important; margin-left: 0px !important;"
+                  >
+                    <li
+                      class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
+                    >
+                      <span class="cursor-pointer">A</span>
+
+                      <div
+                        class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
+                      >
+                        <ul
+                          class="py-0"
+                          style="list-style-type: none!important; margin-left: 0px !important;"
+                        >
+                          <li>A1</li>
+                          <li>A2</li>
+                          <li>A3</li>
+                        </ul>
+                      </div>
+                    </li>
+                    <li
+                      class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
+                    >
+                      <span class="cursor-pointer">B</span>
+
+                      <div
+                        class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
+                      >
+                        <ul
+                          class="py-0"
+                          style="list-style-type: none!important; margin-left: 0px !important;"
+                        >
+                          <li>B1</li>
+                          <li>B2</li>
+                          <li>B3</li>
+                        </ul>
+                      </div>
+                    </li>
+                    <li>
+                      <span class="cursor-pointer">C</span>
+                    </li>
+                  </ul>
+                </div>
+              </div> -->
               <div class="ml-auto relative text-right">
                 <button
-                  class="text-white-500 hover:font-bold py-2 px-1 rounded"
+                  class="text-white-500 hover:font-bold py-2 px-1 rounded dropdown-button"
                   id="language-dropdown-button"
                 >
                   ${outputLanguage} ▼
                 </button>
                 <div
-                  class="absolute right-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden"
+                  class="absolute right-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu"
                   id="language-dropdown-menu"
                 >
                   <ul
-                    class="py-1"
-                    style="list-style-type: none!important;"
+                    class="py-1 text-left"
+                    style="list-style-type: none!important; margin-left: 0px !important;"
                   ></ul>
                 </div>
                 <button
