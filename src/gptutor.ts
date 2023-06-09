@@ -74,7 +74,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
       localResourceRoots: [this.context.extensionUri],
     };
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
-    let OPEN_AI_API_KEY: any = this.context.globalState.get("OpenAI_API_KEY");
+    let OPEN_AI_API_KEY: any = vscode.workspace
+      .getConfiguration("gptutor")
+      .get("openAIApiKey");
     openAiIsActive(OPEN_AI_API_KEY).then((isActive) => {
       if (!isActive) {
         this.switchToSetKeyPanel();
@@ -99,7 +101,14 @@ export class GPTutor implements vscode.WebviewViewProvider {
           let newKey = message.key;
           console.log(newKey);
           if (await openAiIsActive(newKey)) {
-            this.context.globalState.update("OpenAI_API_KEY", newKey);
+            // this.context.globalState.update("OpenAI_API_KEY", newKey);
+            vscode.workspace
+              .getConfiguration("gptutor")
+              .update(
+                "openAIApiKey",
+                newKey,
+                vscode.ConfigurationTarget.Global
+              );
             this.setOpenAiKey(newKey);
             this.switchToMainPanel();
 

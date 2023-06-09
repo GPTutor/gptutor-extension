@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.103",
+  "version": "0.0.104",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -20,6 +20,16 @@
   ],
   "main": "out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "GPTutor",
+      "properties": {
+        "gptutor.openAIApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API Key"
+        }
+      }
+    },
     "commands": [
       {
         "command": "Initialize GPTutor",

@@ -29,19 +29,39 @@ import { supportedLanguages } from "./media/supportedProgrammingLanguages";
 
 function initConfig(context: ExtensionContext) {
   let src = context.workspaceState.get("src");
-  let configPath =
+
+  let SourceConfigPath =
     context.extensionPath + "/" + src + "/media/prompt_config.json";
+  let configPath = "/tmp/gptutor_prompt_config.json";
+
   if (!fs.existsSync(configPath)) {
     fs.copyFileSync(
-      configPath.replace("prompt_config.json", "example_prompt_config.json"),
+      SourceConfigPath.replace(
+        "prompt_config.json",
+        "example_prompt_config.json"
+      ),
       configPath
     );
   }
   context.subscriptions.push(
     commands.registerCommand("GPTutor Edit Prompts", async () => {
-      vscode.workspace
-        .openTextDocument(configPath)
-        .then((doc) => window.showTextDocument(doc));
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "gptutor.openAIApiKey"
+      );
+      let config = workspace.getConfiguration("gptutor");
+
+      console.log(`config: ${config.inspect("openAIApiKey")}`);
+      console.log(config.inspect("openAIApiKey"));
+      // workspace.getConfiguration("gptutor").update("openAIApiKey", "key");
+      // vscode.workspace.openTextDocument(configPath).then((doc) => {
+      //   window.showTextDocument(doc);
+      //   console.log(doc);
+      //   vscode.workspace.onDidChangeTextDocument((e) => {
+      //     console.log(e);
+      //     console.log(e.document == doc);
+      //   });
+      // });
     })
   );
   context.subscriptions.push(
@@ -81,7 +101,10 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("Initialize GPTutor", async () => {
       console.log("Initialize GPTutor");
-      let OPEN_AI_API_KEY: any = context.globalState.get("OpenAI_API_KEY");
+      let OPEN_AI_API_KEY: any = vscode.workspace
+        .getConfiguration("gptutor")
+        .get("openAIApiKey");
+
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
         gptutor.setOpenAiKey(OPEN_AI_API_KEY);
         window.showInformationMessage(`GPTutor Activate Successfully!`);
@@ -102,7 +125,10 @@ export function activate(context: ExtensionContext) {
   // Delete OpenAI API key
   context.subscriptions.push(
     commands.registerCommand("Delete OpenAI API Key", async () => {
-      context.globalState.update("OpenAI_API_KEY", undefined);
+      // context.globalState.update("OpenAI_API_KEY", undefined);
+      workspace
+        .getConfiguration("gptutor")
+        .update("openAIApiKey", "", vscode.ConfigurationTarget.Global);
       gptutor.setOpenAiKey("undefined");
       window.showInformationMessage(`OpenAI_API_KEY Deleted`);
     })

@@ -1,5 +1,6 @@
-import { window, env, Uri, ExtensionContext } from "vscode";
+import { window, env, Uri, ExtensionContext, workspace } from "vscode";
 import { openAiIsActive } from "./openAi";
+import * as vscode from "vscode";
 
 export async function getApiKey(context: ExtensionContext, gptutor: any) {
   const options: {
@@ -29,7 +30,9 @@ export async function getApiKey(context: ExtensionContext, gptutor: any) {
     if (!selection) {
       try {
         if (
-          !(await openAiIsActive(context.globalState.get("OpenAI_API_KEY")))
+          !(await openAiIsActive(
+            workspace.getConfiguration("gptutor").get("openAIApiKey")
+          ))
         ) {
           throw new Error("Invalid API Key");
         }
@@ -41,7 +44,10 @@ export async function getApiKey(context: ExtensionContext, gptutor: any) {
     }
     let key = selection.label;
     if (await openAiIsActive(key)) {
-      context.globalState.update("OpenAI_API_KEY", key);
+      // context.globalState.update("OpenAI_API_KEY", key);
+      workspace
+        .getConfiguration("gptutor")
+        .update("openAIApiKey", key, vscode.ConfigurationTarget.Global);
       context.workspaceState.update("invalidKey", NaN);
 
       gptutor.setOpenAiKey(key);
