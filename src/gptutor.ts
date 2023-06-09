@@ -457,7 +457,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
           <div id="GPTutor-main">
             <div class="flex items-center">
               <!-- <label class="mr-2">Question:</label> -->
-              <!-- <div class="mr-auto relative text-left">
+              <div class="mr-auto relative text-left hidden">
                 <button
                   class="text-white-500 hover:font-bold py-2 px-1 rounded dropdown-button"
                   id="dropdown-button"
@@ -513,7 +513,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                     </li>
                   </ul>
                 </div>
-              </div> -->
+              </div>
               <div class="ml-auto relative text-right">
                 <button
                   class="text-white-500 hover:font-bold py-2 px-1 rounded dropdown-button"

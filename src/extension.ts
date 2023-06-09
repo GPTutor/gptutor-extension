@@ -32,45 +32,43 @@ function initConfig(context: ExtensionContext) {
 
   let SourceConfigPath =
     context.extensionPath + "/" + src + "/media/prompt_config.json";
-  let configPath = "/tmp/gptutor_prompt_config.json";
 
-  if (!fs.existsSync(configPath)) {
+  if (!fs.existsSync(SourceConfigPath)) {
     fs.copyFileSync(
       SourceConfigPath.replace(
         "prompt_config.json",
         "example_prompt_config.json"
       ),
-      configPath
+      SourceConfigPath
     );
   }
   context.subscriptions.push(
     commands.registerCommand("GPTutor Edit Prompts", async () => {
-      vscode.commands.executeCommand(
-        "workbench.action.openSettings",
-        "gptutor.openAIApiKey"
-      );
-      let config = workspace.getConfiguration("gptutor");
-
-      console.log(`config: ${config.inspect("openAIApiKey")}`);
-      console.log(config.inspect("openAIApiKey"));
+      // vscode.commands.executeCommand(
+      //   "workbench.action.openSettings",
+      //   "gptutor.openAIApiKey"
+      // );
+      // let config = workspace.getConfiguration("gptutor");
+      // console.log(`config: ${config.inspect("openAIApiKey")}`);
+      // console.log(config.inspect("openAIApiKey"));
       // workspace.getConfiguration("gptutor").update("openAIApiKey", "key");
-      // vscode.workspace.openTextDocument(configPath).then((doc) => {
-      //   window.showTextDocument(doc);
-      //   console.log(doc);
-      //   vscode.workspace.onDidChangeTextDocument((e) => {
-      //     console.log(e);
-      //     console.log(e.document == doc);
-      //   });
-      // });
+      vscode.workspace.openTextDocument(SourceConfigPath).then((doc) => {
+        window.showTextDocument(doc);
+        console.log(doc);
+        vscode.workspace.onDidChangeTextDocument((e) => {
+          console.log(e);
+          console.log(e.document == doc);
+        });
+      });
     })
   );
-  context.subscriptions.push(
-    commands.registerCommand("GPTutor Reset Prompts Config", async () => {
-      vscode.workspace
-        .openTextDocument(configPath)
-        .then((doc) => window.showTextDocument(doc));
-    })
-  );
+  // context.subscriptions.push(
+  //   commands.registerCommand("GPTutor Reset Prompts Config", async () => {
+  //     vscode.workspace
+  //       .openTextDocument(configPath)
+  //       .then((doc) => window.showTextDocument(doc));
+  //   })
+  // );
 }
 
 export function activate(context: ExtensionContext) {
