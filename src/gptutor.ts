@@ -13,6 +13,7 @@ import {
 import { getLink, getApiKey } from "./apiKey";
 import { openAiIsActive } from "./openAi";
 import { defaultCachePath } from "@vscode/test-electron/out/download";
+import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
@@ -28,13 +29,15 @@ export class GPTutor implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
 
   private context!: vscode.ExtensionContext;
+  private cursorContext: any;
   private currentResponse: string = "";
   private currentMessageNum = 0;
   private currentPrompt?: GPTutorPromptType;
   public isInited = false;
 
-  constructor(_context: vscode.ExtensionContext) {
+  constructor(_context: vscode.ExtensionContext, cursorContext: any) {
     this.context = _context;
+    this.cursorContext = cursorContext;
     let channel = vscode.window.createOutputChannel("GPTutor");
     this.context.workspaceState.update("channel", channel);
     this.appendOutput("GPTutor is constructed.");
@@ -127,17 +130,17 @@ export class GPTutor implements vscode.WebviewViewProvider {
       value: total_text_so_far,
     });
   }
-
-  public async search(prompt: GPTutorPromptType, type: string) {
-    this.currentPrompt = prompt;
+  public async active(mode: string) {
+    this.currentPrompt = await getCurrentPromptV2(
+      this.context,
+      this.cursorContext
+    );
     const model =
       (this.context.globalState.get("MODEL") as string) || DefaultOpenAiModel;
 
-    if (!prompt) {
+    if (!this.currentPrompt) {
       return;
     }
-
-    // focus gpt activity from activity bar
     if (!this.view) {
       await vscode.commands.executeCommand(`${GPTutor.viewType}.focus`);
     } else {
@@ -156,105 +159,54 @@ export class GPTutor implements vscode.WebviewViewProvider {
     });
 
     this.currentMessageNum++;
-    let gptutor = this;
-
+    let gptutor: any = this;
     try {
       let currentMessageNumber = this.currentMessageNum;
-      switch (type) {
-        case "Explain":
-          const explainSearchPrompt = getExplainRequestMsg(
-            prompt.languageId,
-            prompt.codeContext || "",
-            prompt.selectedCode,
-            this.context.globalState.get("language") || "English"
-          );
-          let completion: any = await this.openAiProvider.ask(
-            model,
-            explainSearchPrompt,
-            this.updateViewContent,
-            { view: this.view }
-          );
-          this.currentResponse = completion || "";
-          console.log({
-            currentMessageNumber,
-            explainResponse: this.currentResponse,
-          });
-          break;
-        case "Audit":
-          if (model === DefaultOpenAiModel) {
-            const p1 = FirstReplyForGpt3(
-              prompt.languageId,
-              prompt.selectedCode,
-              prompt.auditContext || "",
-              this.context.globalState.get("language") || "English"
-            );
-            const completion1: any = await this.openAiProvider.ask(
-              model,
-              p1,
-              this.updateViewContent,
-              { view: this.view }
-            );
-            const auditSearchPrompt2 = getAuditRequestMsg(
-              prompt.languageId,
-              completion1 || "",
-              prompt.selectedCode,
-              this.context.globalState.get("language") || "English"
-            );
-            const completion2: any = await this.openAiProvider.ask(
-              model,
-              auditSearchPrompt2,
-              this.updateViewContent,
-              { view: this.view }
-            );
-            this.currentResponse = completion2;
-          } else {
-            const auditSearchPrompt = FirstAuditRequest(
-              prompt.languageId,
-              prompt.selectedCode,
-              prompt.auditContext || "",
-              this.context.globalState.get("language") || "English"
-            );
-            console.log(`auditSearchPrompt: ${auditSearchPrompt}`);
-            const completion1: any = await this.openAiProvider.ask(
-              model,
-              auditSearchPrompt,
-              this.updateViewContent,
-              { view: this.view }
-            );
-            this.currentResponse = completion1 || "";
-          }
+      let config: any = vscode.workspace
+        .getConfiguration("")
+        .get("gptutor.prompts");
+      let prompts =
+        config.specificLanguage[this.currentPrompt.languageId] || config.global;
+      let prompt: any[] = prompts[mode.toLowerCase()].prompt;
 
-          break;
-        case "Comment":
-          const p1 = CommentRequestMsg(
-            prompt.languageId,
-            prompt.selectedCode,
-            prompt.auditContext || "",
-            this.context.globalState.get("language") || "English"
-          );
-          const completion1: any = await this.openAiProvider.ask(
-            model,
-            p1,
-            this.updateViewContent,
-            { view: this.view }
-          );
-          this.currentResponse = completion1 || "";
-          break;
-        default:
-          break;
-      }
+      let outputLanguage: string =
+        this.context.globalState.get("language") || "English";
+      prompt.map((item, index) => {
+        let content: string = item.content;
+        content = content.replaceAll(
+          "${languageId}",
+          gptutor.currentPrompt.languageId || ""
+        );
+        content = content.replaceAll(
+          "${auditContext}",
+          gptutor.currentPrompt.auditContext || ""
+        );
+        content = content.replaceAll(
+          "${codeContext}",
+          gptutor.currentPrompt.codeContext || ""
+        );
+        content = content.replaceAll(
+          "${selectedCode}",
+          gptutor.currentPrompt.selectedCode
+        );
+        content = content.replaceAll("${outputLanguage}", outputLanguage);
+        prompt[index].content = content;
+      });
+      prompt[prompt.length - 1].content +=
+        config.appendixForSpecificLanguage[outputLanguage] || "";
 
-      if (this.currentMessageNum !== currentMessageNumber) {
-        return;
-      }
-
-      if (this.view) {
-        this.view.show?.(true);
-        this.view.webview.postMessage({
-          type: "gptutor-set-answer",
-          value: this.currentResponse,
-        });
-      }
+      console.log(prompt);
+      let completion: any = await this.openAiProvider.ask(
+        model,
+        prompt,
+        this.updateViewContent,
+        { view: this.view }
+      );
+      this.currentResponse = completion || "";
+      console.log({
+        currentMessageNumber,
+        explainResponse: this.currentResponse,
+      });
     } catch (error: any) {
       if (error?.message === "Request failed with status code 400") {
         vscode.window.showErrorMessage(
@@ -302,6 +254,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       }
     }
   }
+
   switchToSetKeyPanel() {
     this.view?.webview.postMessage({
       type: "gptutor-switch-to-set-key-panel",

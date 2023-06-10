@@ -22,6 +22,7 @@ import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
 import * as fs from "fs";
 import { supportedLanguages } from "./media/supportedProgrammingLanguages";
+import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 
 // import { TextDocuments } from "vscode-languageserver";
 // import { TextDocument } from "vscode-languageserver-textdocument";
@@ -44,22 +45,10 @@ function initConfig(context: ExtensionContext) {
   }
   context.subscriptions.push(
     commands.registerCommand("GPTutor Edit Prompts", async () => {
-      // vscode.commands.executeCommand(
-      //   "workbench.action.openSettings",
-      //   "gptutor.openAIApiKey"
-      // );
-      // let config = workspace.getConfiguration("gptutor");
-      // console.log(`config: ${config.inspect("openAIApiKey")}`);
-      // console.log(config.inspect("openAIApiKey"));
-      // workspace.getConfiguration("gptutor").update("openAIApiKey", "key");
-      vscode.workspace.openTextDocument(SourceConfigPath).then((doc) => {
-        window.showTextDocument(doc);
-        console.log(doc);
-        vscode.workspace.onDidChangeTextDocument((e) => {
-          console.log(e);
-          console.log(e.document == doc);
-        });
-      });
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "gptutor.prompts"
+      );
     })
   );
   // context.subscriptions.push(
@@ -77,10 +66,9 @@ export function activate(context: ExtensionContext) {
       ? "src"
       : "out";
   context.workspaceState.update("src", src);
-  const gptutor = new GPTutor(context);
-  initConfig(context);
-
   const cursorContext = new CursorContext(context);
+  const gptutor = new GPTutor(context, cursorContext);
+  initConfig(context);
 
   console.log(
     'Congratulations, your extension "gptutor-extension" is now active!'
@@ -164,17 +152,17 @@ export function activate(context: ExtensionContext) {
 
         const explainCommandUri = Uri.parse(
           `command:GPTutor Active?${encodeURIComponent(
-            JSON.stringify({ mode: "Explain" })
+            JSON.stringify({ mode: "explain" })
           )}`
         );
         const commentCommandUri = Uri.parse(
           `command:GPTutor Active?${encodeURIComponent(
-            JSON.stringify({ mode: "Comment" })
+            JSON.stringify({ mode: "comment" })
           )}`
         );
         const auditCommandUri = Uri.parse(
           `command:GPTutor Active?${encodeURIComponent(
-            JSON.stringify({ mode: "Audit" })
+            JSON.stringify({ mode: "audit" })
           )}`
         );
 
@@ -189,85 +177,14 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("GPTutor Active", async (args) => {
       console.log(`Active ${args}`);
-      commands.executeCommand(`GPTutor ${args.mode}`);
+      let config = workspace.getConfiguration("gptutor");
+      let prompts: any = config.get("prompts");
+      gptutor.active(args.mode);
     })
   );
 
-  context.subscriptions.push(
-    commands.registerCommand("GPTutor Comment", async () => {
-      const { auditContext, languageId } = await getCurrentPromptV2(
-        cursorContext
-      );
-      gptutor.search(
-        {
-          languageId: languageId,
-          auditContext,
-          selectedCode: cursorContext.currentText,
-        },
-        "Comment"
-      );
-    })
-  );
-  context.subscriptions.push(
-    commands.registerCommand("GPTutor Explain", async () => {
-      const { explainContext, languageId } = await getCurrentPromptV2(
-        cursorContext
-      );
-      gptutor.search(
-        {
-          languageId: languageId,
-          codeContext: explainContext,
-          selectedCode: cursorContext.currentText,
-        },
-        "Explain"
-      );
-    })
-  );
-
-  context.subscriptions.push(
-    commands.registerCommand("GPTutor Audit", async () => {
-      const { auditContext, languageId } = await getCurrentPromptV2(
-        cursorContext
-      );
-
-      gptutor.search(
-        {
-          languageId: languageId,
-          auditContext,
-          selectedCode: cursorContext.currentText,
-        },
-        "Audit"
-      );
-    })
-  );
   commands.executeCommand("Initialize GPTutor");
   // cursorContext.init();
-}
-
-async function getCurrentPromptV2(cursorContext: CursorContext) {
-  const editor = window.activeTextEditor;
-  if (!editor) {
-    window.showErrorMessage("No active editor");
-    throw new Error("No active editor");
-  }
-
-  const document = editor.document;
-  const languageId = document.languageId;
-
-  const currentTextLines = document.getText().split("\n");
-  const anchorPosition: any = cursorContext.anchorPosition;
-
-  const explainContext = currentTextLines
-    .slice(anchorPosition.c - 300, anchorPosition.c + 300)
-    .join("\n");
-
-  const auditContext = currentTextLines
-    .slice(0, currentTextLines.length)
-    .join("\n");
-
-  // const definitionContext = await cursorContext.getDefinitionContext();
-  // const definitionContextPrompt = `The following is the source code of the line ${currentTextLines[anchorPosition.c]}:\n${definitionContext}`;
-  return { languageId, auditContext, explainContext };
 }
 
 // origin
