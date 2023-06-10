@@ -167,7 +167,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
         .get("gptutor.prompts");
       let prompts =
         config.specificLanguage[this.currentPrompt.languageId] || config.global;
-      let prompt: any[] = prompts[mode.toLowerCase()].prompt;
+      let prompt: any[] = prompts[mode].prompt;
 
       let outputLanguage: string =
         this.context.globalState.get("language") || "English";

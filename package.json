@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.104",
+  "version": "0.0.105",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -42,7 +42,7 @@
                   },
                   {
                     "role": "user",
-                    "content": "Other context about the selected code is in the following triple quotes \"\"\"${codeContext}\"\"\". The ${languageId} code I selected is in the following triple quotes \"\"\"${selectedCode}\"\"\". Please focus on explain target ${languageId} code. Output in ${outputLanguage}."
+                    "content": "Other context about the selected code is in the following triple quotes \"\"\"${codeContext}\"\"\". The ${languageId} code I selected is in the following triple quotes \"\"\"${selectedCode}\"\"\". You don't need to repeat the selected code again. Please focus on explain target ${languageId} code. Output in ${outputLanguage}."
                   }
                 ]
               },

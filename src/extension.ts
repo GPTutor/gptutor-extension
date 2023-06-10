@@ -150,25 +150,58 @@ export function activate(context: ExtensionContext) {
         // const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
         // const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
 
-        const explainCommandUri = Uri.parse(
-          `command:GPTutor Active?${encodeURIComponent(
-            JSON.stringify({ mode: "explain" })
-          )}`
-        );
-        const commentCommandUri = Uri.parse(
-          `command:GPTutor Active?${encodeURIComponent(
-            JSON.stringify({ mode: "comment" })
-          )}`
-        );
-        const auditCommandUri = Uri.parse(
-          `command:GPTutor Active?${encodeURIComponent(
-            JSON.stringify({ mode: "audit" })
-          )}`
-        );
+        // const explainCommandUri = Uri.parse(
+        //   `command:GPTutor Active?${encodeURIComponent(
+        //     JSON.stringify({ mode: "explain" })
+        //   )}`
+        // );
+        // const commentCommandUri = Uri.parse(
+        //   `command:GPTutor Active?${encodeURIComponent(
+        //     JSON.stringify({ mode: "comment" })
+        //   )}`
+        // );
+        // const auditCommandUri = Uri.parse(
+        //   `command:GPTutor Active?${encodeURIComponent(
+        //     JSON.stringify({ mode: "audit" })
+        //   )}`
+        // );
 
-        const command = new MarkdownString(
-          `[🧑‍🏫 Explain](${explainCommandUri})&nbsp; [📝 Comment](${commentCommandUri})&nbsp; [🕵️ Audit](${auditCommandUri})&nbsp; By GPTutor`
-        );
+        let config: any = vscode.workspace
+          .getConfiguration("")
+          .get("gptutor.prompts");
+        let commands: any = {};
+        let order: string[] = [];
+        let specificLanguagePrompts =
+          config.specificLanguage[document.languageId] || {};
+        console.log(specificLanguagePrompts);
+        for (let key in specificLanguagePrompts) {
+          if (order.includes(key)) {
+            continue;
+          }
+          commands[key] = specificLanguagePrompts[key].display_name;
+          order.push(key);
+        }
+
+        let prompts = config.global;
+
+        for (let key in prompts) {
+          if (order.includes(key)) {
+            continue;
+          }
+          commands[key] = prompts[key].display_name;
+          order.push(key);
+        }
+        let commandString = "";
+
+        order.forEach((key) => {
+          commandString += `[${commands[key]}](${Uri.parse(
+            `command:GPTutor Active?${encodeURIComponent(
+              JSON.stringify({ mode: key })
+            )}`
+          )})&nbsp;&nbsp;`;
+        });
+
+        const command = new MarkdownString(commandString);
         command.isTrusted = true;
         return new Hover([command]);
       },
@@ -176,7 +209,6 @@ export function activate(context: ExtensionContext) {
   );
   context.subscriptions.push(
     commands.registerCommand("GPTutor Active", async (args) => {
-      console.log(`Active ${args}`);
       let config = workspace.getConfiguration("gptutor");
       let prompts: any = config.get("prompts");
       gptutor.active(args.mode);
