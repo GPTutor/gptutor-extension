@@ -23,8 +23,7 @@ function auto_grow(element) {
 
     auto_grow(promptEle);
 
-    var editPromptEle = document.getElementById("stop-generation");
-    editPromptEle.onclick = function () {
+    document.getElementById("stop-generation-button").onclick = function () {
       vscode.postMessage({
         command: "stop-generation",
       });
@@ -189,6 +188,20 @@ function auto_grow(element) {
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
+        break;
+      }
+      case "show-stop-generation-button": {
+        let stopButton = window.document.getElementById(
+          "stop-generation-button"
+        );
+        stopButton.classList.remove("hidden");
+        break;
+      }
+      case "hide-stop-generation-button": {
+        let stopButton = window.document.getElementById(
+          "stop-generation-button"
+        );
+        stopButton.classList.add("hidden");
         break;
       }
     }

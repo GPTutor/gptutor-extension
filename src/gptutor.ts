@@ -165,6 +165,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     this.currentMessageNum++;
     let gptutor: any = this;
+    this.view?.webview.postMessage({
+      type: "show-stop-generation-button",
+    });
     try {
       let currentMessageNumber = this.currentMessageNum;
       let config: any = vscode.workspace
@@ -212,6 +215,11 @@ export class GPTutor implements vscode.WebviewViewProvider {
         currentMessageNumber,
         explainResponse: this.currentResponse,
       });
+      if (currentMessageNumber === this.currentMessageNum) {
+        this.view?.webview.postMessage({
+          type: "hide-stop-generation-button",
+        });
+      }
     } catch (error: any) {
       if (error?.message === "Request failed with status code 400") {
         vscode.window.showErrorMessage(
@@ -512,8 +520,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
               <div class="ml-auto relative text-right">
                 <button
-                  class="text-white-500 hover:font-bold py-2 px-2 rounded"
-                  id="stop-generation"
+                  class="text-white-500 hover:font-bold py-2 px-2 rounded hidden"
+                  id="stop-generation-button"
                 >
                   Stop
                 </button>
