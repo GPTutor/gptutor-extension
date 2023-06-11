@@ -79,7 +79,7 @@ This extension contributes the following settings:
 
 - `> GPTutor: setKey`: Set your OpenAI API key.
 - `> GPTutor: setModel`: Set the GPT model (GPT3.5 or GPT4) to be used.
-- `> GPTutor: edit Prompts`: Edit your prompt to customized your needs.
+- `> GPTutor: edit prompts`: Edit your prompt to customized your needs.
 
 ## Requirements
 
