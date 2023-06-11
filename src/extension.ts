@@ -173,7 +173,7 @@ export function activate(context: ExtensionContext) {
         let order: string[] = [];
         let specificLanguagePrompts =
           config.specificLanguage[document.languageId] || {};
-        console.log(specificLanguagePrompts);
+
         for (let key in specificLanguagePrompts) {
           if (order.includes(key)) {
             continue;

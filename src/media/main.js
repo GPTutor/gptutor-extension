@@ -23,6 +23,13 @@ function auto_grow(element) {
 
     auto_grow(promptEle);
 
+    var editPromptEle = document.getElementById("stop-generation");
+    editPromptEle.onclick = function () {
+      vscode.postMessage({
+        command: "stop-generation",
+      });
+    };
+
     var editPromptEle = document.getElementById("edit-prompt");
     editPromptEle.onclick = function () {
       vscode.postMessage({

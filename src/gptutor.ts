@@ -100,6 +100,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "changeLanguage":
           this.context.globalState.update("language", message.language);
           return;
+        case "stop-generation":
+          this.currentMessageNum++;
+          break;
         case "submit-openai-api-key":
           let newKey = message.key;
           console.log(newKey);
@@ -125,10 +128,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
     }, undefined);
   }
   updateViewContent(new_text: string, total_text_so_far: string, options: any) {
-    options.view.webview.postMessage({
-      type: "gptutor-set-answer",
-      value: total_text_so_far,
-    });
+    if (options.currentMessageNumber == options.gptutor.currentMessageNum) {
+      options.view.webview.postMessage({
+        type: "gptutor-set-answer",
+        value: total_text_so_far,
+      });
+    }
   }
   public async active(mode: string) {
     this.currentPrompt = await getCurrentPromptV2(
@@ -195,12 +200,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
       prompt[prompt.length - 1].content +=
         config.appendixForSpecificLanguage[outputLanguage] || "";
 
-      console.log(prompt);
+      console.log("prompt", prompt);
       let completion: any = await this.openAiProvider.ask(
         model,
         prompt,
-        this.updateViewContent,
-        { view: this.view }
+        this.updateViewContent, //
+        { view: this.view, currentMessageNumber, gptutor }
       );
       this.currentResponse = completion || "";
       console.log({
@@ -500,7 +505,21 @@ export class GPTutor implements vscode.WebviewViewProvider {
             >
             </textarea>
             <hr class="hr" />
-            <label>Answer: </label>
+            <div class="flex items-center">
+              <div class="mr-auto relative text-left">
+                <label>Answer: </label>
+              </div>
+
+              <div class="ml-auto relative text-right">
+                <button
+                  class="text-white-500 hover:font-bold py-2 px-2 rounded"
+                  id="stop-generation"
+                >
+                  Stop
+                </button>
+              </div>
+            </div>
+
             <div id="response" class="pt-4 text-sm"></div>
 
             <script src="${scriptUri}"></script>
