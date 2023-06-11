@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "engines": {
     "vscode": "^1.75.0"
   },

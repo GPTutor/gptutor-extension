@@ -23,7 +23,10 @@ function auto_grow(element) {
 
     auto_grow(promptEle);
 
-    document.getElementById("stop-generation-button").onclick = function () {
+    document.getElementById("stop-generation-button").onclick = function (
+      event
+    ) {
+      event.target.classList.add("hidden");
       vscode.postMessage({
         command: "stop-generation",
       });
