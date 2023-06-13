@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.107",
+  "version": "0.0.109",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -23,12 +23,25 @@
     "configuration": {
       "title": "GPTutor",
       "properties": {
-        "gptutor.openAIApiKey": {
+        "GPTutor.openaiApiKey": {
           "type": "string",
           "default": "",
           "description": "OpenAI API Key"
         },
-        "gptutor.prompts": {
+        "GPTutor.openaiModel": {
+          "type": "string",
+          "default": "gpt-3.5-turbo",
+          "enum": [
+            "gpt-3.5-turbo",
+            "gpt-4"
+          ],
+          "enumDescriptions": [
+            "Default model, use by ChatGPT",
+            "GPT-4 can handle longer code and provide a superior response. Yet it is more expensive. You may need to apply for the access of GPT-4."
+          ],
+          "description": "OpenAI Model Selection"
+        },
+        "GPTutor.prompts": {
           "type": "object",
           "default": {
             "global": {
@@ -176,7 +189,7 @@
       "gptutor": [
         {
           "type": "webview",
-          "id": "gptutor.chatView",
+          "id": "GPTutor.chatView",
           "name": "GPTutor"
         }
       ]

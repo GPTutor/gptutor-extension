@@ -17,6 +17,30 @@ function auto_grow(element) {
   let response = "";
 
   window.onload = async function () {
+    {
+      let gpt35btn = document.getElementById("set-model-gpt3.5");
+      let gpt4btn = document.getElementById("set-model-gpt4");
+      let setModelEvent = (event) => {
+        console.log(event.srcElement.innerText.toLowerCase());
+        vscode.postMessage({
+          command: "set-model",
+          model: event.srcElement.innerText.toLowerCase(),
+        });
+      };
+      gpt35btn.onclick = setModelEvent;
+      gpt4btn.onclick = setModelEvent;
+    }
+
+    {
+      let btn = document.getElementById("switch-to-set-key-panel");
+      let switchToSetKeyPanel = (event) => {
+        vscode.postMessage({
+          command: "switch-to-set-key-panel",
+        });
+      };
+      btn.onclick = switchToSetKeyPanel;
+    }
+
     var promptEle = document.getElementById("prompt-input");
     promptEle.value = "";
     setResponse();
@@ -32,12 +56,19 @@ function auto_grow(element) {
       });
     };
 
-    var editPromptEle = document.getElementById("edit-prompt");
-    editPromptEle.onclick = function () {
+    let editPromptEvent = () => {
       vscode.postMessage({
         command: "edit-prompt",
       });
     };
+    var editPromptEle = document.getElementById("edit-prompt");
+    var editPromptInSettingEle = document.getElementById(
+      "edit-prompt-in-setting"
+    );
+
+    editPromptEle.onclick = editPromptEvent;
+    editPromptInSettingEle.onclick = editPromptEvent;
+
     let subOpenAIKeyBtn = document.getElementById("submit-openai-api-key");
     subOpenAIKeyBtn.onclick = function () {
       let keyInput = document.getElementById("input-openai-api-key");
@@ -60,6 +91,9 @@ function auto_grow(element) {
         });
         dropdownMenu.classList.toggle("hidden");
       });
+      dropdownMenu.onclick = function (event) {
+        dropdownMenu.classList.add("hidden");
+      };
 
       // Get all dropdown items with nested dropdowns
       const dropdownItems = dropdownMenu.getElementsByClassName("relative");
@@ -70,10 +104,11 @@ function auto_grow(element) {
         const dropdownText = item.querySelector("span");
         let isMouseInButton = false;
         item.addEventListener("mouseover", () => {
-          Array.from(dropdownItems).forEach((item) => {
-            item.querySelector("div").classList.add("hidden");
+          Array.from(dropdownItems).forEach((item_) => {
+            let div = item_.querySelector("div");
+            if (div) div.classList.add("hidden");
           });
-          dropdownSubmenu.classList.remove("hidden");
+          if (dropdownSubmenu) dropdownSubmenu.classList.remove("hidden");
           isMouseInButton = true;
         });
 
@@ -94,6 +129,9 @@ function auto_grow(element) {
       );
       const dropdownMenu = document.getElementById("language-dropdown-menu");
       const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
+      const languageMenuInSetting = document.getElementById(
+        "language-dropdown-menu-in-setting"
+      );
 
       dropdownButton.addEventListener("click", () => {
         const dropdownMenus = document.getElementsByClassName("dropdown-menu");
@@ -114,7 +152,7 @@ function auto_grow(element) {
               language: event.srcElement.innerText,
             });
             dropdownButton.innerHTML = `${event.srcElement.innerText} ▼`;
-            dropdownMenu.classList.toggle("hidden");
+            dropdownMenu.classList.add("hidden");
           };
           data.forEach((language) => {
             const li = document.createElement("li");
@@ -129,6 +167,11 @@ function auto_grow(element) {
             );
             li.onclick = languageBottonClickHandler;
             dropdownMenuUl.appendChild(li);
+            let liInSetting = li.cloneNode(true);
+            if (language.length > 21)
+              liInSetting.innerText = language.slice(0, 19) + "...";
+            liInSetting.onclick = languageBottonClickHandler;
+            languageMenuInSetting.appendChild(liInSetting);
           });
         });
     }
@@ -144,8 +187,6 @@ function auto_grow(element) {
         });
       }
     });
-
-    console.log(supportedLanguages);
   };
 
   // Handle messages sent from the extension to the webview

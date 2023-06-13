@@ -47,7 +47,7 @@ function initConfig(context: ExtensionContext) {
     commands.registerCommand("GPTutor Edit Prompts", async () => {
       vscode.commands.executeCommand(
         "workbench.action.openSettings",
-        "gptutor.prompts"
+        "GPTutor.prompts"
       );
     })
   );
@@ -88,8 +88,9 @@ export function activate(context: ExtensionContext) {
     commands.registerCommand("Initialize GPTutor", async () => {
       console.log("Initialize GPTutor");
       let OPEN_AI_API_KEY: any = vscode.workspace
-        .getConfiguration("gptutor")
-        .get("openAIApiKey");
+        .getConfiguration("")
+        .get("GPTutor.openaiApiKey");
+      console.log(`OPEN_AI_API_KEY: ${OPEN_AI_API_KEY}`);
 
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
         gptutor.setOpenAiKey(OPEN_AI_API_KEY);
@@ -111,12 +112,12 @@ export function activate(context: ExtensionContext) {
   // Delete OpenAI API key
   context.subscriptions.push(
     commands.registerCommand("Delete OpenAI API Key", async () => {
-      // context.globalState.update("OpenAI_API_KEY", undefined);
+      // context.globalState.update("openaiApiKey", undefined);
       workspace
-        .getConfiguration("gptutor")
-        .update("openAIApiKey", "", vscode.ConfigurationTarget.Global);
+        .getConfiguration("")
+        .update("GPTutor.openaiApiKey", "", vscode.ConfigurationTarget.Global);
       gptutor.setOpenAiKey("undefined");
-      window.showInformationMessage(`OpenAI_API_KEY Deleted`);
+      window.showInformationMessage(`openaiApiKey Deleted`);
     })
   );
 
@@ -168,7 +169,7 @@ export function activate(context: ExtensionContext) {
 
         let config: any = vscode.workspace
           .getConfiguration("")
-          .get("gptutor.prompts");
+          .get("GPTutor.prompts");
         let commands: any = {};
         let order: string[] = [];
         let specificLanguagePrompts =
@@ -209,8 +210,8 @@ export function activate(context: ExtensionContext) {
   );
   context.subscriptions.push(
     commands.registerCommand("GPTutor Active", async (args) => {
-      let config = workspace.getConfiguration("gptutor");
-      let prompts: any = config.get("prompts");
+      let config = workspace.getConfiguration("");
+      let prompts: any = config.get("GPTutor.prompts");
       gptutor.active(args.mode);
     })
   );

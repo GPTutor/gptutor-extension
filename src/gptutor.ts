@@ -14,7 +14,7 @@ import { getLink, getApiKey } from "./apiKey";
 import { openAiIsActive } from "./openAi";
 import { defaultCachePath } from "@vscode/test-electron/out/download";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
-
+import { setModel } from "./model";
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
     // Concatenate the current string literal with its interpolated value
@@ -23,7 +23,7 @@ function html(strings: TemplateStringsArray, ...values: any[]) {
   return parsedString;
 }
 export class GPTutor implements vscode.WebviewViewProvider {
-  public static readonly viewType = "gptutor.chatView";
+  public static readonly viewType = "GPTutor.chatView";
 
   private openAiProvider!: GPTutorOpenAiProvider;
   private view?: vscode.WebviewView;
@@ -78,13 +78,17 @@ export class GPTutor implements vscode.WebviewViewProvider {
     };
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
     let OPEN_AI_API_KEY: any = vscode.workspace
-      .getConfiguration("gptutor")
-      .get("openAIApiKey");
+      .getConfiguration("")
+      .get("GPTutor.openaiApiKey");
     openAiIsActive(OPEN_AI_API_KEY).then((isActive) => {
       if (!isActive) {
         this.switchToSetKeyPanel();
       }
     });
+    let currentModel: any = vscode.workspace
+      .getConfiguration("")
+      .get("GPTutor.openaiModel") as string;
+    console.log(`current_model: ${currentModel}`);
 
     this.view.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
@@ -95,7 +99,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
           vscode.window.showInformationMessage(message.text);
           return;
         case "edit-prompt":
-          vscode.commands.executeCommand("GPTutor Edit Prompts");
+          vscode.commands.executeCommand(
+            "workbench.action.openSettings",
+            "GPTutor.prompts"
+          );
+          return;
+        case "set-model":
+          setModel(message.model);
           return;
         case "changeLanguage":
           this.context.globalState.update("language", message.language);
@@ -103,15 +113,21 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "stop-generation":
           this.currentMessageNum++;
           break;
+        case "switch-to-set-key-panel":
+          vscode.commands.executeCommand(
+            "workbench.action.openSettings",
+            "GPTutor.openaiApiKey"
+          );
+          break;
         case "submit-openai-api-key":
           let newKey = message.key;
           console.log(newKey);
           if (await openAiIsActive(newKey)) {
-            // this.context.globalState.update("OpenAI_API_KEY", newKey);
+            // this.context.globalState.update("openaiApiKey", newKey);
             vscode.workspace
-              .getConfiguration("gptutor")
+              .getConfiguration("")
               .update(
-                "openAIApiKey",
+                "GPTutor.openaiApiKey",
                 newKey,
                 vscode.ConfigurationTarget.Global
               );
@@ -141,7 +157,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
       this.cursorContext
     );
     const model =
-      (this.context.globalState.get("MODEL") as string) || DefaultOpenAiModel;
+      (vscode.workspace
+        .getConfiguration("")
+        .get("GPTutor.openaiModel") as string) || DefaultOpenAiModel;
 
     if (!this.currentPrompt) {
       return;
@@ -172,7 +190,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
       let currentMessageNumber = this.currentMessageNum;
       let config: any = vscode.workspace
         .getConfiguration("")
-        .get("gptutor.prompts");
+        .get("GPTutor.prompts");
       let prompts =
         config.specificLanguage[this.currentPrompt.languageId] || config.global;
       let prompt: any[] = prompts[mode].prompt;
@@ -227,7 +245,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
         );
       } else if (
         error?.message === "Request failed with status code 404" &&
-        (this.context.globalState.get("MODEL") as string) == "gpt-4"
+        (vscode.workspace
+          .getConfiguration("")
+          .get("GPTutor.openaiModel") as string) == "gpt-4"
       ) {
         vscode.window.showErrorMessage(
           "Your API Key is not supporting GPT-4, use GPT-3 or try another one"
@@ -423,15 +443,15 @@ export class GPTutor implements vscode.WebviewViewProvider {
           <div id="GPTutor-main">
             <div class="flex items-center">
               <!-- <label class="mr-2">Question:</label> -->
-              <div class="mr-auto relative text-left hidden">
+              <div class="mr-auto relative text-left">
                 <button
                   class="text-white-500 hover:font-bold py-2 px-1 rounded dropdown-button"
                   id="dropdown-button"
                 >
-                  AAAA
+                  Settings ▼
                 </button>
                 <div
-                  class="absolute left-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu"
+                  class="absolute left-0 -mt-1 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu z-50"
                   id="dropdown-menu"
                 >
                   <ul
@@ -441,7 +461,19 @@ export class GPTutor implements vscode.WebviewViewProvider {
                     <li
                       class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
                     >
-                      <span class="cursor-pointer">A</span>
+                      <span class="cursor-pointer" id="edit-prompt-in-setting"
+                        >Edit Prompt</span
+                      >
+                    </li>
+
+                    <li
+                      class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
+                    >
+                      <span class="cursor-pointer">Set Model</span>
+                      <span
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2"
+                        >▶</span
+                      >
 
                       <div
                         class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
@@ -450,16 +482,41 @@ export class GPTutor implements vscode.WebviewViewProvider {
                           class="py-0"
                           style="list-style-type: none!important; margin-left: 0px !important;"
                         >
-                          <li>A1</li>
-                          <li>A2</li>
-                          <li>A3</li>
+                          <li id="set-model-gpt3.5">GPT-3.5-Turbo</li>
+                          <li id="set-model-gpt4">GPT-4</li>
                         </ul>
                       </div>
                     </li>
                     <li
                       class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
                     >
-                      <span class="cursor-pointer">B</span>
+                      <span class="cursor-pointer">Change Language</span>
+                      <span
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2"
+                        >▶</span
+                      >
+
+                      <div
+                        class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
+                      >
+                        <ul
+                          id="language-dropdown-menu-in-setting"
+                          class="py-0"
+                          style="list-style-type: none!important; margin-left: 0px !important;"
+                        ></ul>
+                      </div>
+                    </li>
+                    <li
+                      class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
+                    >
+                      <span class="cursor-pointer" id="switch-to-set-key-panel"
+                        >Change API Key</span
+                      >
+                    </li>
+                    <li
+                      class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer hidden"
+                    >
+                      <span class="cursor-pointer">Open History</span>
 
                       <div
                         class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
@@ -468,19 +525,15 @@ export class GPTutor implements vscode.WebviewViewProvider {
                           class="py-0"
                           style="list-style-type: none!important; margin-left: 0px !important;"
                         >
-                          <li>B1</li>
-                          <li>B2</li>
-                          <li>B3</li>
+                          <li>A</li>
+                          <li>B</li>
                         </ul>
                       </div>
-                    </li>
-                    <li>
-                      <span class="cursor-pointer">C</span>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div class="ml-auto relative text-right">
+              <div class="ml-auto relative text-right z-20">
                 <button
                   class="text-white-500 hover:font-bold py-2 px-1 rounded dropdown-button"
                   id="language-dropdown-button"
@@ -488,7 +541,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   ${outputLanguage} ▼
                 </button>
                 <div
-                  class="absolute right-0 mt-2 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu"
+                  class="absolute right-0 -mt-1 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu"
                   id="language-dropdown-menu"
                 >
                   <ul
@@ -497,7 +550,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   ></ul>
                 </div>
                 <button
-                  class="text-white-500 hover:font-bold py-2 px-2 rounded"
+                  class="text-white-500 hover:font-bold py-2 px-2 rounded hidden"
                   id="edit-prompt"
                 >
                   Edit Prompt

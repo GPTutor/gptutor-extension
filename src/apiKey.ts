@@ -31,7 +31,7 @@ export async function getApiKey(context: ExtensionContext, gptutor: any) {
       try {
         if (
           !(await openAiIsActive(
-            workspace.getConfiguration("gptutor").get("openAIApiKey")
+            workspace.getConfiguration("").get("GPTutor.openaiApiKey")
           ))
         ) {
           throw new Error("Invalid API Key");
@@ -44,10 +44,10 @@ export async function getApiKey(context: ExtensionContext, gptutor: any) {
     }
     let key = selection.label;
     if (await openAiIsActive(key)) {
-      // context.globalState.update("OpenAI_API_KEY", key);
+      // context.globalState.update("openaiApiKey", key);
       workspace
-        .getConfiguration("gptutor")
-        .update("openAIApiKey", key, vscode.ConfigurationTarget.Global);
+        .getConfiguration("")
+        .update("GPTutor.openaiApiKey", key, vscode.ConfigurationTarget.Global);
       context.workspaceState.update("invalidKey", NaN);
 
       gptutor.setOpenAiKey(key);
@@ -74,7 +74,7 @@ export async function getApiKey(context: ExtensionContext, gptutor: any) {
 //     placeHolder: "Paste My API Key",
 //   });
 //   if (await openAiIsActive(result)) {
-//     context.globalState.update("OpenAI_API_KEY", result);
+//     context.globalState.update("openaiApiKey", result);
 //     context.workspaceState.update("invalidKey", NaN);
 //     window.showInformationMessage("API Key Saved");
 //   } else {

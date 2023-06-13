@@ -57,15 +57,19 @@ async function inputOpenAiKey(context: ExtensionContext, invalidKey = false) {
     placeHolder: "Paste your OpenAI API Key here",
   });
   if (await validApiKey(result)) {
-    // context.globalState.update("OpenAI_API_KEY", result);
+    // context.globalState.update("openaiApiKey", result);
     vscode.workspace
-      .getConfiguration("gptutor")
-      .update("openAIApiKey", result, vscode.ConfigurationTarget.Global);
-    let OPENAI_API_KEY = vscode.workspace
-      .getConfiguration("gptutor")
-      .get("openAIApiKey");
+      .getConfiguration("")
+      .update(
+        "GPTutor.openaiApiKey",
+        result,
+        vscode.ConfigurationTarget.Global
+      );
+    let openaiApiKey = vscode.workspace
+      .getConfiguration("")
+      .get("GPTutor.openaiApiKey");
     context.workspaceState.update("invalidKey", NaN);
-    window.showInformationMessage(`OpenAI_API_KEY Add Success!`);
+    window.showInformationMessage(`openaiApiKey Add Success!`);
   } else {
     window.showErrorMessage("Invalid OpenAI API Key!");
     context.workspaceState.update("invalidKey", true);
@@ -80,10 +84,10 @@ async function showTutorial() {
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("tutor.init", async () => {
-      let OPENAI_API_KEY: any = vscode.workspace
+      let openaiApiKey: any = vscode.workspace
         .getConfiguration("gptutor")
-        .get("openAIApiKey");
-      if (await validApiKey(OPENAI_API_KEY)) {
+        .get("openaiApiKey");
+      if (await validApiKey(openaiApiKey)) {
         window.showInformationMessage(`Code Tutor Activate Successfully!`);
       } else {
         await obtainApiKey(context);
@@ -152,10 +156,10 @@ export function activate(context: ExtensionContext) {
       let definitionContext = await getDefinitionContext();
       let definitionContextPrompt = `The following is the source code of the library of ${definitionContext}:\n${definitionContext}`;
 
-      let OPENAI_API_KEY: any = vscode.workspace
-        .getConfiguration("gptutor")
-        .get("openAIApiKey");
-      let openai: OpenAIApi = getOpenAI(OPENAI_API_KEY);
+      let openaiApiKey: any = vscode.workspace
+        .getConfiguration("")
+        .get("GPTutor.openaiApiKey");
+      let openai: OpenAIApi = getOpenAI(openaiApiKey);
       let request: any = {
         model: "gpt-3.5-turbo",
         messages: [
