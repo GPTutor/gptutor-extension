@@ -60,5 +60,4 @@ export const supportedLanguages = [
   "latex",
   "objective-cpp",
   "shaderlab",
-  "cadence",
 ];
