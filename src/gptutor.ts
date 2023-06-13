@@ -108,7 +108,14 @@ export class GPTutor implements vscode.WebviewViewProvider {
           setModel(message.model);
           return;
         case "changeLanguage":
-          this.context.globalState.update("language", message.language);
+          // this.context.globalState.update("language", message.language);
+          vscode.workspace
+            .getConfiguration("")
+            .update(
+              "GPTutor.outputLanguage",
+              message.language,
+              vscode.ConfigurationTarget.Global
+            );
           return;
         case "stop-generation":
           this.currentMessageNum++;
@@ -196,7 +203,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
       let prompt: any[] = prompts[mode].prompt;
 
       let outputLanguage: string =
-        this.context.globalState.get("language") || "English";
+        vscode.workspace.getConfiguration("").get("GPTutor.outputLanguage") ||
+        "English";
       prompt.map((item, index) => {
         let content: string = item.content;
         content = content.replaceAll(
@@ -336,7 +344,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
       )
     );
     const outputLanguage =
-      this.context.globalState.get("language") || "English";
+      vscode.workspace.getConfiguration("").get("GPTutor.outputLanguage") ||
+      "English";
 
     return String(html`<!DOCTYPE html>
       <html lang="en">
