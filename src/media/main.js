@@ -142,10 +142,14 @@ function auto_grow(element) {
       });
 
       let supportedLanguages = this.fetch(
-        "https://raw.githubusercontent.com/RayHuang880301/gptutor-extension/main/src/resources/supportedLanguages.json"
+        "https://raw.githubusercontent.com/RayHuang880301/gptutor-extension/main/package.json"
       )
         .then((response) => response.json())
         .then((data) => {
+          let languages =
+            data.contributes.configuration.properties["GPTutor.outputLanguage"][
+              "enum"
+            ];
           let languageBottonClickHandler = function (event) {
             vscode.postMessage({
               command: "changeLanguage",
@@ -154,7 +158,7 @@ function auto_grow(element) {
             dropdownButton.innerHTML = `${event.srcElement.innerText} ▼`;
             dropdownMenu.classList.add("hidden");
           };
-          data.forEach((language) => {
+          languages.forEach((language) => {
             const li = document.createElement("li");
             li.textContent = language;
             li.classList.add(
