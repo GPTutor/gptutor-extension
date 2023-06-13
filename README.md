@@ -55,8 +55,9 @@ https://marketplace.visualstudio.com/items?itemName=gptutor.gptutor
 <br/>
 
 ### 7. (Optional) Change the output language or customize the prompt by clicking the Language Button or Prompt Button on the top right.
-8. <img width="880" alt="截圖 2023-06-11 下午4 13 03" src="https://github.com/RayHuang880301/gptutor-extension/assets/43432631/f826e78d-3583-4c5b-8002-76573e83e127">
-
+<img width="880" alt="截圖 2023-06-11 下午4 13 03" src="https://github.com/RayHuang880301/gptutor-extension/assets/43432631/f826e78d-3583-4c5b-8002-76573e83e127">
+<br/>
+<br/>
 
 ## Usage
 
