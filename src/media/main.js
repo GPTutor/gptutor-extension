@@ -35,7 +35,8 @@ function auto_grow(element) {
       let btn = document.getElementById("switch-to-set-key-panel");
       let switchToSetKeyPanel = (event) => {
         vscode.postMessage({
-          command: "switch-to-set-key-panel",
+          command: "open-settings",
+          setting: "GPTutor.openaiApiKey",
         });
       };
       btn.onclick = switchToSetKeyPanel;
@@ -58,7 +59,8 @@ function auto_grow(element) {
 
     let editPromptEvent = () => {
       vscode.postMessage({
-        command: "edit-prompt",
+        command: "open-settings",
+        setting: "GPTutor.prompts",
       });
     };
     var editPromptEle = document.getElementById("edit-prompt");

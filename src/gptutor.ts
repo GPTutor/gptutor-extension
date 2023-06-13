@@ -98,10 +98,10 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "log":
           vscode.window.showInformationMessage(message.text);
           return;
-        case "edit-prompt":
+        case "open-settings":
           vscode.commands.executeCommand(
             "workbench.action.openSettings",
-            "GPTutor.prompts"
+            message.setting
           );
           return;
         case "set-model":
@@ -119,12 +119,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
           return;
         case "stop-generation":
           this.currentMessageNum++;
-          break;
-        case "switch-to-set-key-panel":
-          vscode.commands.executeCommand(
-            "workbench.action.openSettings",
-            "GPTutor.openaiApiKey"
-          );
           break;
         case "submit-openai-api-key":
           let newKey = message.key;
