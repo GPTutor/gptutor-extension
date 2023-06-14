@@ -491,7 +491,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
                       >
 
                       <div
-                        class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
+                        class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden overflow-auto"
+                        style="height: 70vh"
                       >
                         <ul
                           id="language-dropdown-menu-in-setting"
@@ -535,8 +536,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   ${outputLanguage} ▼
                 </button>
                 <div
-                  class="absolute right-0 -mt-1 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu"
+                  class="absolute right-0 -mt-1 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu overflow-auto"
                   id="language-dropdown-menu"
+                  style="height: 70vh"
                 >
                   <ul
                     class="py-1 text-left"
