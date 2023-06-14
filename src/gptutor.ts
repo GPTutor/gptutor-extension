@@ -1,16 +1,7 @@
 import { OpenAIApi } from "openai";
 import * as vscode from "vscode";
 import { DefaultOpenAiModel, GPTutorOpenAiProvider } from "./openAi";
-import {
-  GPTutorPromptType,
-  getPrompt,
-  getExplainRequestMsg,
-  FirstAuditRequest,
-  getAuditRequestMsg,
-  FirstReplyForGpt3,
-  CommentRequestMsg,
-} from "./prompt";
-import { getLink, getApiKey } from "./apiKey";
+import { GPTutorPromptType } from "./prompt";
 import { openAiIsActive } from "./openAi";
 import { defaultCachePath } from "@vscode/test-electron/out/download";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
@@ -264,12 +255,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
           )
           .then((item) => {
             if (item === "How to get the key?") {
-              getLink();
+              vscode.env.openExternal(
+                vscode.Uri.parse("https://platform.openai.com/account/api-keys")
+              );
             } else if (item == "Set the key now") {
               this.switchToSetKeyPanel();
             }
           });
-        getLink;
       } else if (error?.message.includes("429")) {
         vscode.window
           .showErrorMessage(
@@ -283,7 +275,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
               );
             }
           });
-        getLink;
       } else {
         vscode.window.showErrorMessage(error?.message || "ERROR");
       }

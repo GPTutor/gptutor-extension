@@ -15,17 +15,11 @@ import {
 } from "vscode";
 import * as vscode from "vscode";
 // const path = require('path');
-import { getApiKey } from "./apiKey";
 import { openAiIsActive } from "./openAi";
 import { CursorContext } from "./context/cursor.context";
 import { GPTutor } from "./gptutor";
-import { getModel } from "./model";
 import * as fs from "fs";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
-
-// import { TextDocuments } from "vscode-languageserver";
-// import { TextDocument } from "vscode-languageserver-textdocument";
-// const documents = new TextDocuments(TextDocument);
 
 export function activate(context: ExtensionContext) {
   let src =
@@ -80,7 +74,10 @@ export function activate(context: ExtensionContext) {
   // Set OpenAI API key
   context.subscriptions.push(
     commands.registerCommand("Set OpenAI API Key", async () => {
-      await getApiKey(context, gptutor);
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "GPTutor.openaiApiKey"
+      );
     })
   );
   // Delete OpenAI API key
@@ -97,7 +94,10 @@ export function activate(context: ExtensionContext) {
 
   context.subscriptions.push(
     commands.registerCommand("Set Model", async () => {
-      await getModel(context);
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "GPTutor.openaiModel"
+      );
     })
   );
 
@@ -123,25 +123,6 @@ export function activate(context: ExtensionContext) {
             cursorContext.currentText,
             document.languageId
           );
-          // const explainCommandUri = Uri.parse(`command:GPTutor Explain`);
-          // const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
-          // const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
-
-          // const explainCommandUri = Uri.parse(
-          //   `command:GPTutor Active?${encodeURIComponent(
-          //     JSON.stringify({ mode: "explain" })
-          //   )}`
-          // );
-          // const commentCommandUri = Uri.parse(
-          //   `command:GPTutor Active?${encodeURIComponent(
-          //     JSON.stringify({ mode: "comment" })
-          //   )}`
-          // );
-          // const auditCommandUri = Uri.parse(
-          //   `command:GPTutor Active?${encodeURIComponent(
-          //     JSON.stringify({ mode: "audit" })
-          //   )}`
-          // );
 
           let config: any = vscode.workspace
             .getConfiguration("")
@@ -186,43 +167,17 @@ export function activate(context: ExtensionContext) {
     )
   );
   context.subscriptions.push(
-    commands.registerCommand("GPTutor Active", async (args) => {
-      let config = workspace.getConfiguration("");
-      let prompts: any = config.get("GPTutor.prompts");
-      gptutor.active(args.mode);
-    })
+    commands.registerCommand(
+      "GPTutor Active",
+      async (args = { mode: "explain" }) => {
+        let config = workspace.getConfiguration("");
+        let prompts: any = config.get("GPTutor.prompts");
+        gptutor.active(args.mode);
+      }
+    )
   );
 
   commands.executeCommand("Initialize GPTutor");
-  // cursorContext.init();
-}
-
-// origin
-async function getCurrentPrompt(cursorContext: CursorContext) {
-  const editor: any = window.activeTextEditor;
-  if (!editor) {
-    window.showErrorMessage("No active editor");
-    throw new Error("No active editor");
-  }
-
-  const document = editor.document;
-  const languageId = document.languageId;
-
-  const currentTextLines = document.getText().split("\n");
-  const anchorPosition: any = cursorContext.anchorPosition;
-  // const currentLine = currentTextLines[cursorContext.anchorPosition?.c];
-  const question = `Question: why use ${cursorContext.currentText} at ${
-    currentTextLines[anchorPosition.c]
-  } in the ${document.languageId} code above?`;
-  const codeContext = currentTextLines
-    .slice(anchorPosition.c - 15, anchorPosition.c + 15)
-    .join("\n");
-
-  const definitionContext = await cursorContext.getDefinitionContext();
-  const definitionContextPrompt = `The following is the source code of the line ${
-    currentTextLines[anchorPosition.c]
-  }:\n${definitionContext}`;
-  return { languageId, question, codeContext, definitionContextPrompt };
 }
 
 export function deactivate() {}
