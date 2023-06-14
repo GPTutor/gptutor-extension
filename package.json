@@ -338,7 +338,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out && rm out/media/prompt_config.json",
+    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
