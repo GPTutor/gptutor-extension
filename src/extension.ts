@@ -21,7 +21,6 @@ import { CursorContext } from "./context/cursor.context";
 import { GPTutor } from "./gptutor";
 import { getModel } from "./model";
 import * as fs from "fs";
-import { supportedLanguages } from "./media/supportedProgrammingLanguages";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 
 // import { TextDocuments } from "vscode-languageserver";
@@ -105,83 +104,86 @@ export function activate(context: ExtensionContext) {
   // show Hover provider when hovering over code
   // determine if cursor is selected Text or Hovering over some code
   context.subscriptions.push(
-    languages.registerHoverProvider(supportedLanguages, {
-      provideHover(document, position, token) {
-        if (!gptutor.isInited) {
-          return new Hover([]);
-        }
-
-        const editor = window.activeTextEditor;
-        if (!editor) {
-          window.showErrorMessage("No active editor");
-          return;
-        }
-        const codeBlockContent = new MarkdownString();
-        codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
-        codeBlockContent.appendCodeblock(
-          cursorContext.currentText,
-          document.languageId
-        );
-        // const explainCommandUri = Uri.parse(`command:GPTutor Explain`);
-        // const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
-        // const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
-
-        // const explainCommandUri = Uri.parse(
-        //   `command:GPTutor Active?${encodeURIComponent(
-        //     JSON.stringify({ mode: "explain" })
-        //   )}`
-        // );
-        // const commentCommandUri = Uri.parse(
-        //   `command:GPTutor Active?${encodeURIComponent(
-        //     JSON.stringify({ mode: "comment" })
-        //   )}`
-        // );
-        // const auditCommandUri = Uri.parse(
-        //   `command:GPTutor Active?${encodeURIComponent(
-        //     JSON.stringify({ mode: "audit" })
-        //   )}`
-        // );
-
-        let config: any = vscode.workspace
-          .getConfiguration("")
-          .get("GPTutor.prompts");
-        let commands: any = {};
-        let order: string[] = [];
-        let specificLanguagePrompts =
-          config.specificLanguage[document.languageId] || {};
-
-        for (let key in specificLanguagePrompts) {
-          if (order.includes(key)) {
-            continue;
+    languages.registerHoverProvider(
+      { language: "*" },
+      {
+        provideHover(document, position, token) {
+          if (!gptutor.isInited) {
+            return new Hover([]);
           }
-          commands[key] = specificLanguagePrompts[key].display_name;
-          order.push(key);
-        }
 
-        let prompts = config.global;
-
-        for (let key in prompts) {
-          if (order.includes(key)) {
-            continue;
+          const editor = window.activeTextEditor;
+          if (!editor) {
+            window.showErrorMessage("No active editor");
+            return;
           }
-          commands[key] = prompts[key].display_name;
-          order.push(key);
-        }
-        let commandString = "";
+          const codeBlockContent = new MarkdownString();
+          codeBlockContent.appendCodeblock(`/** GPTutor (🤖,🤖) */`);
+          codeBlockContent.appendCodeblock(
+            cursorContext.currentText,
+            document.languageId
+          );
+          // const explainCommandUri = Uri.parse(`command:GPTutor Explain`);
+          // const commentCommandUri = Uri.parse(`command:GPTutor Comment`);
+          // const auditCommandUri = Uri.parse(`command:Audit GPTutor`);
 
-        order.forEach((key) => {
-          commandString += `[${commands[key]}](${Uri.parse(
-            `command:GPTutor Active?${encodeURIComponent(
-              JSON.stringify({ mode: key })
-            )}`
-          )})&nbsp;&nbsp;`;
-        });
+          // const explainCommandUri = Uri.parse(
+          //   `command:GPTutor Active?${encodeURIComponent(
+          //     JSON.stringify({ mode: "explain" })
+          //   )}`
+          // );
+          // const commentCommandUri = Uri.parse(
+          //   `command:GPTutor Active?${encodeURIComponent(
+          //     JSON.stringify({ mode: "comment" })
+          //   )}`
+          // );
+          // const auditCommandUri = Uri.parse(
+          //   `command:GPTutor Active?${encodeURIComponent(
+          //     JSON.stringify({ mode: "audit" })
+          //   )}`
+          // );
 
-        const command = new MarkdownString(commandString);
-        command.isTrusted = true;
-        return new Hover([command]);
-      },
-    })
+          let config: any = vscode.workspace
+            .getConfiguration("")
+            .get("GPTutor.prompts");
+          let commands: any = {};
+          let order: string[] = [];
+          let specificLanguagePrompts =
+            config.specificLanguage[document.languageId] || {};
+
+          for (let key in specificLanguagePrompts) {
+            if (order.includes(key)) {
+              continue;
+            }
+            commands[key] = specificLanguagePrompts[key].display_name;
+            order.push(key);
+          }
+
+          let prompts = config.global;
+
+          for (let key in prompts) {
+            if (order.includes(key)) {
+              continue;
+            }
+            commands[key] = prompts[key].display_name;
+            order.push(key);
+          }
+          let commandString = "";
+
+          order.forEach((key) => {
+            commandString += `[${commands[key]}](${Uri.parse(
+              `command:GPTutor Active?${encodeURIComponent(
+                JSON.stringify({ mode: key })
+              )}`
+            )})&nbsp;&nbsp;`;
+          });
+
+          const command = new MarkdownString(commandString);
+          command.isTrusted = true;
+          return new Hover([command]);
+        },
+      }
+    )
   );
   context.subscriptions.push(
     commands.registerCommand("GPTutor Active", async (args) => {
