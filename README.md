@@ -54,8 +54,9 @@ https://marketplace.visualstudio.com/items?itemName=gptutor.gptutor
 <br/>
 <br/>
 
-### 7. (Optional) Change the output language or customize the prompt by clicking the Language Button or Prompt Button on the top right.
-<img width="880" alt="截圖 2023-06-11 下午4 13 03" src="https://github.com/GPTutor/gptutor-extension/assets/43432631/f826e78d-3583-4c5b-8002-76573e83e127">
+### 7. Click on the "Settings" button located at the top left corner to access additional configuration options. From there, you can customize settings such as Prompt, Model, or Output Language.
+<img width="552" alt="image" src="https://github.com/GPTutor/gptutor-extension/assets/43432631/dfb8559a-cad8-463f-96eb-e12c435c0ece">
+
 <br/>
 <br/>
 
@@ -79,14 +80,14 @@ GPTutor provides three main features: `Explain`, `Comment`, and `Audit` on the c
 1. Click on the `Audit` option to get an audit of the selected code.
 
 
-
+<!-- 
 ## Extension Settings
 
 This extension contributes the following settings:
 
 - `> GPTutor: setKey`: Set your OpenAI API key.
 - `> GPTutor: setModel`: Set the GPT model (GPT3.5 or GPT4) to be used.
-- `> GPTutor: edit prompts`: Edit your prompt to customized your needs.
+- `> GPTutor: edit prompts`: Edit your prompt to customized your needs. -->
 
 ## Requirements
 
@@ -98,6 +99,8 @@ This extension contributes the following settings:
 This project is licensed under the MIT License. See the [License.txt](https://github.com/GPTutor/gptutor-extension/blob/main/LICENSE.md) file for more information.
 
 ## Paper Reference
+
+https://arxiv.org/abs/2305.01863
 
 ```
 @article{chen2023gptutor,
