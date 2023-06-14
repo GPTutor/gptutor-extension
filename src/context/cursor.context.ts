@@ -18,29 +18,9 @@ export class CursorContext {
   lastText = "";
   lastAnchorPosition: any;
   constructor(_context: ExtensionContext) {
-    // if (!window?.activeTextEditor) {
-    //   throw new Error("No active editor");
-    // }
     this.window = window;
     this.context = _context;
   }
-
-  // init() {
-  //   if(this.isInited) {
-  //     throw new Error("CursorContext is already inited");
-  //   }
-  //   this.context.subscriptions.push(
-  //     languages.registerHoverProvider(["solidity", "javascript", "python"], {
-  //       provideHover: (document, position, token) => {
-  //         this.document = document;
-  //         this.anchorPosition = position;
-  //         return new Hover('');
-  //       }
-  //     })
-  //   );
-
-  //   this.isInited = true;
-  // }
 
   get currentText() {
     if (this.selectedText && this.selectedText.includes(this.hoverText)) {
