@@ -3,7 +3,7 @@
   "displayName": "GPTutor (🤖‚🤖)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RayHuang880301/gptutor-extension"
+    "url": "https://github.com/GPTutor/gptutor-extension"
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",

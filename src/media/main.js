@@ -143,8 +143,8 @@ function auto_grow(element) {
         dropdownMenu.classList.toggle("hidden");
       });
 
-      let supportedLanguages = this.fetch(
-        "https://raw.githubusercontent.com/RayHuang880301/gptutor-extension/main/package.json"
+      this.fetch(
+        "https://raw.githubusercontent.com/GPTutor/gptutor-extension/main/package.json"
       )
         .then((response) => response.json())
         .then((data) => {
