@@ -96,3 +96,14 @@ This extension contributes the following settings:
 ## License
 
 This project is licensed under the MIT License. See the [License.txt](https://github.com/GPTutor/gptutor-extension/blob/main/LICENSE.md) file for more information.
+
+## Paper Reference
+
+```
+@article{chen2023gptutor,
+  title={GPTutor: a ChatGPT-powered programming tool for code explanation},
+  author={Chen, Eason and Huang, Ray and Chen, Han-Shin and Tseng, Yuen-Hsien and Li, Liang-Yi},
+  journal={arXiv preprint arXiv:2305.01863},
+  year={2023}
+}
+```
