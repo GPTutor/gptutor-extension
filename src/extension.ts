@@ -28,38 +28,6 @@ import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 // import { TextDocument } from "vscode-languageserver-textdocument";
 // const documents = new TextDocuments(TextDocument);
 
-function initConfig(context: ExtensionContext) {
-  let src = context.workspaceState.get("src");
-
-  let SourceConfigPath =
-    context.extensionPath + "/" + src + "/media/prompt_config.json";
-
-  if (!fs.existsSync(SourceConfigPath)) {
-    fs.copyFileSync(
-      SourceConfigPath.replace(
-        "prompt_config.json",
-        "example_prompt_config.json"
-      ),
-      SourceConfigPath
-    );
-  }
-  context.subscriptions.push(
-    commands.registerCommand("GPTutor Edit Prompts", async () => {
-      vscode.commands.executeCommand(
-        "workbench.action.openSettings",
-        "GPTutor.prompts"
-      );
-    })
-  );
-  // context.subscriptions.push(
-  //   commands.registerCommand("GPTutor Reset Prompts Config", async () => {
-  //     vscode.workspace
-  //       .openTextDocument(configPath)
-  //       .then((doc) => window.showTextDocument(doc));
-  //   })
-  // );
-}
-
 export function activate(context: ExtensionContext) {
   let src =
     vscode.ExtensionMode[context.extensionMode] === "Development"
@@ -68,7 +36,6 @@ export function activate(context: ExtensionContext) {
   context.workspaceState.update("src", src);
   const cursorContext = new CursorContext(context);
   const gptutor = new GPTutor(context, cursorContext);
-  initConfig(context);
 
   console.log(
     'Congratulations, your extension "gptutor-extension" is now active!'
@@ -100,6 +67,14 @@ export function activate(context: ExtensionContext) {
           "GPTutor Activate Failed because of Invalid OpenAI API Key!"
         );
       }
+    })
+  );
+  context.subscriptions.push(
+    commands.registerCommand("GPTutor Edit Prompts", async () => {
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "GPTutor.prompts"
+      );
     })
   );
 
