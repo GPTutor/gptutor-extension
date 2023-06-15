@@ -31,6 +31,10 @@ export class GPTutorOpenAiProvider {
       // window.showErrorMessage('You need to set API key first.');
       throw new Error("You need to set API key first.");
     }
+    // console.log(`Ask ${model}`);
+    // requestMsg.forEach((msg, index) => {
+    //   console.log(` requestMsg[${index}].length = ${msg.content.length}`);
+    // });
     return await streaming_response(
       this.openai,
       requestMsg,

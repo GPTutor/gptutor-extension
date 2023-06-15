@@ -5,7 +5,7 @@ import { GPTutorPromptType } from "./prompt";
 import { openAiIsActive } from "./openAi";
 import { defaultCachePath } from "@vscode/test-electron/out/download";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
-import { setModel } from "./model";
+import { getModel, setModel } from "./model";
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
     // Concatenate the current string literal with its interpolated value
@@ -24,6 +24,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
   private currentResponse: string = "";
   private currentMessageNum = 0;
   private currentPrompt?: GPTutorPromptType;
+  private currentMode?: string;
   public isInited = false;
 
   constructor(_context: vscode.ExtensionContext, cursorContext: any) {
@@ -76,10 +77,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
         this.switchToSetKeyPanel();
       }
     });
-    let currentModel: any = vscode.workspace
-      .getConfiguration("")
-      .get("GPTutor.openaiModel") as string;
-    console.log(`current_model: ${currentModel}`);
 
     this.view.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
@@ -143,15 +140,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
       });
     }
   }
-  public async active(mode: string) {
+  public async active(mode: string, model: string = "") {
     this.currentPrompt = await getCurrentPromptV2(
       this.context,
       this.cursorContext
     );
-    const model =
-      (vscode.workspace
-        .getConfiguration("")
-        .get("GPTutor.openaiModel") as string) || DefaultOpenAiModel;
+    this.currentMode = mode;
+    model = model || getModel();
 
     if (!this.currentPrompt) {
       return;
@@ -233,17 +228,26 @@ export class GPTutor implements vscode.WebviewViewProvider {
       }
     } catch (error: any) {
       if (error?.message === "Request failed with status code 400") {
-        vscode.window.showErrorMessage(
-          "Request failed with status code 400. This may because the length is too long. You may select less code or use GPT-4 to avoid this problem."
-        );
+        try {
+          if (model.includes("gpt-3.5") && model !== "gpt-3.5-turbo-16k") {
+            vscode.window.showInformationMessage(
+              `Using "gpt-3.5-turbo-16k" to handle long content`
+            );
+            await this.active(this.currentMode, (model = "gpt-3.5-turbo-16k"));
+          } else {
+            throw error;
+          }
+        } catch (error: any) {
+          vscode.window.showErrorMessage(
+            "Request failed with status code 400. This may because the length is too long. You may select less code or use GPT-4 to avoid this problem."
+          );
+        }
       } else if (
         error?.message === "Request failed with status code 404" &&
-        (vscode.workspace
-          .getConfiguration("")
-          .get("GPTutor.openaiModel") as string) == "gpt-4"
+        getModel() == "gpt-4"
       ) {
         vscode.window.showErrorMessage(
-          "Your API Key is not supporting GPT-4, use GPT-3 or try another one"
+          `Your API Key is not supporting ${getModel()}, use GPT-3 or try another one`
         );
       } else if (error?.message === "Request failed with status code 401") {
         this.switchToSetKeyPanel();

@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.110",
+  "version": "0.0.112",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -33,7 +33,9 @@
           "default": "gpt-3.5-turbo",
           "enum": [
             "gpt-3.5-turbo",
-            "gpt-4"
+            "gpt-4",
+            "gpt-3.5-turbo-0301",
+            "gpt-4-0314"
           ],
           "enumDescriptions": [
             "Default model, use by ChatGPT",
