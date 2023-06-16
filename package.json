@@ -186,6 +186,7 @@
         },
         "GPTutor.prompts": {
           "type": "object",
+          "description": "Prompts for GPTutor when you hover over a code block.",
           "default": {
             "global": {
               "explain": {
@@ -280,8 +281,49 @@
                 }
               }
             }
+          }
+        },
+        "GPTutor.chatPrompts": {
+          "type": "object",
+          "default": {
+            "global": {
+              "default": {
+                "display_name": "🤖 Coder",
+                "type": "chatgpt-prompt",
+                "prompt": [
+                  {
+                    "role": "user",
+                    "content": "Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n```${languageId}\n"
+                  }
+                ]
+              },
+              "withComment": {
+                "display_name": "🤖 CoderWithComment",
+                "type": "chatgpt-prompt",
+                "prompt": [
+                  {
+                    "role": "user",
+                    "content": "Complete the ${languageId} code below with the instruction text delimited by triple quotes. These code should include comments if necessary. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n```${languageId}\n"
+                  }
+                ]
+              }
+            },
+            "specificLanguageReplacement": {
+              "python": {
+                "default": {
+                  "display_name": "🤖 CoderPython",
+                  "type": "chatgpt-prompt",
+                  "prompt": [
+                    {
+                      "role": "user",
+                      "content": "You are a master python coder! Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n```${languageId}\n"
+                    }
+                  ]
+                }
+              }
+            }
           },
-          "description": "Prompts for GPTutor"
+          "description": "Prompts for GPTutor when you chat with it in the input box"
         }
       }
     },

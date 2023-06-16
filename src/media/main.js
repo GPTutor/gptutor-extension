@@ -9,19 +9,43 @@ function auto_grow(element) {
     } else {
       element.style.height = "30vh";
     }
-  }, 300);
+  }, 100);
 }
 
 (function () {
   const vscode = acquireVsCodeApi();
   let response = "";
 
+  function askGPTutorBtnClick() {
+    let textarea = document.getElementById("prompt-input");
+    // let input = textarea.value;
+    // let button = document.getElementById("ask-gptutor-button");
+    vscode.postMessage({
+      command: "ask-gptutor",
+      input: textarea.value,
+    });
+  }
+
   window.onload = async function () {
+    {
+      let textarea = document.getElementById("prompt-input");
+      let button = document.getElementById("ask-gptutor-button");
+      button.classList.add("hidden");
+      function handleTextareaChange() {
+        if (textarea.value.length > 0) {
+          button.classList.remove("hidden");
+        } else {
+          button.classList.add("hidden");
+        }
+      }
+      textarea.addEventListener("input", handleTextareaChange);
+      button.addEventListener("click", askGPTutorBtnClick);
+    }
+
     {
       let gpt35btn = document.getElementById("set-model-gpt3.5");
       let gpt4btn = document.getElementById("set-model-gpt4");
       let setModelEvent = (event) => {
-        console.log(event.srcElement.innerText.toLowerCase());
         vscode.postMessage({
           command: "set-model",
           model: event.srcElement.innerText.toLowerCase(),
@@ -213,6 +237,8 @@ function auto_grow(element) {
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
+        let button = document.getElementById("ask-gptutor-button");
+        button.classList.add("hidden");
         break;
       }
       case "gptutor-switch-to-set-key-panel": {

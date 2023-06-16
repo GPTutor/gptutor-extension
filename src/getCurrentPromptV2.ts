@@ -6,6 +6,7 @@ export async function getCurrentPromptV2(
   cursorContext: CursorContext
 ) {
   const editor = window.activeTextEditor;
+
   if (!editor) {
     window.showErrorMessage("No active editor");
     throw new Error("No active editor");

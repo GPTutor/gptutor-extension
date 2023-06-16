@@ -13,6 +13,42 @@ function html(strings: TemplateStringsArray, ...values: any[]) {
   }, "");
   return parsedString;
 }
+function process_prompt(
+  prompt: any,
+  gptutor: any,
+  outputLanguage: string,
+  config: any = undefined,
+  user_input: string = ""
+) {
+  prompt.map((item: any, index: any) => {
+    let content: string = item.content;
+    content = content.replaceAll(
+      "${languageId}",
+      gptutor.currentPrompt.languageId || ""
+    );
+    content = content.replaceAll(
+      "${auditContext}",
+      gptutor.currentPrompt.auditContext || ""
+    );
+    content = content.replaceAll(
+      "${codeContext}",
+      gptutor.currentPrompt.codeContext || ""
+    );
+    content = content.replaceAll(
+      "${selectedCode}",
+      gptutor.currentPrompt.selectedCode
+    );
+    content = content.replaceAll("${outputLanguage}", outputLanguage);
+    content = content.replaceAll("${user_input}", user_input);
+    prompt[index].content = content;
+  });
+  if (config) {
+    prompt[prompt.length - 1].content +=
+      config.appendixForSpecificLanguage[outputLanguage] || "";
+  }
+  return prompt;
+}
+
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = "GPTutor.chatView";
 
@@ -33,6 +69,99 @@ export class GPTutor implements vscode.WebviewViewProvider {
     let channel = vscode.window.createOutputChannel("GPTutor");
     this.context.workspaceState.update("channel", channel);
     this.appendOutput("GPTutor is constructed.");
+  }
+
+  async runChatGPT(
+    prompt: any,
+    model: any = undefined,
+    from: any = "",
+    options: any = {}
+  ) {
+    model = model || getModel();
+    let gptutor: any = this;
+    try {
+      let currentMessageNumber = this.currentMessageNum;
+
+      let completion: any = await this.openAiProvider.ask(
+        model,
+        prompt,
+        this.updateViewContent, //
+        { view: this.view, currentMessageNumber, gptutor, ...options }
+      );
+      this.currentResponse = completion || "";
+      console.log({
+        currentMessageNumber,
+        explainResponse: this.currentResponse,
+      });
+      if (currentMessageNumber === this.currentMessageNum) {
+        this.view?.webview.postMessage({
+          type: "hide-stop-generation-button",
+        });
+      }
+    } catch (error: any) {
+      if (error?.message === "Request failed with status code 400") {
+        try {
+          if (
+            model.includes("gpt-3.5") &&
+            model !== "gpt-3.5-turbo-16k" &&
+            from == "active"
+          ) {
+            vscode.window.showInformationMessage(
+              `Using "gpt-3.5-turbo-16k" to handle long content`
+            );
+            await this.active(
+              gptutor.currentMode,
+              (model = "gpt-3.5-turbo-16k")
+            );
+          } else {
+            throw error;
+          }
+        } catch (error: any) {
+          vscode.window.showErrorMessage(
+            "Request failed with status code 400. This may because the length is too long. You may select less code or use GPT-4 to avoid this problem."
+          );
+        }
+      } else if (
+        error?.message === "Request failed with status code 404" &&
+        getModel() == "gpt-4"
+      ) {
+        vscode.window.showErrorMessage(
+          `Your API Key is not supporting ${getModel()}, use GPT-3 or try another one`
+        );
+      } else if (error?.message === "Request failed with status code 401") {
+        this.switchToSetKeyPanel();
+        vscode.window
+          .showErrorMessage(
+            error?.message || "ERROR",
+            "Set the key now",
+            "How to get the key?"
+          )
+          .then((item) => {
+            if (item === "How to get the key?") {
+              vscode.env.openExternal(
+                vscode.Uri.parse("https://platform.openai.com/account/api-keys")
+              );
+            } else if (item == "Set the key now") {
+              this.switchToSetKeyPanel();
+            }
+          });
+      } else if (error?.message.includes("429")) {
+        vscode.window
+          .showErrorMessage(
+            error?.message + "\nYou may hit the API usage limit." || "ERROR",
+            "Go to OpenAI Dashboard"
+          )
+          .then((item) => {
+            if (item === "Go to OpenAI Dashboard") {
+              vscode.env.openExternal(
+                vscode.Uri.parse("https://platform.openai.com/account/api-keys")
+              );
+            }
+          });
+      } else {
+        vscode.window.showErrorMessage(error?.message || "ERROR");
+      }
+    }
   }
 
   appendOutput(text: string) {
@@ -95,6 +224,39 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "set-model":
           setModel(message.model);
           return;
+        case "ask-gptutor":
+          console.log(message.input);
+          let chatPrompts: any = vscode.workspace
+            .getConfiguration("")
+            .get("GPTutor.chatPrompts");
+          let currentOption =
+            this.context.globalState.get("currentAskGPTutorOption") ||
+            "default";
+          let prompt = chatPrompts.global.default.prompt;
+          let languageId =
+            vscode.window.activeTextEditor?.document.languageId || "javascript";
+          this.currentPrompt = await getCurrentPromptV2(
+            this.context,
+            this.cursorContext
+          );
+          console.log(prompt);
+          let outputLanguage: string =
+            vscode.workspace
+              .getConfiguration("")
+              .get("GPTutor.outputLanguage") || "English";
+          prompt = process_prompt(
+            prompt,
+            this,
+            outputLanguage,
+            undefined,
+            message.input
+          );
+          console.log(prompt);
+          this.runChatGPT(prompt, "", "chatInput", {
+            prefix: "```\n",
+            postfix: "",
+          });
+          return;
         case "changeLanguage":
           // this.context.globalState.update("language", message.language);
           vscode.workspace
@@ -129,14 +291,17 @@ export class GPTutor implements vscode.WebviewViewProvider {
               type: "gptutor-invalid-openai-key",
             });
           }
+          return;
       }
     }, undefined);
   }
   updateViewContent(new_text: string, total_text_so_far: string, options: any) {
     if (options.currentMessageNumber == options.gptutor.currentMessageNum) {
+      let prefix = options.prefix || "";
+      let postfix = options.postfix || "";
       options.view.webview.postMessage({
         type: "gptutor-set-answer",
-        value: total_text_so_far,
+        value: prefix + total_text_so_far + postfix,
       });
     }
   }
@@ -146,7 +311,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
       this.cursorContext
     );
     this.currentMode = mode;
-    model = model || getModel();
 
     if (!this.currentPrompt) {
       return;
@@ -173,116 +337,21 @@ export class GPTutor implements vscode.WebviewViewProvider {
     this.view?.webview.postMessage({
       type: "show-stop-generation-button",
     });
-    try {
-      let currentMessageNumber = this.currentMessageNum;
-      let config: any = vscode.workspace
-        .getConfiguration("")
-        .get("GPTutor.prompts");
-      let prompts =
-        config.specificLanguage[this.currentPrompt.languageId] || config.global;
-      let prompt: any[] = prompts[mode].prompt;
+    let config: any = vscode.workspace
+      .getConfiguration("")
+      .get("GPTutor.prompts");
+    let prompts =
+      config.specificLanguage[this.currentPrompt.languageId] || config.global;
+    let prompt: any[] = prompts[mode].prompt;
 
-      let outputLanguage: string =
-        vscode.workspace.getConfiguration("").get("GPTutor.outputLanguage") ||
-        "English";
-      prompt.map((item, index) => {
-        let content: string = item.content;
-        content = content.replaceAll(
-          "${languageId}",
-          gptutor.currentPrompt.languageId || ""
-        );
-        content = content.replaceAll(
-          "${auditContext}",
-          gptutor.currentPrompt.auditContext || ""
-        );
-        content = content.replaceAll(
-          "${codeContext}",
-          gptutor.currentPrompt.codeContext || ""
-        );
-        content = content.replaceAll(
-          "${selectedCode}",
-          gptutor.currentPrompt.selectedCode
-        );
-        content = content.replaceAll("${outputLanguage}", outputLanguage);
-        prompt[index].content = content;
-      });
-      prompt[prompt.length - 1].content +=
-        config.appendixForSpecificLanguage[outputLanguage] || "";
+    let outputLanguage: string =
+      vscode.workspace.getConfiguration("").get("GPTutor.outputLanguage") ||
+      "English";
 
-      console.log("prompt", prompt);
-      let completion: any = await this.openAiProvider.ask(
-        model,
-        prompt,
-        this.updateViewContent, //
-        { view: this.view, currentMessageNumber, gptutor }
-      );
-      this.currentResponse = completion || "";
-      console.log({
-        currentMessageNumber,
-        explainResponse: this.currentResponse,
-      });
-      if (currentMessageNumber === this.currentMessageNum) {
-        this.view?.webview.postMessage({
-          type: "hide-stop-generation-button",
-        });
-      }
-    } catch (error: any) {
-      if (error?.message === "Request failed with status code 400") {
-        try {
-          if (model.includes("gpt-3.5") && model !== "gpt-3.5-turbo-16k") {
-            vscode.window.showInformationMessage(
-              `Using "gpt-3.5-turbo-16k" to handle long content`
-            );
-            await this.active(this.currentMode, (model = "gpt-3.5-turbo-16k"));
-          } else {
-            throw error;
-          }
-        } catch (error: any) {
-          vscode.window.showErrorMessage(
-            "Request failed with status code 400. This may because the length is too long. You may select less code or use GPT-4 to avoid this problem."
-          );
-        }
-      } else if (
-        error?.message === "Request failed with status code 404" &&
-        getModel() == "gpt-4"
-      ) {
-        vscode.window.showErrorMessage(
-          `Your API Key is not supporting ${getModel()}, use GPT-3 or try another one`
-        );
-      } else if (error?.message === "Request failed with status code 401") {
-        this.switchToSetKeyPanel();
-        vscode.window
-          .showErrorMessage(
-            error?.message || "ERROR",
-            "Set the key now",
-            "How to get the key?"
-          )
-          .then((item) => {
-            if (item === "How to get the key?") {
-              vscode.env.openExternal(
-                vscode.Uri.parse("https://platform.openai.com/account/api-keys")
-              );
-            } else if (item == "Set the key now") {
-              this.switchToSetKeyPanel();
-            }
-          });
-      } else if (error?.message.includes("429")) {
-        vscode.window
-          .showErrorMessage(
-            error?.message + "\nYou may hit the API usage limit." || "ERROR",
-            "Go to OpenAI Dashboard"
-          )
-          .then((item) => {
-            if (item === "Go to OpenAI Dashboard") {
-              vscode.env.openExternal(
-                vscode.Uri.parse("https://platform.openai.com/account/api-keys")
-              );
-            }
-          });
-      } else {
-        vscode.window.showErrorMessage(error?.message || "ERROR");
-      }
-    }
+    prompt = process_prompt(prompt, gptutor, outputLanguage, config);
+
+    console.log("prompt", prompt);
+    this.runChatGPT(prompt, model, "active");
   }
 
   switchToSetKeyPanel() {
@@ -558,13 +627,22 @@ export class GPTutor implements vscode.WebviewViewProvider {
               </div>
             </div>
 
-            <textarea
-              oninput="auto_grow(this)"
-              class="h-30 w-full text-white bg-stone-700 p-2 text-sm"
-              placeholder="Ask something"
-              id="prompt-input"
+            <div class="relative">
+              <textarea
+                oninput="auto_grow(this)"
+                class="h-30 w-full text-white bg-stone-700 p-2 text-sm"
+                style="padding-right: 4rem;"
+                placeholder="Ask something"
+                id="prompt-input"
+              ></textarea>
+            </div>
+            <button
+              class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border w-full hover:bg-stone-700 hover:text-white"
+              id="ask-gptutor-button"
             >
-            </textarea>
+              Ask GPTutor (Enter)
+            </button>
+
             <hr class="hr" />
             <div class="flex items-center">
               <div class="mr-auto relative text-left">

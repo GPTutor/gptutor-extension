@@ -50,7 +50,7 @@ export function activate(context: ExtensionContext) {
       let OPEN_AI_API_KEY: any = vscode.workspace
         .getConfiguration("")
         .get("GPTutor.openaiApiKey");
-      console.log(`OPEN_AI_API_KEY: ${OPEN_AI_API_KEY}`);
+      // console.log(`OPEN_AI_API_KEY: ${OPEN_AI_API_KEY}`);
 
       if (await openAiIsActive(OPEN_AI_API_KEY)) {
         gptutor.setOpenAiKey(OPEN_AI_API_KEY);
