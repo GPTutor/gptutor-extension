@@ -656,6 +656,12 @@ export class GPTutor implements vscode.WebviewViewProvider {
                 >
                   Stop
                 </button>
+                <button
+                  class="text-white-500 hover:font-bold py-2 px-2 rounded"
+                  id="clear-output-button"
+                >
+                  Clear
+                </button>
               </div>
             </div>
 

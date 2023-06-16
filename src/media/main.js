@@ -80,6 +80,11 @@ function auto_grow(element) {
         command: "stop-generation",
       });
     };
+    document.getElementById("clear-output-button").onclick = function (event) {
+      console.log("AAA");
+      response = "";
+      setResponse();
+    };
 
     let editPromptEvent = () => {
       vscode.postMessage({
@@ -231,6 +236,7 @@ function auto_grow(element) {
       }
       case "gptutor-clear-answer": {
         response = "";
+        setResponse();
         break;
       }
       case "gptutor-set-prompt": {
