@@ -78,6 +78,11 @@ export class GPTutor implements vscode.WebviewViewProvider {
     options: any = {}
   ) {
     model = model || getModel();
+
+    options.temperature = vscode.workspace
+      .getConfiguration("")
+      .get("GPTutor.openaiTemperature");
+
     let gptutor: any = this;
     try {
       let currentMessageNumber = this.currentMessageNum;
@@ -572,6 +577,26 @@ export class GPTutor implements vscode.WebviewViewProvider {
                           class="py-0"
                           style="list-style-type: none!important; margin-left: 0px !important;"
                         ></ul>
+                      </div>
+                    </li>
+                    <li
+                      class="relative hover:bg-gray-100 px-2 py-1 hover:text-black cursor-pointer"
+                    >
+                      <span class="cursor-pointer">Set Model Parameters</span>
+                      <span
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2"
+                        >▶</span
+                      >
+
+                      <div
+                        class="absolute left-full top-0 mt-[-1] w-48 bg-stone-600 text-white rounded-md shadow-lg hidden"
+                      >
+                        <ul
+                          class="py-0"
+                          style="list-style-type: none!important; margin-left: 0px !important;"
+                        >
+                          <li id="set-openai-temperature">Temperature</li>
+                        </ul>
                       </div>
                     </li>
                     <li

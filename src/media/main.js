@@ -41,6 +41,14 @@ function auto_grow(element) {
       textarea.addEventListener("input", handleTextareaChange);
       button.addEventListener("click", askGPTutorBtnClick);
     }
+    {
+      document.getElementById("set-openai-temperature").onclick = function () {
+        vscode.postMessage({
+          command: "open-settings",
+          setting: "GPTutor.openaiTemperature",
+        });
+      };
+    }
 
     {
       let gpt35btn = document.getElementById("set-model-gpt3.5");
@@ -81,7 +89,6 @@ function auto_grow(element) {
       });
     };
     document.getElementById("clear-output-button").onclick = function (event) {
-      console.log("AAA");
       response = "";
       setResponse();
     };

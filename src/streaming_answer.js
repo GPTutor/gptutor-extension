@@ -14,6 +14,7 @@ export async function streaming_response(
       model: model_name,
       messages: chatMessages,
       stream: true,
+      temperature: options.temperature || 1,
     },
     { responseType: "stream" }
   );
