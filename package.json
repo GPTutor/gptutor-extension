@@ -302,8 +302,8 @@
                   }
                 ]
               },
-              "withComment": {
-                "display_name": "🤖 CoderWithComment",
+              "rewriter": {
+                "display_name": "🤖 Rewriter",
                 "type": "chatgpt-prompt",
                 "prompt": [
                   {

@@ -28,9 +28,28 @@ function auto_grow(element) {
 
   window.onload = async function () {
     {
+      const dropdownMenu = document.getElementById("ask-gptutor-dropdown-menu");
+      const dropdownButton = document.getElementById(
+        "ask-gptutor-select-mode-button"
+      );
+
+      console.log(dropdownButton);
+      dropdownButton.addEventListener("click", () => {
+        const dropdownMenu = document.getElementById(
+          "ask-gptutor-dropdown-menu"
+        );
+
+        dropdownMenu.classList.toggle("hidden");
+      });
+      vscode.postMessage({
+        command: "init-chat-mods-options",
+      });
+    }
+    {
       let textarea = document.getElementById("prompt-input");
+      let div = document.getElementById("ask-gptutor-div");
       let button = document.getElementById("ask-gptutor-button");
-      button.classList.add("hidden");
+      div.classList.add("hidden");
       function handleTextareaChange() {
         if (textarea.value.length > 0) {
           button.classList.remove("hidden");
@@ -241,6 +260,39 @@ function auto_grow(element) {
         setResponse();
         break;
       }
+      case "init-chat-mods-options": {
+        const dropdownButton = document.getElementById(
+          "ask-gptutor-select-mode-button"
+        );
+        dropdownButton.innerText = `${message.currentOption} ▼`;
+        const dropdownMenu = document.getElementById(
+          "ask-gptutor-dropdown-menu"
+        );
+        const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
+        function chatBottonClickHandler(event) {
+          console.log(event);
+        }
+        message.options.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          li.classList.add(
+            "hover:bg-gray-100",
+            "hover:text-black",
+            "px-2",
+            "py-1",
+            "cursor-pointer",
+            "languageListElements"
+          );
+          li.onclick = chatBottonClickHandler;
+          dropdownMenuUl.appendChild(li);
+          let liInSetting = li.cloneNode(true);
+          if (item.length > 21)
+            liInSetting.innerText = item.slice(0, 19) + "...";
+          // liInSetting.onclick = chatBottonClickHandler;
+          // languageMenuInSetting.appendChild(liInSetting);
+        });
+        break;
+      }
       case "gptutor-clear-answer": {
         response = "";
         setResponse();
@@ -250,7 +302,7 @@ function auto_grow(element) {
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
-        let button = document.getElementById("ask-gptutor-button");
+        let button = document.getElementById("ask-gptutor-div");
         button.classList.add("hidden");
         break;
       }

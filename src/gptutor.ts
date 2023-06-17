@@ -229,6 +229,18 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "set-model":
           setModel(message.model);
           return;
+        case "init-chat-mods-options": {
+          let currentOption = "default";
+          let options = ["default", "AAA", "BBB", "CCC"];
+          options = options.filter((e) => e !== currentOption);
+          this.view?.webview.postMessage({
+            type: "init-chat-mods-options",
+            currentOption,
+            options,
+          });
+          return;
+        }
+
         case "ask-gptutor":
           console.log(message.input);
           let chatPrompts: any = vscode.workspace
@@ -661,12 +673,34 @@ export class GPTutor implements vscode.WebviewViewProvider {
                 id="prompt-input"
               ></textarea>
             </div>
-            <button
-              class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border w-full hover:bg-stone-700 hover:text-white"
-              id="ask-gptutor-button"
+            <div
+              id="ask-gptutor-div"
+              style="display: flex; flex-direction: row;"
             >
-              Ask GPTutor (Enter)
-            </button>
+              <button
+                class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white"
+                id="ask-gptutor-button"
+                style="width: 50%;"
+              >
+                Ask GPTutor (Enter)
+              </button>
+              <button
+                class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white dropdown-button"
+                id="ask-gptutor-select-mode-button"
+                style="width: 50%;"
+              ></button>
+              <div
+                class="absolute right-0 mt-8 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu overflow-auto z-10"
+                id="ask-gptutor-dropdown-menu"
+                class="ask-gptutor-dropdown-menu-class"
+                style="height: 70vh"
+              >
+                <ul
+                  class="py-1 text-left"
+                  style="list-style-type: none!important; margin-left: 0px !important;"
+                ></ul>
+              </div>
+            </div>
 
             <hr class="hr" />
             <div class="flex items-center">
