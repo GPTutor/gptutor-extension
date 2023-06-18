@@ -269,6 +269,7 @@ function auto_grow(element) {
           "ask-gptutor-dropdown-menu"
         );
         const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
+        dropdownMenuUl.innerHTML = "";
         function chatBottOnClickHandler(event) {
           vscode.postMessage({
             command: "set-chat-mods-option",
@@ -302,7 +303,7 @@ function auto_grow(element) {
         message.specLanguageOptions.forEach((item) => {
           initLi(item);
         });
-        {
+        if (message.specLanguageOptions) {
           const hr = document.createElement("hr");
           hr.classList.add("hr", "m-0");
           dropdownMenuUl.appendChild(hr);
@@ -449,7 +450,14 @@ function auto_grow(element) {
     for (let i = 0; i < codes.length; i++) {
       code = codes[i];
       code.onclick = async (event) => {
-        await navigator.clipboard.writeText(event.srcElement.innerText);
+        let ele = event.srcElement;
+        for (let i = 0; i < 10; i++) {
+          if (ele.tagName.toLowerCase() == "code") {
+            break;
+          }
+          ele = ele.parentElement;
+        }
+        await navigator.clipboard.writeText(ele.innerText);
         vscode.postMessage({
           command: "log",
           text: "[GPTutor] Text Copied to Clipboard.",
