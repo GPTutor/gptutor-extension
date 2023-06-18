@@ -264,7 +264,7 @@ function auto_grow(element) {
         const dropdownButton = document.getElementById(
           "ask-gptutor-select-mode-button"
         );
-        dropdownButton.innerText = `${message.currentOption} ▼`;
+        dropdownButton.innerText = `${message.currentOption.displayName} ▼`;
         const dropdownMenu = document.getElementById(
           "ask-gptutor-dropdown-menu"
         );
@@ -273,14 +273,15 @@ function auto_grow(element) {
         function chatBottOnClickHandler(event) {
           vscode.postMessage({
             command: "set-chat-mods-option",
-            option: event.srcElement.innerHTML,
+            option: event.srcElement.attributes["key"],
           });
           dropdownButton.innerText = `${event.srcElement.innerHTML} ▼`;
           dropdownMenu.classList.add("hidden");
         }
         let initLi = (item) => {
           const li = document.createElement("li");
-          li.textContent = item;
+          li.textContent = item.displayName;
+          li.attributes["key"] = item.key;
           li.classList.add(
             "hover:bg-gray-100",
             "hover:text-black",

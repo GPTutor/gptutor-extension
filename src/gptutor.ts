@@ -180,13 +180,19 @@ export class GPTutor implements vscode.WebviewViewProvider {
   }
 
   initChatModsOptions() {
+    let languageId =
+      vscode.window.activeTextEditor?.document.languageId || "javascript";
     let currentOption: any = this.context.globalState.get(
       "chatPromptsCurrentOption",
       {}
     );
-    let languageId =
-      vscode.window.activeTextEditor?.document.languageId || "javascript";
+
     currentOption = currentOption[languageId] || "default";
+    currentOption = {
+      key: currentOption,
+      displayName: currentOption,
+    };
+
     let chatPrompts: any = vscode.workspace
       .getConfiguration("")
       .get("GPTutor.chatPrompts");
@@ -195,11 +201,24 @@ export class GPTutor implements vscode.WebviewViewProvider {
     chatPrompts.specificLanguage[languageId];
 
     for (let key in chatPrompts.global) {
-      globalOptions.push(key);
+      globalOptions.push({
+        key: key,
+        displayName: chatPrompts.global[key].display_name,
+      });
+      if (key == currentOption.key) {
+        currentOption.displayName = chatPrompts.global[key].display_name;
+      }
     }
     for (let key in chatPrompts.specificLanguage[languageId]) {
-      specLanguageOptions.push(key);
+      specLanguageOptions.push({
+        key: key,
+        displayName: chatPrompts.specificLanguage[languageId][key].display_name,
+      });
       globalOptions = globalOptions.filter((e) => e !== key);
+      if (key == currentOption.key) {
+        currentOption.displayName =
+          chatPrompts.specificLanguage[languageId][key].display_name;
+      }
     }
 
     // let options = ["default", "AAA", "BBB", "CCC"];
