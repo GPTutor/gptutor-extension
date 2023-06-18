@@ -269,11 +269,15 @@ function auto_grow(element) {
           "ask-gptutor-dropdown-menu"
         );
         const dropdownMenuUl = dropdownMenu.getElementsByTagName("ul")[0];
-        function chatBottonClickHandler(event) {
-          console.log(event);
+        function chatBottOnClickHandler(event) {
+          vscode.postMessage({
+            command: "set-chat-mods-option",
+            option: event.srcElement.innerHTML,
+          });
+          dropdownButton.innerText = `${event.srcElement.innerHTML} ▼`;
+          dropdownMenu.classList.add("hidden");
         }
-
-        message.globalOptions.forEach((item) => {
+        let initLi = (item) => {
           const li = document.createElement("li");
           li.textContent = item;
           li.classList.add(
@@ -284,36 +288,28 @@ function auto_grow(element) {
             "cursor-pointer",
             "languageListElements"
           );
-          li.onclick = chatBottonClickHandler;
+          li.onclick = chatBottOnClickHandler;
           dropdownMenuUl.appendChild(li);
           let liInSetting = li.cloneNode(true);
           if (item.length > 21)
             liInSetting.innerText = item.slice(0, 19) + "...";
+
           // liInSetting.onclick = chatBottonClickHandler;
           // languageMenuInSetting.appendChild(liInSetting);
+        };
+        // initLi("Auto (Beta)");
+
+        message.specLanguageOptions.forEach((item) => {
+          initLi(item);
         });
         {
           const hr = document.createElement("hr");
+          hr.classList.add("hr", "m-0");
           dropdownMenuUl.appendChild(hr);
         }
-        message.specLanguageOptions.forEach((item) => {
-          const li = document.createElement("li");
-          li.textContent = item;
-          li.classList.add(
-            "hover:bg-gray-100",
-            "hover:text-black",
-            "px-2",
-            "py-1",
-            "cursor-pointer",
-            "languageListElements"
-          );
-          li.onclick = chatBottonClickHandler;
-          dropdownMenuUl.appendChild(li);
-          let liInSetting = li.cloneNode(true);
-          if (item.length > 21)
-            liInSetting.innerText = item.slice(0, 19) + "...";
-          // liInSetting.onclick = chatBottonClickHandler;
-          // languageMenuInSetting.appendChild(liInSetting);
+
+        message.globalOptions.forEach((item) => {
+          initLi(item);
         });
 
         break;

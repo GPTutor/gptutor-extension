@@ -69,6 +69,10 @@ export class GPTutor implements vscode.WebviewViewProvider {
     let channel = vscode.window.createOutputChannel("GPTutor");
     this.context.workspaceState.update("channel", channel);
     this.appendOutput("GPTutor is constructed.");
+
+    vscode.window.onDidChangeActiveTextEditor((e) => {
+      this.initChatModsOptions();
+    });
   }
 
   async runChatGPT(
@@ -77,6 +81,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     from: any = "",
     options: any = {}
   ) {
+    console.log(prompt);
     model = model || getModel();
 
     options.temperature = vscode.workspace
@@ -169,6 +174,39 @@ export class GPTutor implements vscode.WebviewViewProvider {
     }
   }
 
+  initChatModsOptions() {
+    let currentOption: any = this.context.globalState.get(
+      "chatPromptsCurrentOption",
+      {}
+    );
+    let languageId =
+      vscode.window.activeTextEditor?.document.languageId || "javascript";
+    currentOption = currentOption[languageId] || "default";
+    let chatPrompts: any = vscode.workspace
+      .getConfiguration("")
+      .get("GPTutor.chatPrompts");
+    let globalOptions: any[] = [];
+    let specLanguageOptions: any[] = [];
+    chatPrompts.specificLanguage[languageId];
+
+    for (let key in chatPrompts.global) {
+      globalOptions.push(key);
+    }
+    for (let key in chatPrompts.specificLanguage[languageId]) {
+      specLanguageOptions.push(key);
+      globalOptions = globalOptions.filter((e) => e !== key);
+    }
+
+    // let options = ["default", "AAA", "BBB", "CCC"];
+    // options = options.filter((e) => e !== currentOption);
+    this.view?.webview.postMessage({
+      type: "init-chat-mods-options",
+      currentOption,
+      globalOptions,
+      specLanguageOptions,
+    });
+  }
+
   appendOutput(text: string) {
     let channel: any = this.context.workspaceState.get("channel");
     channel.appendLine(text);
@@ -230,56 +268,44 @@ export class GPTutor implements vscode.WebviewViewProvider {
           setModel(message.model);
           return;
         case "init-chat-mods-options": {
+          this.initChatModsOptions();
+          return;
+        }
+        case "set-chat-mods-option": {
           let currentOption: any = this.context.workspaceState.get(
             "chatPromptsCurrentOption",
             {}
           );
           let languageId =
             vscode.window.activeTextEditor?.document.languageId || "javascript";
-          currentOption = currentOption[languageId] || "default";
-
-          let chatPrompts: any = vscode.workspace
-            .getConfiguration("")
-            .get("GPTutor.chatPrompts");
-          let globalOptions: any[] = [];
-          let specLanguageOptions: any[] = [];
-          chatPrompts.specificLanguage[languageId];
-
-          for (let key in chatPrompts.global) {
-            globalOptions.push(key);
-          }
-          for (let key in chatPrompts.specificLanguage[languageId]) {
-            specLanguageOptions.push(key);
-            globalOptions = globalOptions.filter((e) => e !== key);
-          }
-
-          // let options = ["default", "AAA", "BBB", "CCC"];
-          // options = options.filter((e) => e !== currentOption);
-          this.view?.webview.postMessage({
-            type: "init-chat-mods-options",
-            currentOption,
-            globalOptions,
-            specLanguageOptions,
-          });
+          currentOption[languageId] = message.option;
+          this.context.globalState.update(
+            "chatPromptsCurrentOption",
+            currentOption
+          );
           return;
         }
-
         case "ask-gptutor":
           console.log(message.input);
           let chatPrompts: any = vscode.workspace
             .getConfiguration("")
             .get("GPTutor.chatPrompts");
-          let currentOption =
-            this.context.globalState.get("currentAskGPTutorOption") ||
-            "default";
-          let prompt = chatPrompts.global.default.prompt;
+          let currentOption: any =
+            this.context.globalState.get("chatPromptsCurrentOption") || {};
+
           let languageId =
             vscode.window.activeTextEditor?.document.languageId || "javascript";
+          let specificLanguageOptions =
+            chatPrompts["specificLanguage"][languageId] || {};
+          let prompt =
+            specificLanguageOptions[currentOption[languageId]] ||
+            chatPrompts["global"][currentOption[languageId]] ||
+            chatPrompts.global.default;
+          prompt = prompt.prompt;
           this.currentPrompt = await getCurrentPromptV2(
             this.context,
             this.cursorContext
           );
-          console.log(prompt);
           let outputLanguage: string =
             vscode.workspace
               .getConfiguration("")
@@ -390,7 +416,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     prompt = process_prompt(prompt, gptutor, outputLanguage, config);
 
-    console.log("prompt", prompt);
     this.runChatGPT(prompt, model, "active");
   }
 
