@@ -272,7 +272,8 @@ function auto_grow(element) {
         function chatBottonClickHandler(event) {
           console.log(event);
         }
-        message.options.forEach((item) => {
+
+        message.globalOptions.forEach((item) => {
           const li = document.createElement("li");
           li.textContent = item;
           li.classList.add(
@@ -291,6 +292,30 @@ function auto_grow(element) {
           // liInSetting.onclick = chatBottonClickHandler;
           // languageMenuInSetting.appendChild(liInSetting);
         });
+        {
+          const hr = document.createElement("hr");
+          dropdownMenuUl.appendChild(hr);
+        }
+        message.specLanguageOptions.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          li.classList.add(
+            "hover:bg-gray-100",
+            "hover:text-black",
+            "px-2",
+            "py-1",
+            "cursor-pointer",
+            "languageListElements"
+          );
+          li.onclick = chatBottonClickHandler;
+          dropdownMenuUl.appendChild(li);
+          let liInSetting = li.cloneNode(true);
+          if (item.length > 21)
+            liInSetting.innerText = item.slice(0, 19) + "...";
+          // liInSetting.onclick = chatBottonClickHandler;
+          // languageMenuInSetting.appendChild(liInSetting);
+        });
+
         break;
       }
       case "gptutor-clear-answer": {

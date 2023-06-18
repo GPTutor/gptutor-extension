@@ -230,13 +230,36 @@ export class GPTutor implements vscode.WebviewViewProvider {
           setModel(message.model);
           return;
         case "init-chat-mods-options": {
-          let currentOption = "default";
-          let options = ["default", "AAA", "BBB", "CCC"];
-          options = options.filter((e) => e !== currentOption);
+          let currentOption: any = this.context.workspaceState.get(
+            "chatPromptsCurrentOption",
+            {}
+          );
+          let languageId =
+            vscode.window.activeTextEditor?.document.languageId || "javascript";
+          currentOption = currentOption[languageId] || "default";
+
+          let chatPrompts: any = vscode.workspace
+            .getConfiguration("")
+            .get("GPTutor.chatPrompts");
+          let globalOptions: any[] = [];
+          let specLanguageOptions: any[] = [];
+          chatPrompts.specificLanguage[languageId];
+
+          for (let key in chatPrompts.global) {
+            globalOptions.push(key);
+          }
+          for (let key in chatPrompts.specificLanguage[languageId]) {
+            specLanguageOptions.push(key);
+            globalOptions = globalOptions.filter((e) => e !== key);
+          }
+
+          // let options = ["default", "AAA", "BBB", "CCC"];
+          // options = options.filter((e) => e !== currentOption);
           this.view?.webview.postMessage({
             type: "init-chat-mods-options",
             currentOption,
-            options,
+            globalOptions,
+            specLanguageOptions,
           });
           return;
         }

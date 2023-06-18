@@ -298,22 +298,22 @@
                 "prompt": [
                   {
                     "role": "user",
-                    "content": "Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n```${languageId}\n"
+                    "content": "Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n"
                   }
                 ]
               },
               "rewriter": {
-                "display_name": "🤖 Rewriter",
+                "display_name": "🤖 Refactor",
                 "type": "chatgpt-prompt",
                 "prompt": [
                   {
                     "role": "user",
-                    "content": "Complete the ${languageId} code below with the instruction text delimited by triple quotes. These code should include comments if necessary. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n```${languageId}\n"
+                    "content": "Refactor the following ${languageId} code delimited by the following triple quotes: \"\"\"${selectedCode}\"\"\" with the instruction by the following triple quotes: \"\"\"${user_input}\"\"\""
                   }
                 ]
               }
             },
-            "specificLanguageReplacement": {
+            "specificLanguage": {
               "python": {
                 "default": {
                   "display_name": "🤖 CoderPython",
@@ -321,7 +321,17 @@
                   "prompt": [
                     {
                       "role": "user",
-                      "content": "You are a master python coder! Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"\n\n```${languageId}\n"
+                      "content": "You are a master python coder! Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\""
+                    }
+                  ]
+                },
+                "fastAPI Master": {
+                  "display_name": "🤖 FastAPI Master",
+                  "type": "chatgpt-prompt",
+                  "prompt": [
+                    {
+                      "role": "user",
+                      "content": "You are a master python coder in fastapi! Complete the ${languageId} fastAPI code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\""
                     }
                   ]
                 }
