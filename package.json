@@ -302,13 +302,13 @@
                   }
                 ]
               },
-              "rewriter": {
+              "refactor": {
                 "display_name": "🤖 Refactor",
                 "type": "chatgpt-prompt",
                 "prompt": [
                   {
                     "role": "user",
-                    "content": "Refactor the following ${languageId} code delimited by the following triple quotes: \"\"\"${selectedCode}\"\"\" with the instruction by the following triple quotes: \"\"\"${user_input}\"\"\""
+                    "content": "Here are some context about the code to help you refactor, delimited by the following triple quotes: \"\"\"${codeContext}\"\"\". Refactor the ${languageId} code delimited by the following triple quotes: \"\"\"${selectedCode}\"\"\" with the instruction delimited by the following triple quotes: \"\"\"${user_input}\"\"\"."
                   }
                 ]
               }
