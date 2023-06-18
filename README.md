@@ -4,6 +4,18 @@ GPTutor(🤖,🤖) is a Visual Studio Code extension that uses OpenAI's GPT (Gen
 
 https://marketplace.visualstudio.com/items?itemName=gptutor.gptutor
 
+## GPTutor x Move Workshop:
+Come and participate in the workshop on June 28th, from 11:00 AM to 12:30 PM GMT+9, featuring Sam Blackshear, the creator of Move, and Eason Chen, the creator of GPTutor. Join us to delve into the world of GPTutor and Move development.
+
+Register at https://lu.ma/gptutor
+
+## Donation
+GPTutor is an open-source, free tool. Donations are welcome:
+
+Sui: gptutor.sui<br>
+Ethereum: 0xCD1Ef67405DC7B2516298dcfc9De8A325d29635C<br>
+BTC: 1AoMLkWvi3MGvCpeqq5YYRERKX3cZQx8U1<br>
+
 ## Features
 
 - Code tutor using OpenAI's GPT models.
