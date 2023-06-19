@@ -238,7 +238,7 @@
               }
             },
             "appendixForSpecificLanguage": {
-              "Chinese (Traditional)": "請盡量使用繁體中文與臺灣地區用語，避免簡體字與中國大陸地區的用詞。比方請用「程式碼」而不是「代码」。"
+              "Chinese (Traditional)": "請使用繁體中文與臺灣地區用語，不要用簡體字與中國大陸地區的用詞。比方請用「程式碼」而不是「代码」。"
             },
             "specificLanguage": {
               "move": {

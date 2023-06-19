@@ -27,8 +27,8 @@ function process_prompt(
       gptutor.currentPrompt.languageId || ""
     );
     content = content.replaceAll(
-      "${auditContext}",
-      gptutor.currentPrompt.auditContext || ""
+      "${entireDocument}",
+      gptutor.currentPrompt.entireDocument || ""
     );
     content = content.replaceAll(
       "${codeContext}",
@@ -37,6 +37,26 @@ function process_prompt(
     content = content.replaceAll(
       "${selectedCode}",
       gptutor.currentPrompt.selectedCode
+    );
+    content = content.replaceAll(
+      "${definitionContext}",
+      gptutor.currentPrompt.selectedCode
+    );
+    content = content.replaceAll(
+      "${codeBefore}",
+      gptutor.currentPrompt.codeBefore
+    );
+    content = content.replaceAll(
+      "${codeAfter}",
+      gptutor.currentPrompt.codeAfter
+    );
+    content = content.replaceAll(
+      "${codeContextBefore}",
+      gptutor.currentPrompt.codeContextBefore
+    );
+    content = content.replaceAll(
+      "${codeContextAfter}",
+      gptutor.currentPrompt.codeContextAfter
     );
     content = content.replaceAll("${outputLanguage}", outputLanguage);
     content = content.replaceAll("${user_input}", user_input);
@@ -343,7 +363,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
           );
           console.log(prompt);
           this.runChatGPT(prompt, "", "chatInput", {
-            prefix: "```\n",
+            prefix: "",
             postfix: "",
           });
           return;

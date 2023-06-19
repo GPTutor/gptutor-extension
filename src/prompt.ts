@@ -9,5 +9,10 @@ export interface GPTutorPromptType {
   languageId: string;
   selectedCode: string;
   codeContext?: string;
-  auditContext?: string;
+  entireDocument?: string;
+  definitionContext: string;
+  codeBefore: string;
+  codeAfter: string;
+  codeContextBefore: string;
+  codeContextAfter: string;
 }
