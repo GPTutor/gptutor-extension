@@ -62,10 +62,14 @@ function process_prompt(
     content = content.replaceAll("${user_input}", user_input);
     prompt[index].content = content;
   });
-  if (config) {
-    prompt[prompt.length - 1].content +=
-      config.appendixForSpecificLanguage[outputLanguage] || "";
-  }
+
+  let instructionForSpecificLanguage: any = vscode.workspace
+    .getConfiguration("")
+    .get("GPTutor.instructionForSpecificLanguage");
+  prompt[prompt.length - 1].content +=
+    instructionForSpecificLanguage[outputLanguage] || "";
+  console.log(instructionForSpecificLanguage);
+
   return prompt;
 }
 
@@ -104,6 +108,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
     this.view?.webview.postMessage({
       type: "gptutor-set-answer",
       value: "Loading...",
+    });
+    this.view?.webview.postMessage({
+      type: "show-stop-generation-button",
     });
 
     console.log(prompt);
@@ -440,9 +447,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     this.currentMessageNum++;
     let gptutor: any = this;
-    this.view?.webview.postMessage({
-      type: "show-stop-generation-button",
-    });
+
     let config: any = vscode.workspace
       .getConfiguration("")
       .get("GPTutor.prompts");
