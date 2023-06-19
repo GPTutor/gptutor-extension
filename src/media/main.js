@@ -118,12 +118,10 @@ function auto_grow(element) {
         setting: "GPTutor.prompts",
       });
     };
-    var editPromptEle = document.getElementById("edit-prompt");
     var editPromptInSettingEle = document.getElementById(
       "edit-prompt-in-setting"
     );
 
-    editPromptEle.onclick = editPromptEvent;
     editPromptInSettingEle.onclick = editPromptEvent;
 
     let subOpenAIKeyBtn = document.getElementById("submit-openai-api-key");
