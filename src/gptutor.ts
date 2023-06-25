@@ -7,6 +7,7 @@ import { defaultCachePath } from "@vscode/test-electron/out/download";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 import { getModel, setModel } from "./model";
 import { askWithProxy } from "./proxy";
+import { process_prompt } from "./process_prompt";
 
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
@@ -15,66 +16,6 @@ function html(strings: TemplateStringsArray, ...values: any[]) {
   }, "");
   return parsedString;
 }
-function process_prompt(
-  prompt: any,
-  gptutor: any,
-  outputLanguage: string,
-  config: any = undefined,
-  user_input: string = ""
-) {
-  prompt.map((item: any, index: any) => {
-    let content: string = item.content;
-    content = content.replaceAll(
-      "${languageId}",
-      gptutor.currentPrompt.languageId || ""
-    );
-    content = content.replaceAll(
-      "${entireDocument}",
-      gptutor.currentPrompt.entireDocument || ""
-    );
-    content = content.replaceAll(
-      "${codeContext}",
-      gptutor.currentPrompt.codeContext || ""
-    );
-    content = content.replaceAll(
-      "${selectedCode}",
-      gptutor.currentPrompt.selectedCode
-    );
-    content = content.replaceAll(
-      "${definitionContext}",
-      gptutor.currentPrompt.selectedCode
-    );
-    content = content.replaceAll(
-      "${codeBefore}",
-      gptutor.currentPrompt.codeBefore
-    );
-    content = content.replaceAll(
-      "${codeAfter}",
-      gptutor.currentPrompt.codeAfter
-    );
-    content = content.replaceAll(
-      "${codeContextBefore}",
-      gptutor.currentPrompt.codeContextBefore
-    );
-    content = content.replaceAll(
-      "${codeContextAfter}",
-      gptutor.currentPrompt.codeContextAfter
-    );
-    content = content.replaceAll("${outputLanguage}", outputLanguage);
-    content = content.replaceAll("${user_input}", user_input);
-    prompt[index].content = content;
-  });
-
-  let instructionForSpecificLanguage: any = vscode.workspace
-    .getConfiguration("")
-    .get("GPTutor.instructionForSpecificLanguage");
-  prompt[prompt.length - 1].content +=
-    instructionForSpecificLanguage[outputLanguage] || "";
-  console.log(instructionForSpecificLanguage);
-
-  return prompt;
-}
-
 export class GPTutor implements vscode.WebviewViewProvider {
   public static readonly viewType = "GPTutor.chatView";
 
@@ -124,8 +65,18 @@ export class GPTutor implements vscode.WebviewViewProvider {
       .get("GPTutor.openaiTemperature");
 
     let gptutor: any = this;
+    let text =
+      '```\n<div class="flex justify-center items-center">GPTutor</div>\n```';
+
     try {
       let currentMessageNumber = this.currentMessageNum;
+      // this.updateViewContent(text, text, {
+      //   view: this.view,
+      //   currentMessageNumber,
+      //   gptutor,
+      //   ...options,
+      // });
+      // return;
       if (options.useProxy) {
         askWithProxy(
           "https://backend.vscode.gptutor.best/v1/stream",
