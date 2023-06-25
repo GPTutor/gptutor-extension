@@ -38,7 +38,8 @@ export async function getCurrentPromptV2(
     .join("\n");
   let selectedCode = cursorContext.currentText;
 
-  const definitionContext = await cursorContext.getDefinitionContext();
+  // const definitionContext = await cursorContext.getDefinitionContext();
+  let definitionContext = "";
   // const definitionContextPrompt = `The following is the source code of the line ${currentTextLines[anchorPosition.c]}:\n${definitionContext}`;
   return {
     languageId,

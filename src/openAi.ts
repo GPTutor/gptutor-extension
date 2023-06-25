@@ -1,7 +1,6 @@
 import { window } from "vscode";
 import { Configuration, OpenAIApi } from "openai";
 import { getAuditRequestMsg, reqType } from "./utils";
-import axios from "axios";
 import { streaming_response } from "./streaming_answer";
 
 export const DefaultOpenAiModel = "gpt-3.5-turbo";
@@ -43,12 +42,12 @@ export class GPTutorOpenAiProvider {
       options
     );
 
-    const request: any = {
-      model: model,
-      messages: requestMsg,
-    };
-    // // TODO: handle ERROR
-    return await this.openai.createChatCompletion(request);
+    // const request: any = {
+    //   model: model,
+    //   messages: requestMsg,
+    // };
+    // // // TODO: handle ERROR
+    // return await this.openai.createChatCompletion(request);
     // const res = await this.openai.createChatCompletion(request);
     // return res.data.choices[0].message?.content || '';
   }

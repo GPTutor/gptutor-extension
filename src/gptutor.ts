@@ -6,6 +6,8 @@ import { openAiIsActive } from "./openAi";
 import { defaultCachePath } from "@vscode/test-electron/out/download";
 import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 import { getModel, setModel } from "./model";
+import { askWithProxy } from "./proxy";
+
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
     // Concatenate the current string literal with its interpolated value
@@ -123,22 +125,32 @@ export class GPTutor implements vscode.WebviewViewProvider {
     let gptutor: any = this;
     try {
       let currentMessageNumber = this.currentMessageNum;
-
-      let completion: any = await this.openAiProvider.ask(
-        model,
-        prompt,
-        this.updateViewContent, //
-        { view: this.view, currentMessageNumber, gptutor, ...options }
-      );
-      this.currentResponse = completion || "";
-      console.log({
-        currentMessageNumber,
-        explainResponse: this.currentResponse,
-      });
-      if (currentMessageNumber === this.currentMessageNum) {
-        this.view?.webview.postMessage({
-          type: "hide-stop-generation-button",
+      if (options.useProxy) {
+        askWithProxy(
+          "https://backend.vscode.gptutor.best/v1/stream",
+          "credential",
+          model,
+          prompt,
+          this.updateViewContent, //
+          { view: this.view, currentMessageNumber, gptutor, ...options }
+        );
+      } else {
+        let completion: any = await this.openAiProvider.ask(
+          model,
+          prompt,
+          this.updateViewContent, //
+          { view: this.view, currentMessageNumber, gptutor, ...options }
+        );
+        this.currentResponse = completion || "";
+        console.log({
+          currentMessageNumber,
+          explainResponse: this.currentResponse,
         });
+        if (currentMessageNumber === this.currentMessageNum) {
+          this.view?.webview.postMessage({
+            type: "hide-stop-generation-button",
+          });
+        }
       }
     } catch (error: any) {
       if (error?.message === "Request failed with status code 400") {
