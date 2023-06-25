@@ -48,8 +48,6 @@ export function process_prompt(
     let instructionForSpecificLanguage: any = vscode.workspace
       .getConfiguration("")
       .get("GPTutor.instructionForSpecificLanguage");
-    prompt[prompt.length - 1].content +=
-      instructionForSpecificLanguage[outputLanguage] || "";
     content = content.replaceAll(
       "${outputLanguage}",
       outputLanguage + instructionForSpecificLanguage
