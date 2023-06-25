@@ -107,6 +107,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
     from: any = "",
     options: any = {}
   ) {
+    this.currentMessageNum++;
     this.view?.webview.postMessage({
       type: "gptutor-set-answer",
       value: "Loading...",
@@ -457,7 +458,6 @@ export class GPTutor implements vscode.WebviewViewProvider {
       value: this.currentPrompt?.selectedCode || "",
     });
 
-    this.currentMessageNum++;
     let gptutor: any = this;
 
     let config: any = vscode.workspace
