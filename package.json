@@ -306,6 +306,20 @@
                   }
                 ]
               },
+              "tailwind": {
+                "display_name": "🤖 Tailwind Rewriter",
+                "type": "chatgpt-prompt",
+                "prompt": [
+                  {
+                    "role": "system",
+                    "content": "You are a helpful assistant that rewrite the html code with the user's instruction in Tailwind CSS class. Your output should be surrounded with triple backquote (```) and new line, such as: \n```\n<div>Hi</div>\n```\n. Make sure each HTML tag is start with < and end with >. Please make very very sure to generate code snippets in the correct HTML format. Please follow this convention throughout our conversation."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Instruction: ${user_input}\n\nThe code: ${selectedCode}"
+                  }
+                ]
+              },
               "refactor": {
                 "display_name": "🤖 Refactor",
                 "type": "chatgpt-prompt",
