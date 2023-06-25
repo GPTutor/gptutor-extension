@@ -52,9 +52,9 @@ function auto_grow(element) {
       div.classList.add("hidden");
       function handleTextareaChange() {
         if (textarea.value.length > 0) {
-          button.classList.remove("hidden");
+          div.classList.remove("hidden");
         } else {
-          button.classList.add("hidden");
+          div.classList.add("hidden");
         }
       }
       textarea.addEventListener("input", handleTextareaChange);

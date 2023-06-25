@@ -723,32 +723,31 @@ export class GPTutor implements vscode.WebviewViewProvider {
                 id="prompt-input"
               ></textarea>
             </div>
-            <div
-              id="ask-gptutor-div"
-              style="display: flex; flex-direction: row;"
-            >
-              <button
-                class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white"
-                id="ask-gptutor-button"
-                style="width: 50%;"
-              >
-                Ask GPTutor (Beta)
-              </button>
-              <button
-                class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white dropdown-button"
-                id="ask-gptutor-select-mode-button"
-                style="width: 50%;"
-              ></button>
-              <div
-                class="absolute right-0 mt-8 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu overflow-auto z-10"
-                id="ask-gptutor-dropdown-menu"
-                class="ask-gptutor-dropdown-menu-class"
-                style="height: 70vh"
-              >
-                <ul
-                  class="py-1 text-left"
-                  style="list-style-type: none!important; margin-left: 0px !important;"
-                ></ul>
+            <div id="ask-gptutor-div">
+              <div style="display: flex; flex-direction: row;">
+                <button
+                  class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white"
+                  id="ask-gptutor-button"
+                  style="width: 50%;"
+                >
+                  Ask GPTutor (Beta)
+                </button>
+                <button
+                  class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white dropdown-button"
+                  id="ask-gptutor-select-mode-button"
+                  style="width: 50%;"
+                ></button>
+                <div
+                  class="absolute right-0 mt-8 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu overflow-auto z-10"
+                  id="ask-gptutor-dropdown-menu"
+                  class="ask-gptutor-dropdown-menu-class"
+                  style="height: 70vh"
+                >
+                  <ul
+                    class="py-1 text-left"
+                    style="list-style-type: none!important; margin-left: 0px !important;"
+                  ></ul>
+                </div>
               </div>
             </div>
 
