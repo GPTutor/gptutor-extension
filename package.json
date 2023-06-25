@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.113",
+  "version": "0.0.114",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -19,6 +19,16 @@
     "onView:gptutor.chatView"
   ],
   "main": "out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "publish": "npm run compile && vsce package && vsce publish",
+    "package": "vsce package"
+  },
   "contributes": {
     "configuration": {
       "title": "GPTutor",
@@ -424,16 +434,6 @@
         }
       ]
     }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && copyfiles -u 1 \"src/resources/**/*\" out && copyfiles -u 1 \"src/media/**/*\" out",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
-    "publish": "npm run compile && vsce package && vsce publish",
-    "package": "vsce package"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
