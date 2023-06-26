@@ -738,7 +738,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   id="ask-gptutor-button"
                   style="width: 50%;"
                 >
-                  Ask GPTutor (Beta)
+                  Ask GPTutor
                 </button>
                 <button
                   class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white dropdown-button"
@@ -806,6 +806,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                     Run Again with Edited Prompt
                   </button>
                 </div>
+                <hr class="hr" />
               </div>
             </div>
 

@@ -307,7 +307,7 @@
           "default": {
             "global": {
               "default": {
-                "display_name": "🤖 Code Generator",
+                "display_name": "🤖 Code Generate",
                 "type": "chatgpt-prompt",
                 "prompt": [
                   {
@@ -320,8 +320,22 @@
                   }
                 ]
               },
+              "rewriter": {
+                "display_name": "🤖 Rewrite",
+                "type": "chatgpt-prompt",
+                "prompt": [
+                  {
+                    "role": "system",
+                    "content": "You are a helpful assistant that rewrite the selected ${languageId} code with the user's instruction and according to the provided context. Make sure the rewrited code fit the context, instead of use undefined variable. Your output should be surrounded with triple backquote (```) and new line. Please follow this convention throughout our conversation.\nHere are some context about the code to help you rewrite, delimited by the following triple quotes: \"\"\"${codeContext}\"\"\". If there is no selected code provided, ignore selected code and generate code directly according to instruction."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Instruction: ${user_input}\nselected ${languageId} code: ${selectedCode}"
+                  }
+                ]
+              },
               "tailwind": {
-                "display_name": "🤖 Tailwind Rewriter",
+                "display_name": "🤖 Tailwind Rewrite",
                 "type": "chatgpt-prompt",
                 "prompt": [
                   {
@@ -331,16 +345,6 @@
                   {
                     "role": "user",
                     "content": "Instruction: ${user_input}\n\nThe code: ${selectedCode}"
-                  }
-                ]
-              },
-              "refactor": {
-                "display_name": "🤖 Refactor",
-                "type": "chatgpt-prompt",
-                "prompt": [
-                  {
-                    "role": "user",
-                    "content": "Here are some context about the code to help you refactor, delimited by the following triple quotes: \"\"\"${codeContext}\"\"\". Refactor the selected ${languageId} code delimited by the following triple quotes: \"\"\"${selectedCode}\"\"\" with the instruction delimited by the following triple quotes: \"\"\"${user_input}\"\"\". You shall do the following three steps: 1. point out the problem of the selected ${languageId} code according to the instruction. 2. refactor the code following the syntex of the code above, to fix those problems 3. explain the refactored code. Output your explain and comment in ${outputLanguage} if possible. "
                   }
                 ]
               }
@@ -354,6 +358,22 @@
                     {
                       "role": "user",
                       "content": "You are a master python coder in fastapi! Complete the ${languageId} fastAPI code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"Output your explain and comment in ${outputLanguage} but the code and variable name should be in English."
+                    }
+                  ]
+                }
+              },
+              "move": {
+                "CoinCreater": {
+                  "display_name": "🪙 Coin Creator",
+                  "type": "chatgpt-prompt",
+                  "prompt": [
+                    {
+                      "role": "system",
+                      "content": "You are a helpful assistant that generate the move code according to user's instruction and the context. Your output code should be surrounded with triple backquote (```) and new line. Please make very very sure to generate code snippets in the correct move format (which is similar to Rust). You don't need to interact with user or ask further information but just generate code directly. Rewrite the move code below with the user's instruction: \n```move\n// Copyright (c) Mysten Labs, Inc.\n// SPDX-License-Identifier: Apache-2.0\n\n/// Example coin with a trusted manager responsible for minting/burning (e.g., a stablecoin)\n/// By convention, modules defining custom coin types use upper case names, in contrast to\n/// ordinary modules, which use camel case.\nmodule fungible_coin::managed {\n    use std::option;\n    use sui::coin::{Self, Coin, TreasuryCap};\n    use sui::transfer;\n    use sui::tx_context::{Self, TxContext};\n    use sui::url;\n\n    /// Name of the coin. By convention, this type has the same name as its parent module\n    /// and has no fields. The full type of the coin defined by this module will be `COIN<MANAGED>`.\n    struct MANAGED has drop {}\n\n    /// Register the managed currency to acquire its `TreasuryCap`. Because\n    /// this is a module initializer, it ensures the currency only gets\n    /// registered once.\n    fun init(witness: MANAGED, ctx: &mut TxContext) {\n        // Get a treasury cap for the coin and give it to the transaction sender\n        let decimals = 2;\n        let symbol = b\"SYMBOL_OF_THE_COIN\";\n        let name = b\"NAME_OF_THE_COIN\";\n        let description =  b\"DESCRIPTION_OF_THE_COIN\";\n        let icon_url = option::some(url::new_unsafe_from_bytes(b\"https://blog.sui.io/content/images/2023/04/Sui_Droplet_Logo_Blue-3.png\"));\n        \n        let (treasury_cap, metadata) = coin::create_currency<MANAGED>(witness, decimals, symbol, name, description, icon_url, ctx);\n        transfer::public_freeze_object(metadata);\n        coin::mint_and_transfer(&mut treasury_cap, 100000, tx_context::sender(ctx), ctx);\n        transfer::public_transfer(treasury_cap, tx_context::sender(ctx))\n        \n    }\n\n    /// Manager can mint new coins\n    public entry fun mint(\n        treasury_cap: &mut TreasuryCap<MANAGED>, amount: u64, recipient: address, ctx: &mut TxContext\n    ) {\n        coin::mint_and_transfer(treasury_cap, amount, recipient, ctx)\n    }\n\n    /// Manager can burn coins\n    public entry fun burn(treasury_cap: &mut TreasuryCap<MANAGED>, coin: Coin<MANAGED>) {\n        coin::burn(treasury_cap, coin);\n    }\n\n}\n// Publish it by running `sui client publish . --gas COIN_OBJECT_ID --gas-budget 300000000 --skip-dependency-verification`\n```\n"
+                    },
+                    {
+                      "role": "user",
+                      "content": "Instruction: ${user_input}"
                     }
                   ]
                 }
