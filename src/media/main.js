@@ -112,17 +112,19 @@ function auto_grow(element) {
       setResponse();
     };
 
-    let editPromptEvent = () => {
-      vscode.postMessage({
-        command: "open-settings",
-        setting: "GPTutor.prompts",
-      });
-    };
-    var editPromptInSettingEle = document.getElementById(
-      "edit-prompt-in-setting"
-    );
+    {
+      let editPromptEvent = () => {
+        vscode.postMessage({
+          command: "open-settings",
+          setting: "GPTutor.prompt",
+        });
+      };
+      var editPromptInSettingEle = document.getElementById(
+        "edit-prompt-in-setting"
+      );
 
-    editPromptInSettingEle.onclick = editPromptEvent;
+      editPromptInSettingEle.onclick = editPromptEvent;
+    }
 
     let subOpenAIKeyBtn = document.getElementById("submit-openai-api-key");
     subOpenAIKeyBtn.onclick = function () {

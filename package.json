@@ -302,7 +302,7 @@
             }
           }
         },
-        "GPTutor.chatPrompts": {
+        "GPTutor.promptsForInputBox": {
           "type": "object",
           "default": {
             "global": {
