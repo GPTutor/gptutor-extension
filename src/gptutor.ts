@@ -272,6 +272,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     this.view.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
+        case "run-with-prompt":
+          this.runChatGPT(message.prompt);
+          return;
         case "alert":
           vscode.window.showErrorMessage(message.text);
           return;
@@ -795,6 +798,14 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   id="currentPromptTextArea"
                   class="h-30 w-full text-white bg-stone-700 p-2 text-sm"
                 ></textarea>
+                <div class="text-center">
+                  <button
+                    class="border border-stone hover:bg-white hover:text-black rounded px-2 py-1"
+                    id="run-again-with-edited-prompt-button"
+                  >
+                    Run Again with Edited Prompt
+                  </button>
+                </div>
               </div>
             </div>
 

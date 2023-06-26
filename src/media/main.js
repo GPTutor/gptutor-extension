@@ -28,6 +28,21 @@ function auto_grow(element) {
 
   window.onload = async function () {
     {
+      const runWithEditedPromptBtn = document.getElementById(
+        "run-again-with-edited-prompt-button"
+      );
+
+      runWithEditedPromptBtn.addEventListener("click", () => {
+        let currentPromptTextrea = document.getElementById(
+          "currentPromptTextArea"
+        );
+        vscode.postMessage({
+          command: "run-with-prompt",
+          prompt: JSON.parse(currentPromptTextrea.value),
+        });
+      });
+    }
+    {
       function toggleCollapse() {
         const collapsible = document.getElementById("collapsedCurrentPrompt");
         collapsible.classList.toggle("max-h-0");
