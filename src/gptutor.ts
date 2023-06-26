@@ -767,7 +767,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
               <div class="ml-auto relative text-right">
                 <button
                   class="text-white-500 hover:font-bold py-2 px-2 rounded"
-                  id="togglecollapsedCurrentPrompt"
+                  id="toggleCollapsedCurrentPrompt"
                 >
                   Show Prompt
                 </button>

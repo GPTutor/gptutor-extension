@@ -43,6 +43,9 @@ function auto_grow(element) {
       });
     }
     {
+      const togglePromptCollapse = document.getElementById(
+        "toggleCollapsedCurrentPrompt"
+      );
       function toggleCollapse() {
         const collapsible = document.getElementById("collapsedCurrentPrompt");
         collapsible.classList.toggle("max-h-0");
@@ -52,10 +55,12 @@ function auto_grow(element) {
           "currentPromptTextArea"
         );
         auto_grow(currentPromptTextrea);
+        if (togglePromptCollapse.innerHTML.includes("Show Prompt")) {
+          togglePromptCollapse.innerHTML = "Hide Prompt";
+        } else {
+          togglePromptCollapse.innerHTML = "Show Prompt";
+        }
       }
-      const togglePromptCollapse = document.getElementById(
-        "togglecollapsedCurrentPrompt"
-      );
       togglePromptCollapse.onclick = toggleCollapse;
     }
     {
