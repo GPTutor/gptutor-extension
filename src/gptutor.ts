@@ -186,7 +186,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     let chatPrompts: any = vscode.workspace
       .getConfiguration("")
-      .get("GPTutor.chatPrompts");
+      .get("GPTutor.promptsForInputBox");
     let globalOptions: any[] = [];
     let specLanguageOptions: any[] = [];
     chatPrompts.specificLanguage[languageId];
@@ -304,7 +304,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
           console.log(message.input);
           let chatPrompts: any = vscode.workspace
             .getConfiguration("")
-            .get("GPTutor.chatPrompts");
+            .get("GPTutor.promptsForInputBox");
           let currentOption: any =
             this.context.globalState.get("chatPromptsCurrentOption") || {};
 

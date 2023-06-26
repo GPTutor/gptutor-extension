@@ -50,7 +50,7 @@ export function process_prompt(
       .get("GPTutor.instructionForSpecificLanguage");
     content = content.replaceAll(
       "${outputLanguage}",
-      outputLanguage + instructionForSpecificLanguage
+      outputLanguage + (instructionForSpecificLanguage["outputLanguage"] || "")
     );
 
     content = content.replaceAll("${user_input}", user_input);
