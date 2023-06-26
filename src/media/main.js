@@ -28,6 +28,22 @@ function auto_grow(element) {
 
   window.onload = async function () {
     {
+      function toggleCollapse() {
+        const collapsible = document.getElementById("collapsedCurrentPrompt");
+        collapsible.classList.toggle("max-h-0");
+        collapsible.classList.toggle("h-auto");
+        collapsible.classList.toggle("hidden");
+        let currentPromptTextrea = document.getElementById(
+          "currentPromptTextArea"
+        );
+        auto_grow(currentPromptTextrea);
+      }
+      const togglePromptCollapse = document.getElementById(
+        "togglecollapsedCurrentPrompt"
+      );
+      togglePromptCollapse.onclick = toggleCollapse;
+    }
+    {
       const dropdownMenu = document.getElementById("ask-gptutor-dropdown-menu");
       const dropdownButton = document.getElementById(
         "ask-gptutor-select-mode-button"
@@ -255,6 +271,14 @@ function auto_grow(element) {
     const message = event.data;
 
     switch (message.type) {
+      case "update-current-prompt": {
+        let currentPromptTextrea = document.getElementById(
+          "currentPromptTextArea"
+        );
+        currentPromptTextrea.value = JSON.stringify(message.prompt, null, 2);
+        auto_grow(currentPromptTextrea);
+        break;
+      }
       case "gptutor-set-answer": {
         response = message.value;
         setResponse();

@@ -57,6 +57,11 @@ export class GPTutor implements vscode.WebviewViewProvider {
       type: "show-stop-generation-button",
     });
 
+    this.view?.webview.postMessage({
+      type: "update-current-prompt",
+      prompt: prompt,
+    });
+
     console.log(prompt);
     model = model || getModel();
 
@@ -753,11 +758,16 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
             <hr class="hr" />
             <div class="flex items-center">
-              <div class="mr-auto relative text-left">
+              <div class="mr-auto relative text-left hidden">
                 <label>Answer: </label>
               </div>
-
               <div class="ml-auto relative text-right">
+                <button
+                  class="text-white-500 hover:font-bold py-2 px-2 rounded"
+                  id="togglecollapsedCurrentPrompt"
+                >
+                  Show Prompt
+                </button>
                 <button
                   class="text-white-500 hover:font-bold py-2 px-2 rounded hidden"
                   id="stop-generation-button"
@@ -770,6 +780,21 @@ export class GPTutor implements vscode.WebviewViewProvider {
                 >
                   Clear
                 </button>
+              </div>
+            </div>
+            <div class="overflow-hidden">
+              <div
+                class="h-auto max-h-0 transition-all duration-300 hidden"
+                id="collapsedCurrentPrompt"
+              >
+                <!-- Collapsible content goes here -->
+                <!-- This content will be collapsed initially -->
+                <textarea
+                  oninput="auto_grow(this)"
+                  wrap="soft"
+                  id="currentPromptTextArea"
+                  class="h-30 w-full text-white bg-stone-700 p-2 text-sm"
+                ></textarea>
               </div>
             </div>
 

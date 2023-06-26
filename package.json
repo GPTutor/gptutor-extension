@@ -311,8 +311,12 @@
                 "type": "chatgpt-prompt",
                 "prompt": [
                   {
+                    "role": "system",
+                    "content": "You are a helpful assistant that generate the ${languageId} code according to user's instruction and the context.Your output code should be surrounded with triple backquote (```) and new line. Please make very very sure to generate code snippets in the correct ${languageId} format. You dont need to interact with user but just generate all code directly. Please follow this convention throughout our conversation."
+                  },
+                  {
                     "role": "user",
-                    "content": "Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"\n\nOutput your explain and comment in ${outputLanguage} if possible."
+                    "content": "Instruction: ${user_input}"
                   }
                 ]
               },
@@ -343,16 +347,6 @@
             },
             "specificLanguage": {
               "python": {
-                "default": {
-                  "display_name": "🤖 CoderPython",
-                  "type": "chatgpt-prompt",
-                  "prompt": [
-                    {
-                      "role": "user",
-                      "content": "You are a master python coder! Complete the ${languageId} code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"Output your explain and comment in ${outputLanguage} but the code and variable name should be in English."
-                    }
-                  ]
-                },
                 "fastAPI Master": {
                   "display_name": "🤖 FastAPI Master",
                   "type": "chatgpt-prompt",
