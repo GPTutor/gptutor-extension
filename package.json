@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "0.0.114",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -221,7 +221,7 @@
                   },
                   {
                     "role": "user",
-                    "content": "Other context about the selected code is in the following triple quotes \"\"\"${codeContext}\"\"\". The ${languageId} code I selected is in the following triple quotes \"\"\"${selectedCode}\"\"\". You don't need to repeat the selected code again. Please focus on explain target ${languageId} code. Output in ${outputLanguage}."
+                    "content": "Other context about the selected code is in the following triple backquote (```) \n```\n${codeContext}\n```\n. The ${languageId} code I selected is in the following triple backquote (```) \n```\n${selectedCode}\n```\n. You don't need to repeat the selected code again. Please focus on explain target ${languageId} code. Output in ${outputLanguage}."
                   }
                 ]
               },
@@ -266,7 +266,7 @@
                     },
                     {
                       "role": "user",
-                      "content": "Other context about the selected code is in the following triple quotes \"\"\"${codeContext}\"\"\". The ${languageId} code I selected is in the following triple quotes \"\"\"${selectedCode}\"\"\". Please focus on explain target ${languageId} code. Output in ${outputLanguage}."
+                      "content": "Other context about the selected code is in the following triple backquote (```) \n```\n${codeContext}\n```\n. The ${languageId} code I selected is in the following triple backquote (```) \n```\n${selectedCode}\n```\n. Please focus on explain target ${languageId} code. Output in ${outputLanguage}."
                     }
                   ]
                 },
@@ -326,7 +326,7 @@
                 "prompt": [
                   {
                     "role": "system",
-                    "content": "You are a helpful assistant that rewrite the selected ${languageId} code with the user's instruction and according to the provided context. Make sure the rewrited code fit the context, instead of use undefined variable. Your output should be surrounded with triple backquote (```) and new line. Please follow this convention throughout our conversation.\nHere are some context about the code to help you rewrite, delimited by the following triple quotes: \"\"\"${codeContext}\"\"\". If there is no selected code provided, ignore selected code and generate code directly according to instruction."
+                    "content": "You are a helpful assistant that rewrite the selected ${languageId} code with the user's instruction and according to the provided context. Make sure the rewrited code fit the context, instead of use undefined variable. Your output should be surrounded with triple backquote (```) and new line. Please follow this convention throughout our conversation.\nHere are some context about the code to help you rewrite, delimited by the following triple backquote (```): \n```\n${codeContext}\n```\n. If there is no selected code provided, ignore selected code and generate code directly according to instruction."
                   },
                   {
                     "role": "user",
@@ -357,7 +357,7 @@
                   "prompt": [
                     {
                       "role": "user",
-                      "content": "You are a master python coder in fastapi! Complete the ${languageId} fastAPI code below with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"Output your explain and comment in ${outputLanguage} but the code and variable name should be in English."
+                      "content": "You are a master python coder in fastapi! Complete the ${languageId} fastAPI code below with the instruction text delimited by triple backquote (```). \n\n\n\n\n```\n${user_input}\n```\nOutput your explain and comment in ${outputLanguage} but the code and variable name should be in English."
                     }
                   ]
                 }
@@ -385,7 +385,7 @@
                   "prompt": [
                     {
                       "role": "user",
-                      "content": "You are a react generator! \n\nHere are the code before the cursor delimited by triple quotes: \"\"\"${codeBefore}\"\"\"\n\nAnd here are the code after the cursor delimited by triple quotes: \"\"\"${codeAfter}\"\"\"\n\nHere is the code selected by the user delimited by triple quotes: \"\"\"${selectedCode}\"\"\"\n\nComplete the react code on the cursor or refactor the selected code with the instruction text delimited by triple quotes. \n\n\n\n\"\"\"${user_input}\"\"\"Output your explain and comment in ${outputLanguage} but the code and variable name should be in English."
+                      "content": "You are a react generator! \n\nHere are the code before the cursor delimited by triple backquote (```): \n```\n${codeBefore}\n```\n\n\nAnd here are the code after the cursor delimited by triple backquote (```): \n```\n${codeAfter}\n```\n\n\nHere is the code selected by the user delimited by triple backquote (```): \n```\n${selectedCode}\n```\n\n\nComplete the react code on the cursor or refactor the selected code with the instruction text delimited by triple backquote (```). \n\n\n\n\n```\n${user_input}\n```\nOutput your explain and comment in ${outputLanguage} but the code and variable name should be in English."
                     }
                   ]
                 }

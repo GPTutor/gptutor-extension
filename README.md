@@ -74,7 +74,7 @@ BTC: 1AoMLkWvi3MGvCpeqq5YYRERKX3cZQx8U1<br>
 
 ## Usage
 
-GPTutor provides three main features: `Explain`, `Comment`, and `Audit` on the code you selected.
+GPTutor provides three main features: `Explain`, `Comment`, and `Audit` whhen you hover on the code you selected. Moreover, you can interact with GPTutor directly on the input box.
 
 
 ### Code Explain
@@ -91,6 +91,14 @@ GPTutor provides three main features: `Explain`, `Comment`, and `Audit` on the c
 1. Hover over a code block in a supported language.
 1. Click on the `Audit` option to get an audit of the selected code.
 
+### Interact by Input Box
+
+1. Input the instruction
+2. Selected the mode, such as `Code Generate` and `Rewrite`
+3. Execute by `Ask GPTutor`.
+
+## Customize Prompt
+Follow the instructions [in this document](docs/Prompt.md) to customize the prompt. The default prompts is in set the [package.json](package.json), you are welcome to send pull requests for your awesome prompts.
 
 <!-- 
 ## Extension Settings
