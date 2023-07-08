@@ -245,11 +245,11 @@
                 "prompt": [
                   {
                     "role": "system",
-                    "content": "You are a Senior ${languageId} Developer \n I will provide some ${languageId} code, and it will be your job to explain the  ${languageId} code I selected."
+                    "content": "You are a Senior ${languageId} Developer \n I will provide some ${languageId} code, and it will be your job to do code review on the ${languageId} code I selected."
                   },
                   {
                     "role": "user",
-                    "content": "Given the ${languageId} code, I want you to do the following:\n\n1. if there is a problem with this ${selectedCode} code or if there is a security concern, \n modify this ${languageId} code. Only return the code after modified. Here is the full code context in the following triple backquote if needed. \n```\n${codeContext}\n```\n. return the code with the triple backquote (```). Add or rewrite the comment in the code in ${outputLanguage}.\n\n2. Then, check again if there is a security concern with the original code, modified code, and the context. List each of the concern.\n\n3. Refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, then you don't need to output anything in this step. \nOutput in ${outputLanguage}."
+                    "content": "Here is the full code context in the following triple backquote if needed. \n```\n${codeContext}\n```\n.\n\nHere is the selected code in the triple backquote: \n```\n${selectedCode}\n```\n\nGiven the selected ${languageId} code, I want you to do the following:\n\n1. if there is a problem, such as bug or security concern, with the selected code, modify the selected ${languageId} code and return it with the triple backquote (```). Add or rewrite the comment in the code in ${outputLanguage}.\n\n2. Then, check again if there is a security concern with the original code, modified code, and the context. List each of the concern.\n\n3. Refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, then you don't need to output anything in this step. Please focus on the selected code, but you may reference the full code context for more information. \nOutput in ${outputLanguage}."
                   }
                 ]
               }
@@ -290,11 +290,11 @@
                   "prompt": [
                     {
                       "role": "system",
-                      "content": "Move is an open source language for writing safe smart contracts. It's format is similar to Rust. You are a Senior ${languageId} Developer \n I will provide some ${languageId} code, and it will be your job to explain the  ${languageId} code I selected."
+                      "content": "Move is an open source language for writing safe smart contracts. It's format is similar to Rust. You are a Senior ${languageId} Developer \n I will provide some ${languageId} code, and it will be your job to do code review on the ${languageId} code I selected."
                     },
                     {
                       "role": "user",
-                      "content": "Given the ${languageId} code, I want you to do the following:\n\n1. if there is a problem with this ${languageId} code or if there is a security concern, \n modify this ${languageId} code. Only return the code after modified. Here is the full code context if needed. \n```\n${codeContext}\n```\n. return the code with triple backquote (```). Add or rewrite the comment in the code in ${outputLanguage}.\n\n2. Then, check again if there is a security concern with the original code, modified code, and the context. List each of the concern.\n\n3. Refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, then you don't need to output anything in this step. \nOutput in ${outputLanguage}."
+                      "content": "Here is the full code context in the following triple backquote if needed. \n```\n${codeContext}\n```\n.\n\nHere is the selected code in the triple backquote: \n```\n${selectedCode}\n```\n\nGiven the selected ${languageId} code, I want you to do the following:\n\n1. if there is a problem, such as bug or security concern, with the selected code, modify the selected ${languageId} code and return it with the triple backquote (```). Add or rewrite the comment in the code in ${outputLanguage}.\n\n2. Then, check again if there is a security concern with the original code, modified code, and the context. List each of the concern.\n\n3. Refine and audit this code again \n Please think carefully. And audit this code to be better. \n If it is already quite secure and efficient, then you don't need to output anything in this step. Please focus on the selected code, but you may reference the full code context for more information. \nOutput in ${outputLanguage}."
                     }
                   ]
                 }
