@@ -9,7 +9,6 @@ export const sleep = (second: number) => {
   return new Promise((resolve) => setTimeout(resolve, second * 1000));
 };
 
-
 export const getTutorRequestMsg = (
   languageId: string,
   definitionContextPrompt: string,
@@ -29,7 +28,7 @@ export const getTutorRequestMsg = (
 };
 
 //! Eason plz content
-export const getAuditRequestMsg = (
+export const getReviewRequestMsg = (
   languageId: string,
   definitionContextPrompt: string,
   codeContext: string,

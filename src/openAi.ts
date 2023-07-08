@@ -1,6 +1,6 @@
 import { window } from "vscode";
 import { Configuration, OpenAIApi } from "openai";
-import { getAuditRequestMsg, reqType } from "./utils";
+import { getReviewRequestMsg, reqType } from "./utils";
 import { streaming_response } from "./streaming_answer";
 
 export const DefaultOpenAiModel = "gpt-3.5-turbo";

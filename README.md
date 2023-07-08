@@ -1,6 +1,6 @@
 # GPTutor(🤖,🤖) - VS Code Extension
 
-GPTutor(🤖,🤖) is a Visual Studio Code extension that uses OpenAI's GPT (Generative Pre-trained Transformer) models to provide users with code explanations and audits for a better understanding of their code and enabling users to get insights into code blocks and improve their coding skills. (Supported Move programming languages now)
+GPTutor(🤖,🤖) is a Visual Studio Code extension that uses OpenAI's GPT (Generative Pre-trained Transformer) models to provide users with code explanations and Reviews for a better understanding of their code and enabling users to get insights into code blocks and improve their coding skills. (Supported Move programming languages now)
 
 https://marketplace.visualstudio.com/items?itemName=gptutor.gptutor
 
@@ -19,7 +19,7 @@ BTC: 1AoMLkWvi3MGvCpeqq5YYRERKX3cZQx8U1<br>
 ## Features
 
 - Code tutor using OpenAI's GPT models.
-- Code audit (review) using OpenAI's GPT models.
+- Code Review (review) using OpenAI's GPT models.
 - Code comment using OpenAI's GPT models.
 - Supports Move language for now.
 - Non-custodial API key (100% Free and we don't own your key).
@@ -61,7 +61,7 @@ BTC: 1AoMLkWvi3MGvCpeqq5YYRERKX3cZQx8U1<br>
 <br/>
 <br/>
 
-### 6. Choose the explain, audit or comment to help you
+### 6. Choose the explain, Review or comment to help you
 <img width="880" alt="截圖 2023-06-11 下午4 13 03" src="https://github.com/GPTutor/gptutor-extension/assets/84802160/9990a600-e573-4590-809d-c9f060d7caf3">
 <br/>
 <br/>
@@ -74,7 +74,7 @@ BTC: 1AoMLkWvi3MGvCpeqq5YYRERKX3cZQx8U1<br>
 
 ## Usage
 
-GPTutor provides three main features: `Explain`, `Comment`, and `Audit` whhen you hover on the code you selected. Moreover, you can interact with GPTutor directly on the input box.
+GPTutor provides three main features: `Explain`, `Comment`, and `Review` whhen you hover on the code you selected. Moreover, you can interact with GPTutor directly on the input box.
 
 
 ### Code Explain
@@ -86,10 +86,10 @@ GPTutor provides three main features: `Explain`, `Comment`, and `Audit` whhen yo
 
 1. Hover over a code block in a supported language.
 2. Click on the `Comment` option to get a commented and refactored version of the selected code.
-### Code Audit
+### Code Review
 
 1. Hover over a code block in a supported language.
-1. Click on the `Audit` option to get an audit of the selected code.
+1. Click on the `Review` option to get an Review of the selected code.
 
 ### Interact by Input Box
 

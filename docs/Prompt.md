@@ -30,7 +30,7 @@ Then, you will see the value of `GPTutor.prompts` and `GPTutor.promptInputBox` a
         ]
       },
       "comment": {...},
-      "audit": {...},
+      "Review": {...},
     }
     "specificLanguage": {
       "move": {
@@ -49,7 +49,7 @@ Then, you will see the value of `GPTutor.prompts` and `GPTutor.promptInputBox` a
           ]
         },
         "comment": {...},
-        "audit": {...}
+        "Review": {...}
       }
     }
   }
@@ -80,7 +80,7 @@ The following is the explanation of the `GPTutor.prompts` and `GPTutor.promptsFo
 2. `GPTutor.promptsForInputBox` is the prompt configs when you interact with the input box.
 3. Global: These prompts will take effect in all languages.
 4. Specific Language: These prompts will only affect the key in the specified language. For instance, the prompt labeled "move" will only show up when the document's language is Move.
-5. Keys: `explain`, `comment`, and `audit` are the function's keys. If a key in the specific language duplicates a key in the global section, the specific language key will be prioritized.
+5. Keys: `explain`, `comment`, and `Review` are the function's keys. If a key in the specific language duplicates a key in the global section, the specific language key will be prioritized.
 6. `display_name`: This is the name that will be displayed in GPTutor's pop-up or dropdown menu.
 7. `type`: This indicates the type of prompt. Currently, only `chatgpt-prompt` is supported, but we plan to support others such as Google-Bard, Azure, and 3rd party Service Proxy APIs in the future.
 8. `prompt`: This is the specific prompt that will be used for ChatGPT.
