@@ -672,6 +672,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                           style="list-style-type: none!important; margin-left: 0px !important;"
                         >
                           <li id="set-openai-temperature">Temperature</li>
+                          <li id="set-openai-basepath">Base Path</li>
                         </ul>
                       </div>
                     </li>

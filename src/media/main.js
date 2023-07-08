@@ -104,6 +104,14 @@ function auto_grow(element) {
         });
       };
     }
+    {
+      document.getElementById("set-openai-basepath").onclick = function () {
+        vscode.postMessage({
+          command: "open-settings",
+          setting: "GPTutor.openaiBasePath",
+        });
+      };
+    }
 
     {
       let gpt35btn = document.getElementById("set-model-gpt3.5");

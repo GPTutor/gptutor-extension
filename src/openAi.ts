@@ -1,4 +1,5 @@
 import { window } from "vscode";
+import * as vscode from "vscode";
 import { Configuration, OpenAIApi } from "openai";
 import { getReviewRequestMsg, reqType } from "./utils";
 import { streaming_response } from "./streaming_answer";
@@ -72,9 +73,15 @@ export async function openAiIsActive(apiKey: string | undefined) {
 }
 
 function getOpenAI(apiKey: string) {
-  const configuration = new Configuration({
+  let configuration = new Configuration({
     apiKey: apiKey,
   });
+  let basePath: any = vscode.workspace
+    .getConfiguration("")
+    .get("GPTutor.openaiBasePath");
+  if (basePath) {
+    configuration.basePath = basePath;
+  }
   const openai = new OpenAIApi(configuration);
   return openai;
 }
