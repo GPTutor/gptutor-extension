@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for smart contract development.",
   "publisher": "gptutor",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -335,7 +335,7 @@
                   },
                   {
                     "role": "user",
-                    "content": "Instruction: ${user_input}\nselected ${languageId} code: ${selectedCode}"
+                    "content": "Instruction: ${user_input}\nselected ${languageId} code: \n```\n${selectedCode}\n```\n"
                   }
                 ]
               },
