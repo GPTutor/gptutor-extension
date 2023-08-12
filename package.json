@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/GPTutor/gptutor-extension"
   },
-  "description": "A VS Code extension for smart contract development.",
+  "description": "A VS Code extension for AI Pair Programming and Smart Contract Development.",
   "publisher": "gptutor",
   "version": "1.0.4",
   "engines": {
