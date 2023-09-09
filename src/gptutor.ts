@@ -159,7 +159,9 @@ export class GPTutor implements vscode.WebviewViewProvider {
       } else if (error?.message.includes("429")) {
         vscode.window
           .showErrorMessage(
-            error?.message + "\nYou may hit the API usage limit." || "ERROR",
+            error?.message +
+              "\nYou may hit the API usage limit or your free quota has expired. You may set up a new free account or use the paid account's OpenAI API Key to continue." ||
+              "ERROR",
             "Go to OpenAI Dashboard"
           )
           .then((item) => {
