@@ -1,6 +1,6 @@
 import { ExtensionContext, window, workspace } from "vscode";
 import * as vscode from "vscode";
-import { DefaultOpenAiModel } from "./openAi";
+import { defaultOpenAiModel } from "./openAi";
 let models = [
   "gpt-3.5-turbo",
   "gpt-4",
@@ -14,7 +14,7 @@ export function getModel() {
   return (
     (vscode.workspace
       .getConfiguration("")
-      .get("GPTutor.openaiModel") as string) || DefaultOpenAiModel
+      .get("GPTutor.openaiModel") as string) || defaultOpenAiModel
   );
 }
 

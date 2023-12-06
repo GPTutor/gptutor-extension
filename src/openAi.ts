@@ -1,13 +1,13 @@
 import { window } from "vscode";
 import * as vscode from "vscode";
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
 import { getReviewRequestMsg, reqType } from "./utils";
 import { streaming_response } from "./streaming_answer";
 
-export const DefaultOpenAiModel = "gpt-3.5-turbo";
+export const defaultOpenAiModel = "gpt-3.5-turbo";
 
 export class GPTutorOpenAiProvider {
-  openai!: OpenAIApi;
+  openai!: OpenAI;
 
   constructor() {}
 
@@ -61,7 +61,8 @@ export async function openAiIsActive(apiKey: string | undefined) {
   const openai = getOpenAI(apiKey);
   // console.log(openai);
   try {
-    const response = await openai.listModels();
+    const response = await openai.models.list();
+
     return true;
   } catch (e: any) {
     if (e.message === "Request failed with status code 401") {
@@ -73,15 +74,19 @@ export async function openAiIsActive(apiKey: string | undefined) {
 }
 
 function getOpenAI(apiKey: string) {
-  let configuration = new Configuration({
-    apiKey: apiKey,
-  });
   let basePath: any = vscode.workspace
     .getConfiguration("")
     .get("GPTutor.openaiBasePath");
+  let openai;
   if (basePath) {
-    configuration.basePath = basePath;
+    openai = new OpenAI({
+      apiKey: apiKey,
+      baseURL: basePath,
+    });
+  } else {
+    openai = new OpenAI({
+      apiKey: apiKey,
+    });
   }
-  const openai = new OpenAIApi(configuration);
   return openai;
 }

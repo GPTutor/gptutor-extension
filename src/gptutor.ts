@@ -1,6 +1,5 @@
-import { OpenAIApi } from "openai";
 import * as vscode from "vscode";
-import { DefaultOpenAiModel, GPTutorOpenAiProvider } from "./openAi";
+import { defaultOpenAiModel, GPTutorOpenAiProvider } from "./openAi";
 import { GPTutorPromptType } from "./prompt";
 import { openAiIsActive } from "./openAi";
 import { defaultCachePath } from "@vscode/test-electron/out/download";
