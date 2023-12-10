@@ -722,6 +722,11 @@
   dependencies:
     "delayed-stream" "~1.0.0"
 
+"command-exists@^1.2.9":
+  "integrity" "sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w=="
+  "resolved" "https://registry.npmjs.org/command-exists/-/command-exists-1.2.9.tgz"
+  "version" "1.2.9"
+
 "commander@^10.0.1":
   "integrity" "sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug=="
   "resolved" "https://registry.npmjs.org/commander/-/commander-10.0.1.tgz"
@@ -2370,6 +2375,11 @@
   "resolved" "https://registry.npmjs.org/semver/-/semver-5.7.1.tgz"
   "version" "5.7.1"
 
+"semver@^6.3.0":
+  "integrity" "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="
+  "resolved" "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz"
+  "version" "6.3.1"
+
 "semver@^7.3.5", "semver@^7.3.7", "semver@^7.3.8":
   "integrity" "sha512-RgOxM8Mw+7Zus0+zcLEUn8+JfoLpj/huFTItQy2hsM4khuC1HYRDp0cU482Ewn/Fcy6bCjufD8vAj7voC66KQw=="
   "resolved" "https://registry.npmjs.org/semver/-/semver-7.4.0.tgz"
@@ -2760,6 +2770,32 @@
     "targz" "^1.0.1"
     "unzipper" "^0.10.14"
     "vscode-extension-tester-locators" "^3.5.1"
+
+"vscode-jsonrpc@^5.0.1":
+  "integrity" "sha512-JvONPptw3GAQGXlVV2utDcHx0BiY34FupW/kI6mZ5x06ER5DdPG/tXWMVHjTNULF5uKPOUUD0SaXg5QaubJL0A=="
+  "resolved" "https://registry.npmjs.org/vscode-jsonrpc/-/vscode-jsonrpc-5.0.1.tgz"
+  "version" "5.0.1"
+
+"vscode-languageclient@^6.1.4":
+  "integrity" "sha512-EUOU+bJu6axmt0RFNo3nrglQLPXMfanbYViJee3Fbn2VuQoX0ZOI4uTYhSRvYLP2vfwTP/juV62P/mksCdTZMA=="
+  "resolved" "https://registry.npmjs.org/vscode-languageclient/-/vscode-languageclient-6.1.4.tgz"
+  "version" "6.1.4"
+  dependencies:
+    "semver" "^6.3.0"
+    "vscode-languageserver-protocol" "3.15.3"
+
+"vscode-languageserver-protocol@3.15.3":
+  "integrity" "sha512-zrMuwHOAQRhjDSnflWdJG+O2ztMWss8GqUUB8dXLR/FPenwkiBNkMIJJYfSN6sgskvsF0rHAoBowNQfbyZnnvw=="
+  "resolved" "https://registry.npmjs.org/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.15.3.tgz"
+  "version" "3.15.3"
+  dependencies:
+    "vscode-jsonrpc" "^5.0.1"
+    "vscode-languageserver-types" "3.15.1"
+
+"vscode-languageserver-types@3.15.1":
+  "integrity" "sha512-+a9MPUQrNGRrGU630OGbYVQ+11iOIovjCkqxajPa9w57Sd5ruK8WQNsslzpa0x/QJqC8kRc2DUxWjIFwoNm4ZQ=="
+  "resolved" "https://registry.npmjs.org/vscode-languageserver-types/-/vscode-languageserver-types-3.15.1.tgz"
+  "version" "3.15.1"
 
 "web-streams-polyfill@^3.2.1":
   "integrity" "sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q=="
