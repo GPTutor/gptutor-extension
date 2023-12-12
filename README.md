@@ -120,13 +120,24 @@ This project is licensed under the MIT License. See the [License.txt](https://gi
 
 ## Paper Reference
 
-https://arxiv.org/abs/2305.01863
+Paper 1 introduce GPTutor: https://arxiv.org/abs/2305.01863
 
 ```
 @article{chen2023gptutor,
   title={GPTutor: a ChatGPT-powered programming tool for code explanation},
   author={Chen, Eason and Huang, Ray and Chen, Han-Shin and Tseng, Yuen-Hsien and Li, Liang-Yi},
   journal={arXiv preprint arXiv:2305.01863},
+  year={2023}
+}
+```
+
+Paper 2 that focus on customizable prompts: https://arxiv.org/abs/2310.13896
+
+```
+@article{chen2023gptutor,
+  title={GPTutor: an open-source AI pair programming tool alternative to Copilot},
+  author={Chen, Eason and Huang, Ray and Liang, Justa and Chen, Damien and Hung, Pierce},
+  journal={arXiv preprint arXiv:2310.13896},
   year={2023}
 }
 ```
