@@ -69,7 +69,6 @@ export async function getCurrentPromptV2(
     for (let i = 0; i < hints.length; i++) {
       const hint = hints[i];
       if (hint.kind === 2) {
-        console.log(lines[hint.position.line]);
         let line = lines[hint.position.line];
         if (hint.position.character <= line.length) {
           // Insert the hint value at the specified position in the line
@@ -83,11 +82,12 @@ export async function getCurrentPromptV2(
               hint.position.character + linesPrePadding[hint.position.line]
             ) +
             hint.label[0].value +
+            " " +
             line.substring(
               hint.position.character + linesPrePadding[hint.position.line]
             );
           lines[hint.position.line] = newLine;
-          linesPrePadding[hint.position.line] += hint.label[0].value.length;
+          linesPrePadding[hint.position.line] += hint.label[0].value.length + 1;
         } else {
           console.error("Invalid character position");
         }
