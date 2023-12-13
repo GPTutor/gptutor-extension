@@ -7,9 +7,19 @@ import { getCurrentPromptV2 } from "./getCurrentPromptV2";
 import { getModel, setModel } from "./model";
 import { askWithProxy } from "./proxy";
 import { process_prompt } from "./process_prompt";
+import axios from "axios";
 
 import * as fs from "fs";
 import * as path from "path";
+import { getPromptByQuery } from "./suiGPT/getPromptByQuery";
+
+interface SuiGptGetPromptApiResponse {
+  // Define the structure of your response here
+  // Example:
+  match_titles: string[];
+  top3_match_titles: string[];
+  top3_match: any; // Replace 'any' with a more specific type as needed
+}
 
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
@@ -349,39 +359,13 @@ export class GPTutor implements vscode.WebviewViewProvider {
           }
           return;
         case "ask-suigpt":
-          console.log(message.input);
           {
-            let chatPrompts: any = vscode.workspace
-              .getConfiguration("")
-              .get("GPTutor.promptsForInputBox");
-            let currentOption: any =
-              this.context.globalState.get("chatPromptsCurrentOption") || {};
-            let languageId =
-              vscode.window.activeTextEditor?.document.languageId ||
-              "javascript";
-            let specificLanguageOptions =
-              chatPrompts["specificLanguage"][languageId] || {};
-            let prompt =
-              specificLanguageOptions[currentOption[languageId]] ||
-              chatPrompts["global"][currentOption[languageId]] ||
-              chatPrompts.global.default;
-            prompt = prompt.prompt;
-            this.currentPrompt = await getCurrentPromptV2(
-              this.context,
-              this.cursorContext
-            );
-            let outputLanguage: string =
-              vscode.workspace
-                .getConfiguration("")
-                .get("GPTutor.outputLanguage") || "English";
-            prompt = process_prompt(
-              prompt,
-              this,
-              outputLanguage,
-              undefined,
-              message.input
-            );
+            let query: any = message.input;
+            let prompt = await getPromptByQuery(query);
+
             console.log(prompt);
+            // return;
+
             const activeEditor = vscode.window.activeTextEditor;
             if (!activeEditor) {
               return; // No open text editor
