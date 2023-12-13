@@ -361,6 +361,18 @@ export class GPTutor implements vscode.WebviewViewProvider {
         case "ask-suigpt":
           {
             let query: any = message.input;
+            if (query.length < 5) {
+              query =
+                "A fungible coin name and symbol is Eason that I can manage to airdrop by a list of whitelists";
+              this.view?.webview.postMessage({
+                type: "gptutor-set-prompt",
+                value: query,
+                showBtn: true,
+              });
+              vscode.window.showInformationMessage("Use Default Message");
+
+              return;
+            }
             let prompt = await getPromptByQuery(query);
 
             console.log(prompt);

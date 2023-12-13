@@ -387,8 +387,10 @@ function auto_grow(element) {
         var promptEle = document.getElementById("prompt-input");
         promptEle.value = message.value;
         auto_grow(promptEle);
-        let button = document.getElementById("ask-gptutor-div");
-        button.classList.add("hidden");
+        if (!message.showBtn) {
+          let button = document.getElementById("ask-gptutor-div");
+          button.classList.add("hidden");
+        }
         break;
       }
       case "gptutor-switch-to-set-key-panel": {
