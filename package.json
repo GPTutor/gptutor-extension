@@ -7,7 +7,7 @@
   },
   "description": "A VS Code extension for AI Pair Programming and Smart Contract Development.",
   "publisher": "gptutor",
-  "version": "1.1.0",
+  "version": "1.2.2",
   "engines": {
     "vscode": "^1.75.0"
   },
