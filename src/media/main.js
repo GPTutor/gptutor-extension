@@ -18,10 +18,15 @@ function auto_grow(element) {
 
   function askGPTutorBtnClick() {
     let textarea = document.getElementById("prompt-input");
-    // let input = textarea.value;
-    // let button = document.getElementById("ask-gptutor-button");
     vscode.postMessage({
       command: "ask-gptutor",
+      input: textarea.value,
+    });
+  }
+  function askSuiGPTBtnClick() {
+    let textarea = document.getElementById("prompt-input");
+    vscode.postMessage({
+      command: "ask-suigpt",
       input: textarea.value,
     });
   }
@@ -95,6 +100,11 @@ function auto_grow(element) {
       }
       textarea.addEventListener("input", handleTextareaChange);
       button.addEventListener("click", askGPTutorBtnClick);
+    }
+    {
+      let textarea = document.getElementById("prompt-input");
+      let button = document.getElementById("ask-suigpt-button");
+      button.addEventListener("click", askSuiGPTBtnClick);
     }
     {
       document.getElementById("set-openai-temperature").onclick = function () {

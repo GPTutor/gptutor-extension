@@ -8,6 +8,9 @@ import { getModel, setModel } from "./model";
 import { askWithProxy } from "./proxy";
 import { process_prompt } from "./process_prompt";
 
+import * as fs from "fs";
+import * as path from "path";
+
 function html(strings: TemplateStringsArray, ...values: any[]) {
   const parsedString = strings.reduce((acc, curr, index) => {
     // Concatenate the current string literal with its interpolated value
@@ -45,7 +48,8 @@ export class GPTutor implements vscode.WebviewViewProvider {
     prompt: any,
     model: any = undefined,
     from: any = "",
-    options: any = {}
+    options: any = {},
+    update_function: any = this.updateViewContent
   ) {
     this.currentMessageNum++;
     this.view?.webview.postMessage({
@@ -74,27 +78,21 @@ export class GPTutor implements vscode.WebviewViewProvider {
 
     try {
       let currentMessageNumber = this.currentMessageNum;
-      // this.updateViewContent(text, text, {
-      //   view: this.view,
-      //   currentMessageNumber,
-      //   gptutor,
-      //   ...options,
-      // });
-      // return;
+
       if (options.useProxy) {
         askWithProxy(
           "https://backend.vscode.gptutor.best/v1/stream",
           "credential",
           model,
           prompt,
-          this.updateViewContent, //
+          update_function, //
           { view: this.view, currentMessageNumber, gptutor, ...options }
         );
       } else {
         let completion: any = await this.openAiProvider.ask(
           model,
           prompt,
-          this.updateViewContent, //
+          update_function, //
           { view: this.view, currentMessageNumber, gptutor, ...options }
         );
         this.currentResponse = completion || "";
@@ -311,41 +309,113 @@ export class GPTutor implements vscode.WebviewViewProvider {
         }
         case "ask-gptutor":
           console.log(message.input);
-          let chatPrompts: any = vscode.workspace
-            .getConfiguration("")
-            .get("GPTutor.promptsForInputBox");
-          let currentOption: any =
-            this.context.globalState.get("chatPromptsCurrentOption") || {};
-
-          let languageId =
-            vscode.window.activeTextEditor?.document.languageId || "javascript";
-          let specificLanguageOptions =
-            chatPrompts["specificLanguage"][languageId] || {};
-          let prompt =
-            specificLanguageOptions[currentOption[languageId]] ||
-            chatPrompts["global"][currentOption[languageId]] ||
-            chatPrompts.global.default;
-          prompt = prompt.prompt;
-          this.currentPrompt = await getCurrentPromptV2(
-            this.context,
-            this.cursorContext
-          );
-          let outputLanguage: string =
-            vscode.workspace
+          {
+            let chatPrompts: any = vscode.workspace
               .getConfiguration("")
-              .get("GPTutor.outputLanguage") || "English";
-          prompt = process_prompt(
-            prompt,
-            this,
-            outputLanguage,
-            undefined,
-            message.input
-          );
-          console.log(prompt);
-          this.runChatGPT(prompt, "", "chatInput", {
-            prefix: "",
-            postfix: "",
-          });
+              .get("GPTutor.promptsForInputBox");
+            let currentOption: any =
+              this.context.globalState.get("chatPromptsCurrentOption") || {};
+
+            let languageId =
+              vscode.window.activeTextEditor?.document.languageId ||
+              "javascript";
+            let specificLanguageOptions =
+              chatPrompts["specificLanguage"][languageId] || {};
+            let prompt =
+              specificLanguageOptions[currentOption[languageId]] ||
+              chatPrompts["global"][currentOption[languageId]] ||
+              chatPrompts.global.default;
+            prompt = prompt.prompt;
+            this.currentPrompt = await getCurrentPromptV2(
+              this.context,
+              this.cursorContext
+            );
+            let outputLanguage: string =
+              vscode.workspace
+                .getConfiguration("")
+                .get("GPTutor.outputLanguage") || "English";
+            prompt = process_prompt(
+              prompt,
+              this,
+              outputLanguage,
+              undefined,
+              message.input
+            );
+            console.log(prompt);
+            this.runChatGPT(prompt, "", "chatInput", {
+              prefix: "",
+              postfix: "",
+            });
+          }
+          return;
+        case "ask-suigpt":
+          console.log(message.input);
+          {
+            let chatPrompts: any = vscode.workspace
+              .getConfiguration("")
+              .get("GPTutor.promptsForInputBox");
+            let currentOption: any =
+              this.context.globalState.get("chatPromptsCurrentOption") || {};
+            let languageId =
+              vscode.window.activeTextEditor?.document.languageId ||
+              "javascript";
+            let specificLanguageOptions =
+              chatPrompts["specificLanguage"][languageId] || {};
+            let prompt =
+              specificLanguageOptions[currentOption[languageId]] ||
+              chatPrompts["global"][currentOption[languageId]] ||
+              chatPrompts.global.default;
+            prompt = prompt.prompt;
+            this.currentPrompt = await getCurrentPromptV2(
+              this.context,
+              this.cursorContext
+            );
+            let outputLanguage: string =
+              vscode.workspace
+                .getConfiguration("")
+                .get("GPTutor.outputLanguage") || "English";
+            prompt = process_prompt(
+              prompt,
+              this,
+              outputLanguage,
+              undefined,
+              message.input
+            );
+            console.log(prompt);
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+              return; // No open text editor
+            }
+
+            const activeFilePath = activeEditor.document.uri.fsPath;
+            const directoryPath = path.dirname(activeFilePath);
+            const newFilePath = path.join(directoryPath, "test.move");
+
+            try {
+              fs.writeFileSync(newFilePath, "// Generated by SuiGPT\n");
+              const newFileUri = vscode.Uri.file(newFilePath);
+              const document = await vscode.workspace.openTextDocument(
+                newFileUri
+              );
+              const editor = await vscode.window.showTextDocument(document);
+
+              await this.runChatGPT(
+                prompt,
+                "",
+                "chatInput",
+                {
+                  prefix: "",
+                  postfix: "",
+                  editor: editor,
+                },
+                this.insertToActiveEditor
+              );
+            } catch (err) {
+              vscode.window.showErrorMessage(
+                `Error creating or writing to file: ${err}`
+              );
+            }
+          }
           return;
         case "changeLanguage":
           // this.context.globalState.update("language", message.language);
@@ -394,6 +464,31 @@ export class GPTutor implements vscode.WebviewViewProvider {
         value: prefix + total_text_so_far + postfix,
       });
     }
+  }
+  async insertToActiveEditor(
+    new_text: string,
+    total_text_so_far: string,
+    options: any
+  ) {
+    let editor = options.editor;
+    let document = editor.document;
+    const lastLine = document.lineAt(document.lineCount - 1);
+    const endOfDocument = lastLine.range.end;
+    await editor.edit((editBuilder: any) => {
+      // replace content to total_text_so_far
+      total_text_so_far = total_text_so_far.replace("```move", "```");
+      total_text_so_far = total_text_so_far.replace(
+        "```",
+        "// Generated by SuiGPT\n"
+      );
+      editBuilder.replace(
+        new vscode.Range(
+          new vscode.Position(0, 0),
+          new vscode.Position(document.lineCount, 0)
+        ),
+        total_text_so_far
+      );
+    });
   }
   public async active(mode: string, model: string = "") {
     this.currentPrompt = await getCurrentPromptV2(
@@ -747,6 +842,7 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   id="ask-gptutor-select-mode-button"
                   style="width: 50%;"
                 ></button>
+
                 <div
                   class="absolute right-0 mt-8 w-48 bg-stone-600 rounded-md shadow-lg hidden dropdown-menu overflow-auto z-10"
                   id="ask-gptutor-dropdown-menu"
@@ -759,9 +855,17 @@ export class GPTutor implements vscode.WebviewViewProvider {
                   ></ul>
                 </div>
               </div>
+              <button
+                class="text-white-500 text-sm mt-2 rounded-md border-stone-500 border hover:bg-stone-700 hover:text-white"
+                id="ask-suigpt-button"
+                style="width: 100%;"
+              >
+                Ask SuiGPT (Alpha)
+              </button>
             </div>
 
             <hr class="hr" />
+
             <div class="flex items-center">
               <div class="mr-auto relative text-left hidden">
                 <label>Answer: </label>
